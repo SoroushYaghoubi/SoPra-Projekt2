@@ -1,7 +1,7 @@
 package entity
 
 /**
- * Enum to distinguish between bonsai tile types
+ * Enum to distinguish between bonsai [TileType]s
  */
 enum class TileType {
     WOOD,

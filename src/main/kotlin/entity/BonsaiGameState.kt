@@ -3,18 +3,10 @@ package entity
 /**
  * The state of the game at a given moment
  *
- * preconditions
- * - list of [players] is not empty
- * - [currentPlayer] must be player from the player list
- * - [botSpeed] must be a positive int
- *
- * post conditions
- * - the game state reflects the current game state, including active player, position and state of cards, and goals
- *
  * @property currentPlayer Player from players list whose turn it is
  * @property players List of all players participating in the game. should have two to four players
  * @property botSpeed Speed at which the bot plays. must be a positive int
- * @property currentState Current phase of the game
+ * @property currentState Current state of the game
  * @property endGameCounter Tracks how many turn are left in the game, once the game end condition was met
  * @property zenDeck Deck of cards available for the game. empty till assigned cards at game start
  * @property faceUpCards Set of face-up cards available for selection during meditate. empty till assigned cards at game start

@@ -1,12 +1,12 @@
 package entity
 
 /**
- * Represents a bonsai tile, which has shape of a hexagon
+ * Represents a bonsai [Tile], which has shape of a hexagon
  *
  * @param q hexagonal coordinate
  * @param r hexagonal coordinate
  * @param s hexagonal coordinate
- * @param tileType is bonsai tile type
+ * @param tileType is bonsai [TileType]
  */
 
 data class Tile(var q : Int, var r : Int, val tileType: TileType) {

@@ -1,15 +1,8 @@
 package entity
 
 /**
- * A goal tile in the game, representing fought over objectives for [Player]s.
+ * A goal tile in the game, representing fought over objectives for [Player]s
  * No [Player] can have the same [GoalTile] as another [Player]
- *
- * preconditions
- * - [tier] must be 1, 2 or 3
- * - [score] must be a positive int
- *
- * post conditions
- * - [GoalTile] is created with a [goalTileType], [tier], and [score]
  *
  * @property goalTileType [GoalTileType], one of five options
  * @property tier Tier of the [GoalTile] can be 1,2 or 3
