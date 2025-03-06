@@ -1,3 +1,18 @@
 package entity
 
-data class BonsaiGame(val history: History)
+/**
+ * Game instance that manages the [BonsaiGameState] of a game and the saved states of the game
+ * that are saved in [History]
+ *
+ * @property history Stores [History] of game actions. `null` at start
+ * a [History] needs to be recorded at game start
+ */
+/*
+class BonsaiGame(val bonsaiGameState: BonsaiGameState?) {
+    val history: History? = null
+}
+ */
+
+class BonsaiGame() {
+    val history: History? = null
+}
