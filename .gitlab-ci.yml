@@ -1,0 +1,13 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp -r build/dokka/html/* public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
