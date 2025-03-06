@@ -1,5 +1,6 @@
 package entity
 
-data class History(var currentPosition : Int){
-    val gameStates = mutableListOf<BonsaiGameState>()
+class History {
+    var currentPosition = 0
+    val gameStates            = mutableListOf<BonsaiGameState>()
 }

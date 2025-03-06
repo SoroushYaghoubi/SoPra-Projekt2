@@ -1,3 +1,5 @@
 package entity
 
-data class BonsaiGame(val history: History)
+class BonsaiGame() {
+    val history: History? = null
+}
