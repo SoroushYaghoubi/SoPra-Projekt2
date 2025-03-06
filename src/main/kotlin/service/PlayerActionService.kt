@@ -1,5 +1,7 @@
 package service
 
+import entity.*
+
 class PlayerActionService {
     /**
      * Restores the last action

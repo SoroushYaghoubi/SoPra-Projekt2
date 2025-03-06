@@ -1,5 +1,7 @@
 package service
 
+import entity.*
+
 class GameService {
     /**
      * Stats a new game with:
