@@ -1,4 +1,5 @@
 package service
+import entity.*
 
 class GameService {
     /**

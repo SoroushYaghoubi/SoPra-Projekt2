@@ -1,5 +1,9 @@
 package entity
 
+/**
+ * Enum to distinguish between states of the game
+ */
+
 enum class States {
     START_TURN,
     END_TURN,
