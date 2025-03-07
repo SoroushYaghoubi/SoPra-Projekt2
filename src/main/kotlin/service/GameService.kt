@@ -1,6 +1,7 @@
 package service
 
 import entity.*
+import gui.*
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
@@ -42,7 +43,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     fun continueGame(){}
 
     /**
-     * Switches the turn to the next player.
+     * Switches the turn to the next player. Assuming player list is in correct turn order
      *
      * preconditions:
      * - Current player has ended his turn.
@@ -50,7 +51,22 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * post conditions:
      * - The current player switched to the next player.
      */
-    fun switchPlayerTurn(){}
+    fun switchPlayerTurn() {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.bonsaiGameState.lastOrNull()
+        checkNotNull(gameState) { "No active game state." }
+
+        val currentIndex = gameState.players.indexOf(gameState.currentPlayer)
+
+        // get next player in the list, looping back to the first player at end of the list
+        val nextIndex = (currentIndex + 1) % gameState.players.size
+        gameState.currentPlayer = gameState.players[nextIndex]
+
+        // refreshes here and not in endTurn
+        onAllRefreshables { refreshAfterEndTurn() }
+    }
 
     /**
      * Shows the winner of the game.
@@ -83,6 +99,24 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      *
      * @throws IllegalStateException if zen deck is empty.
      */
-    fun refillBoard(){}
+    fun refillBoard() {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.bonsaiGameState.lastOrNull()
+        checkNotNull(gameState) { "No active game state." }
+
+        if (gameState.zenDeck.isEmpty()) {
+            throw IllegalStateException("Zen deck is empty.")
+        }
+
+        if (gameState.faceUpCards.size < 4) {
+            val newCard = gameState.zenDeck.removeAt(0)
+            // new card is added at index 3
+            gameState.faceUpCards.add(newCard)
+        }
+
+        onAllRefreshables { refreshAfterChooseCard() }
+    }
 
 }
