@@ -16,7 +16,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * post conditions:
      * - Last action(s) is(are) restored.
      *
-     * @throws IllegalStateException if no action was undone before. TODO or if there isn't a next game state.
+     * @throws IllegalStateException if there isn't a next game state.
      */
     fun redo(){}
 
@@ -62,7 +62,6 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * preconditions:
      * - The game has started and is currently running.
-     * TODO - player can place a wood tile on his bonsai tree.
      *
      * post conditions:
      * - updates that the current player has done an action during his turn.
@@ -227,3 +226,4 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      */
     fun discardSupplyTile(){}
 }
+
