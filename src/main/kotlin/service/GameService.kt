@@ -2,6 +2,8 @@ package service
 
 import entity.*
 import gui.*
+import java.io.File
+import kotlinx.serialization.json.Json
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
@@ -40,7 +42,16 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      *
      * @throws IllegalStateException if there is no previously saved game.
      */
-    fun continueGame(){}
+    fun continueGame(){
+        val savedGameState = File("./savedGameState.json")
+        if (!savedGameState.exists()){
+            throw IllegalStateException ("There is no saved gameState")
+        }
+        val jsonString = savedGameState.readText()
+        val game = Json.decodeFromString<BonsaiGame>(jsonString)
+        rootService.currentGame = game
+        onAllRefreshables { refreshAfterGameStart() }
+    }
 
     /**
      * Switches the turn to the next player. Assuming player list is in correct turn order

@@ -1,5 +1,6 @@
 package entity
 
+import kotlinx.serialization.Serializable
 /**
  * This class represents a human or non-human [Player] for this game
  * and stores all the players assets and actions
@@ -19,6 +20,7 @@ package entity
  * @property hasPlayed signifies if the player has taken his turn
  */
 
+@Serializable
 data class Player(val name : String ,
                   val playerType: PlayerType,
                   val isLocal: Boolean)

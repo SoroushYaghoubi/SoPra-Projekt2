@@ -1,6 +1,9 @@
 package service
 
 import entity.*
+import kotlinx.serialization.json.Json
+import java.io.File
+
 
 /**
  * The service layer class which contains the player's action functions.
@@ -128,7 +131,14 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if there is no existing game.
      */
-    fun saveGame(){}
+    fun saveGame(){
+        val game = checkNotNull(rootService.currentGame)
+        if (!game.bonsaiGameState.last().currentPlayer.isLocal){
+            throw IllegalStateException("Can only be saved if played local")
+        }
+        val json = Json.encodeToString(game)
+        File("./savedGameState.json").writeText(json)
+    }
 
     /**
      * Checks if a bonsai tile can be played based on the symbols shown on

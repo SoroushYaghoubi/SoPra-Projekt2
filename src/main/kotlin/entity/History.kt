@@ -1,5 +1,6 @@
 package entity
 
+import kotlinx.serialization.Serializable
 /**
  * Represents the history of game states in a Bonsai game.
  *
@@ -9,6 +10,7 @@ package entity
  * @property currentPosition The current position in the history .
  * @property gameStates A list of all game states that have been recorded in the history.
  */
+@Serializable
 class History {
     var currentPosition = 0
     val gameStates            = mutableListOf<BonsaiGameState>()
