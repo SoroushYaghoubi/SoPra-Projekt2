@@ -16,7 +16,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * post conditions:
      * - Last action(s) is(are) restored.
      *
-     * @throws IllegalStateException if no action was undone before. TODO or if there isn't a next game state.
+     * @throws IllegalStateException if there isn't a next game state.
      */
     fun redo(){}
 
@@ -62,7 +62,6 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * preconditions:
      * - The game has started and is currently running.
-     * TODO - player can place a wood tile on his bonsai tree.
      *
      * post conditions:
      * - updates that the current player has done an action during his turn.
@@ -143,7 +142,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @return true if bonsai tile can be placed.
      * @throws IllegalArgumentException if player has no bonsai tiles to place.
      */
-    fun canPlayTile(tile: Tile): Boolean{}
+    fun canPlayTile(tile: Tile): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
 
     /**
      * Checks if a bonsai tile can be played based on the game rules.
@@ -160,14 +159,14 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @throws IllegalArgumentException if player has no bonsai tiles to place.
      * @throws IllegalArgumentException if bonsai tile is played in invalid position.
      */
-    fun canPlayTile(tile: Tile, tilePosition: Pair<Int,Int>): Boolean{}
+    fun canPlayTile(tile: Tile, tilePosition: Pair<Int,Int>): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
 
     /**
      * Checks if player can claim a goal tile.
      *
      * @return true if player reached conditions to claim a goal tile.
      */
-    fun canClaimGoalTile(): Boolean{}
+    fun canClaimGoalTile(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
 
     /**
      * Player claims or renounces goal tile.
@@ -192,7 +191,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @return true if redo is available, otherwise false.
      */
-    fun canRedo(): Boolean{}
+    fun canRedo(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
 
     /**
      * Checks if player can undo his turn.
@@ -202,7 +201,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @return true if undo is available, otherwise false.
      */
-    fun canUndo(): Boolean{}
+    fun canUndo(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
 
     /**
      * Checks if player has played an action before ending his turn.
@@ -212,7 +211,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      *  @return true if player can end his turn.
      */
-    fun canEndTurn(): Boolean{}
+    fun canEndTurn(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
 
     /**
      * Discards tile(s) from supply if the personal capacity limit has been exceeded.
@@ -227,3 +226,4 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      */
     fun discardSupplyTile(){}
 }
+

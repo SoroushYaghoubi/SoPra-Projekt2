@@ -82,6 +82,10 @@ tasks.dokkaHtml.configure {
     outputDirectory.set(projectDir.resolve("public/dokka"))
 }
 
+tasks.dokkaGfm.configure {
+    outputDirectory.set(projectDir.resolve("public/dokka"))
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
