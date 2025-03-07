@@ -1,5 +1,7 @@
 package entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * The state of the game at a given moment
  *
@@ -16,6 +18,7 @@ package entity
  * @throws IllegalArgumentException If [botSpeed] is negative
  */
 
+@Serializable
 data class BonsaiGameState(var currentPlayer : Player ,
                            val players: MutableList<Player>,
                            val botSpeed : Int ,

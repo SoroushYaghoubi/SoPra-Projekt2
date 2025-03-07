@@ -1,6 +1,6 @@
 package entity
 
-
+import kotlinx.serialization.Serializable
 /**
  * general card in the game
  *
@@ -9,5 +9,5 @@ package entity
  *
  * @throws IllegalArgumentException If [id] is negative or not an int
  */
-
+@Serializable
 abstract class Card(val id : Int, val cardType: CardType)
