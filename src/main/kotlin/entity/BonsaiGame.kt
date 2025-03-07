@@ -5,7 +5,7 @@ package entity
  * that are saved in [History]
  *
  * @property history Stores [History] of game actions. `null` at start
- * a [History] needs to be recorded at game start
+ * the [History] needs to be recorded at game start
  */
 
 class BonsaiGame() {
