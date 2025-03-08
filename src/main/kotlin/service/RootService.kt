@@ -10,11 +10,11 @@ import gui.Refreshable
  */
 class RootService {
 
-    private val playerActionService = PlayerActionService(this)
-    private val gameService = GameService(this)
+    val playerActionService = PlayerActionService(this)
+    val gameService = GameService(this)
 
     /** current active Game, that could be Null if the game hasn't started yet*/
-    var currentGame : BonsaiGame? = null
+    var currentGame: BonsaiGame? = null
 
     /**
      * Adds the provided [newRefreshable] to all services connected
