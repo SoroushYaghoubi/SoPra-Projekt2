@@ -4,11 +4,10 @@ import entity.*
 import kotlinx.serialization.json.Json
 import java.io.File
 
-
 /**
  * The service layer class which contains the player's action functions.
  */
-class PlayerActionService (private val rootService: RootService) : AbstractRefreshingService() {
+class PlayerActionService(private val rootService: RootService) : AbstractRefreshingService() {
     /**
      * Restores the last action.
      *
@@ -21,7 +20,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if there isn't a next game state.
      */
-    fun redo(){}
+    fun redo() {}
 
     /**
      * Reverses the last action(s).
@@ -34,7 +33,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if no previous action exists (game has just started).
      */
-    fun undo(){}
+    fun undo() {}
 
     /**
      * Meditate to receive a zen card:
@@ -58,7 +57,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @param cardPosition The position of the selected zen card.
      * @throws IllegalStateException if player has already done an action during his current turn.
      */
-    fun meditate(cardPosition: Int){}
+    fun meditate(cardPosition: Int) {}
 
     /**
      * Action to place a tile from personal supply on bonsai tree.
@@ -72,7 +71,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if player has already done an action during his current turn.
      */
-    fun cultivate(){}
+    fun cultivate() {}
 
     /**
      * Place a bonsai tile to players bonsai tree.
@@ -89,7 +88,17 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @throws IllegalArgumentException if the bonsai tile is not playable.
      * @throws IllegalArgumentException if the tile position is invalid.
      */
-    fun playTile(tile: Tile, tilePosition: Pair<Int,Int>){}
+    fun playTile(tile: Tile, tilePosition: Pair<Int, Int>) {
+        if (!canPlayTile(tile, tilePosition)){
+            throw IllegalArgumentException("Tile can not be played")
+        }
+        val currentPlayer = getCurrentPlayer()
+        currentPlayer.bonsaiTree[tilePosition] = tile
+        currentPlayer.personalSupply.remove(tile)
+        currentPlayer.playableTilesCopy.remove(tile.tileType)
+        // TODO: check if player has achieved a goal tile
+        onAllRefreshables { refreshAfterPlayTile() }
+    }
 
     /**
      * Ends the turn of the current player.
@@ -102,7 +111,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if the current player has not played an action yet.
      */
-    fun endTurn(){
+    fun endTurn() {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -112,12 +121,12 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
         require(canEndTurn())
 
         // Trigger end game by counting the turn of player
-        if (gameState.zenDeck.isEmpty()){
+        if (gameState.zenDeck.isEmpty()) {
             gameState.endGameCounter++
         }
 
         // When the counter = the number of players -> all players finish their last turn
-        if(gameState.endGameCounter == gameState.players.size){
+        if (gameState.endGameCounter == gameState.players.size) {
             rootService.gameService.showWinner()
         } else {
             rootService.gameService.calculateScore()
@@ -142,7 +151,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @param tilePosition The position of the bonsai tile to be removed from.
      * @throws IllegalStateException if there is no tile (bonsai tree is empty).
      */
-    fun removeFromTree(tile: Tile, tilePosition: Pair<Int,Int>){}
+    fun removeFromTree(tile: Tile, tilePosition: Pair<Int, Int>) {}
 
     /**
      * Saves the current game state.
@@ -155,9 +164,9 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if there is no existing game.
      */
-    fun saveGame(){
+    fun saveGame() {
         val game = checkNotNull(rootService.currentGame)
-        if (!game.bonsaiGameState.last().currentPlayer.isLocal){
+        if (!game.bonsaiGameState.last().currentPlayer.isLocal) {
             throw IllegalStateException("Can only be saved if played local")
         }
         val json = Json.encodeToString(game)
@@ -176,7 +185,13 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @return true if bonsai tile can be placed.
      * @throws IllegalArgumentException if player has no bonsai tiles to place.
      */
-    fun canPlayTile(tile: Tile): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
+    fun canPlayTile(tile: Tile): Boolean {
+        val currentPlayer = getCurrentPlayer()
+        if (!currentPlayer.personalSupply.contains(tile)) {
+            throw IllegalArgumentException("Player does not have this bonsai tile in hand")
+        }
+        return currentPlayer.playableTilesCopy.contains(tile.tileType)
+    }
 
     /**
      * Checks if a bonsai tile can be played based on the game rules.
@@ -193,14 +208,60 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @throws IllegalArgumentException if player has no bonsai tiles to place.
      * @throws IllegalArgumentException if bonsai tile is played in invalid position.
      */
-    fun canPlayTile(tile: Tile, tilePosition: Pair<Int,Int>): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
+    fun canPlayTile(tile: Tile, tilePosition: Pair<Int, Int>): Boolean {
+        if (!canPlayTile(tile)){
+            return false
+        }
+        val currentPlayer = getCurrentPlayer()
+        if (currentPlayer.bonsaiTree.containsKey(tilePosition)) {
+            throw IllegalArgumentException("Position is already occupied")
+        }
+        val tree = currentPlayer.bonsaiTree
+        val q = tilePosition.first
+        val r = tilePosition.second
+        val neighbourTiles = mutableListOf(
+            tree.getOrDefault(Pair(q + 1, r), null)?.tileType,
+            tree.getOrDefault(Pair(q, r + 1), null)?.tileType,
+            tree.getOrDefault(Pair(q - 1, r + 1), null)?.tileType,
+            tree.getOrDefault(Pair(q - 1, r), null)?.tileType,
+            tree.getOrDefault(Pair(q, r - 1), null)?.tileType,
+            tree.getOrDefault(Pair(q + 1, r - 1), null)?.tileType,
+        ).filterNotNull()
+        if (neighbourTiles.isEmpty()){
+            throw IllegalArgumentException("There are no adjacent cards")
+        }
+        if (tile.tileType == TileType.WOOD){
+            return neighbourTiles.contains(TileType.WOOD)
+        }
+        if (tile.tileType == TileType.LEAF){
+            return neighbourTiles.contains(TileType.WOOD)
+        }
+        if (tile.tileType == TileType.FLOWER){
+            return neighbourTiles.contains(TileType.LEAF)
+        }
+        if (tile.tileType == TileType.FRUIT){
+            if (neighbourTiles.first() == TileType.LEAF && neighbourTiles.last() == TileType.LEAF){
+                return true
+            }
+            for (i in 0..<neighbourTiles.size - 1){
+                val currentTile = neighbourTiles[i]
+                val nextTile = neighbourTiles[i + 1]
+                if (currentTile == TileType.LEAF && nextTile == TileType.LEAF){
+                    return true
+                }
+            }
+        }
+        return false
+    }
 
     /**
      * Checks if player can claim a goal tile.
      *
      * @return true if player reached conditions to claim a goal tile.
      */
-    fun canClaimGoalTile(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
+    fun canClaimGoalTile(): Boolean {
+        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+    }
 
     /**
      * Player claims or renounces goal tile.
@@ -215,7 +276,7 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      * @param claim true if player accepts goal tile, otherwise false.
      *
      */
-    fun claimOrRenounceGoal(claim: Boolean){}
+    fun claimOrRenounceGoal(claim: Boolean) {}
 
     /**
      * Checks if player can redo his turn.
@@ -225,7 +286,9 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @return true if redo is available, otherwise false.
      */
-    fun canRedo(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
+    fun canRedo(): Boolean {
+        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+    }
 
     /**
      * Checks if player can undo his turn.
@@ -235,7 +298,9 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @return true if undo is available, otherwise false.
      */
-    fun canUndo(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
+    fun canUndo(): Boolean {
+        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+    }
 
     /**
      * Checks if player has played an action before ending his turn.
@@ -245,7 +310,9 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      *  @return true if player can end his turn.
      */
-    fun canEndTurn(): Boolean{ TODO("just remove this todo. this is only for kotlin compiler to stop complaining") }
+    fun canEndTurn(): Boolean {
+        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+    }
 
     /**
      * Discards tile(s) from supply if the personal capacity limit has been exceeded.
@@ -258,6 +325,10 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if personal supply is not over capacity limit.
      */
-    fun discardSupplyTile(){}
+    fun discardSupplyTile() {}
+
+    private fun getCurrentPlayer(): Player {
+        return checkNotNull(rootService.currentGame?.bonsaiGameState?.last()?.currentPlayer)
+    }
 }
 
