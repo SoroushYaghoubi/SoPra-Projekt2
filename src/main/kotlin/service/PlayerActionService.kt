@@ -102,7 +102,31 @@ class PlayerActionService (private val rootService: RootService) : AbstractRefre
      *
      * @throws IllegalStateException if the current player has not played an action yet.
      */
-    fun endTurn(){}
+    fun endTurn(){
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.bonsaiGameState.lastOrNull()
+        checkNotNull(gameState) { "No active game state." }
+
+        require(canEndTurn())
+
+        // Trigger end game by counting the turn of player
+        if (gameState.zenDeck.isEmpty()){
+            gameState.endGameCounter++
+        }
+
+        // When the counter = the number of players -> all players finish their last turn
+        if(gameState.endGameCounter == gameState.players.size){
+            rootService.gameService.showWinner()
+        } else {
+            rootService.gameService.calculateScore()
+            rootService.gameService.switchPlayerTurn()
+        }
+
+        // Update history -> later
+
+    }
 
     /**
      * Removes bonsai tile from players bonsai tree.
