@@ -126,13 +126,55 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      *
      * preconditions:
      * - Zen deck is empty and all players played their last action.
-     *
+     * NOTE by Giang: this is already checked in endTurn of PlayerActionService
      * post conditions:
      * - The winner is shown.
      *
      * @throws IllegalStateException if game isn't over yet.
      */
-    fun showWinner(){}
+    fun showWinner(){
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.bonsaiGameState.lastOrNull()
+        checkNotNull(gameState) { "No active game state." }
+
+        // Get the winner's name using the index
+        gameState.players[getWinnerIndex()].name
+    }
+
+    // Help function to get the index of the winner
+    private fun getWinnerIndex(): Int {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+        val gameState = game.bonsaiGameState.lastOrNull()
+        checkNotNull(gameState) { "No active game state." }
+
+        val maxScore = gameState.players.maxOf { it.score }
+        val playerOrder: MutableList<Player> = mutableListOf()
+
+        // List of players as candidate for winner: those with highest score
+        val candidates = gameState.players.filter { it.score == maxScore }
+
+        // If only one has the highest score
+        if (candidates.size == 1) {
+            return gameState.players.indexOf(candidates[0])
+        }
+
+        // In case of a tie, find the candidate who is farthest from the starting player in the playOrder list
+        var farthestIndex = 0
+        var maxDistance = 0
+
+        // Checking the position of candidates in playerOrder, the player with the highest index is then the farthest
+        for (candidate in candidates) {
+            val candidateIndexInOrder = playerOrder.indexOf(candidate)
+            if (candidateIndexInOrder > maxDistance) {
+                maxDistance = candidateIndexInOrder
+                farthestIndex = gameState.players.indexOf(candidate)
+            }
+        }
+        return farthestIndex
+    }
 
     /**
      * Calculates the score of the current player.
