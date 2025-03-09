@@ -241,8 +241,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         if (gameState.faceUpCards.size < 4) {
             val newCard = gameState.zenDeck.removeAt(0)
-            // new card is added at index 3
-            gameState.faceUpCards.add(newCard)
+            gameState.faceUpCards.add( 0, newCard)
         }
 
         onAllRefreshables { refreshAfterChooseCard() }
