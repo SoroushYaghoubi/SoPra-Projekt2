@@ -98,7 +98,7 @@ class RefillBoardTest {
         val game = rootService.currentGame
         checkNotNull(game)
         val gameState = game.bonsaiGameState.last()
-        gameState.faceUpCards.removeAt(1)
+        gameState.faceUpCards.removeAt(2)
         rootService.gameService.refillBoard()
         assertEquals(5 , gameState.faceUpCards.first().id)
         assertEquals(4 , gameState.faceUpCards[1].id)
@@ -116,7 +116,7 @@ class RefillBoardTest {
         val game = rootService.currentGame
         checkNotNull(game)
         val gameState = game.bonsaiGameState.last()
-        gameState.faceUpCards.removeAt(1)
+        gameState.faceUpCards.removeAt(3)
         rootService.gameService.refillBoard()
         assertEquals(5 , gameState.faceUpCards.first().id)
         assertEquals(4 , gameState.faceUpCards[1].id)
