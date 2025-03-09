@@ -161,6 +161,20 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         gameState.players[getWinnerIndex()].name
     }
 
+    // Dennis implemented showWinner with a return value to test it
+    /*
+    fun showWinner(): String {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.bonsaiGameState.lastOrNull()
+        checkNotNull(gameState) { "No active game state." }
+
+        // Get the winner's name using the index and return it
+        return gameState.players[getWinnerIndex()].name
+    }
+    */
+
     /**
      * Help function to get the index of the winner
      */
