@@ -22,7 +22,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * post conditions:
      * - Game started.
      *
-     * @param players List of player names that are playing this game.
+     * @param playerOrder List of ordered players that are playing this game.
      * @param playerOrder A list of Players deciding the player order.
      * @param networkGame true if game is played online otherwise false.
      */
@@ -31,21 +31,18 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                      networkGame: Boolean ,
                      goalTilesEntries : MutableList<GoalTileType>
                      ){
-
-        check(rootService.currentGame == null) {"There is already a game running."}
+       // check required conditions
+       check(rootService.currentGame == null) {"There is already a game running."}
        require(playerOrder.size > 2) {"at least 2 Players"}
 
-        val players = playerOrder.map { player ->
-            Player(player.name, player.playerType, player.isLocal)
-        }.toMutableList()
-
-
-       val zenDeck = when (players.size){
+       // create the zenDeck depending on the number of players
+       val zenDeck = when (playerOrder.size){
             2-> create2PlayersZenDeck().shuffled().toMutableList()
             3-> create3PlayersZenDeck().shuffled().toMutableList()
             else -> create4PlayersZenDeck().shuffled().toMutableList()
         }
 
+        // put the first 4 cards face up
         val faceUpCards = mutableListOf<Card>()
         repeat(4) {
                 faceUpCards.add(zenDeck.removeAt(0))
@@ -53,12 +50,33 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         if (!networkGame) {
 
-            // a new game state at the start of the game
             val gameState = BonsaiGameState(currentPlayer = playerOrder.first(),
                 players = playerOrder,
                 1,
                 currentState = States.START_TURN)
+
+            // create the list of goalTiles
             gameState.goalTiles = createGoalTiles(goalTilesEntries , playerOrder.size)
+            // assign the created zenDeck to the zenDeck of the game
+            gameState.zenDeck = zenDeck
+            // assign the face-up cards list to the game face-up cards
+            gameState.faceUpCards = faceUpCards
+
+            // give each player the post Tiles depending on the order
+            gameState.players.forEachIndexed { index, player ->
+                val tiles = mutableListOf<TileType>()
+
+                if (index == 0) {
+                    tiles.add(TileType.WOOD)
+                } else {
+                    tiles.add(TileType.WOOD)
+                    tiles.add(TileType.LEAF)
+
+                    if (index >= 2) tiles.add(TileType.FLOWER)
+                    if (index >= 3) tiles.add(TileType.FRUIT)
+                }
+                player.personalSupply.addAll(tiles.map { Tile(null , null , it) })
+            }
 
             // add the new game state to the history
             val setHistory = History().apply { gameStates.add(gameState) }
@@ -143,7 +161,9 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         gameState.players[getWinnerIndex()].name
     }
 
-    // Help function to get the index of the winner
+    /**
+     * Help function to get the index of the winner
+     */
     private fun getWinnerIndex(): Int {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
@@ -299,7 +319,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     /**
      *
      */
-     private fun createGoalTiles(goalTilesTypesEntries : MutableList<GoalTileType> , playerSize: Int)
+      fun createGoalTiles(goalTilesTypesEntries : MutableList<GoalTileType> , playerSize: Int)
      : MutableList<MutableList<GoalTile>>  {
 
         val goalTiles : MutableList<MutableList<GoalTile>> = mutableListOf()
@@ -342,6 +362,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                 }
             }
         }
+
         if(playerSize==2){
             goalTiles.forEach {
                 goalTile -> run {
@@ -349,6 +370,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
             }
             }
         }
+        println("Goal Tiles" + goalTiles)
 
         return goalTiles
 
