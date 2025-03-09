@@ -13,4 +13,8 @@ import kotlinx.serialization.Serializable
 data class Tile(val q: Int? = null, val r: Int? = null, val tileType: TileType) {
     val s: Int?
         get() = if (q != null && r != null) (-q - r) else null
+
+    override fun toString(): String {
+        return "Tile Type: ${this.tileType}"
+    }
 }
