@@ -3,9 +3,16 @@ package service
 import kotlin.test.*
 import entity.*
 
-class PlayerActionServiceTest {
+/**
+ * Tests if function continueGame works correctly, by checking if all gameStates are saved correct.
+ * Saved game should be the same as the gameState played with
+ */
+class ContinueGameTest {
+    /**
+     * Tests if saveGame and continueGame works correctly
+     */
     @Test
-    fun testSaveGame() {
+    fun testContinueGame() {
 
         val rootService = RootService()
         val gameService = GameService(rootService)
@@ -13,8 +20,8 @@ class PlayerActionServiceTest {
         val game = BonsaiGame()
         val player1 = Player("Tom", PlayerType.HUMAN, true)
         val player2 = Player("Tomy", PlayerType.HUMAN, true)
-        val gameState1 = BonsaiGameState(player1, mutableListOf(player1,player2), 2, States.MEDITATE)
-        val gameState2 = BonsaiGameState(player2, mutableListOf(player1,player2), 2, States.CULTIVATE)
+        val gameState1 = BonsaiGameState(player1, mutableListOf(player1, player2), 2, States.MEDITATE)
+        val gameState2 = BonsaiGameState(player2, mutableListOf(player1, player2), 2, States.CULTIVATE)
         val history = History()
         history.currentPosition = 1
         history.gameStates.add(gameState1)
@@ -32,7 +39,6 @@ class PlayerActionServiceTest {
         assertEquals(game.bonsaiGameState.last(), loadedGame.bonsaiGameState.last())
         assertEquals(game.history?.currentPosition, loadedGame.history?.currentPosition)
         assertEquals(game.history?.gameStates, loadedGame.history?.gameStates)
-
     }
 
 }
