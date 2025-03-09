@@ -84,7 +84,6 @@ class StartNewGameTest {
         val game = checkNotNull(rootService.currentGame)
         val bonsaiGameState = game.bonsaiGameState.last()
         assertEquals(4, bonsaiGameState.faceUpCards.size)
-        // TODO : Check if its work now
     }
 
 }
