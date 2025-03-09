@@ -5,56 +5,56 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after the game has started
      */
-    fun refreshAfterGameStart()
+    fun refreshAfterGameStart(){}
 
     /**
      * perform refreshes that are necessary after the game has ended
      */
-    fun refreshAfterGameEnd()
+    fun refreshAfterGameEnd(){}
 
     /**
      * perform refreshes that are necessary after a player has played a tile
      */
-    fun refreshAfterPlayTile()
+    fun refreshAfterPlayTile(){}
 
     /**
      * perform refreshes that are necessary after a player has meditated
      */
-    fun refreshAfterMeditate()
+    fun refreshAfterMeditate(){}
 
     /**
      * perform refreshes that are necessary after a player has chosen a card
      */
-    fun refreshAfterChooseCard()
+    fun refreshAfterChooseCard(){}
 
     /**
      * perform refreshes that are necessary after a player has chosen a tile
      */
-    fun refreshAfterChooseTile()
+    fun refreshAfterChooseTile(){}
 
     /**
      * perform refreshes that are necessary after a player has ended his turn
      */
-    fun refreshAfterEndTurn()
+    fun refreshAfterEndTurn(){}
 
     /**
      * perform refreshes that are necessary after a player has discarded tile
      */
-    fun refreshAfterDiscardTile()
+    fun refreshAfterDiscardTile(){}
 
     /**
      * perform refreshes that are necessary after a player has removed tiles from his tree
      */
-    fun refreshAfterRemoveFromTree()
+    fun refreshAfterRemoveFromTree(){}
 
     /**
      * perform refreshes that are necessary a player has claimed a goal tile
      */
-    fun refreshAfterClaimGoal()
+    fun refreshAfterClaimGoal(){}
 
     /**
      * perform refreshes that are necessary after a player has redone or undone his turn
      */
-    fun refreshAfterRedoOrUndo()
+    fun refreshAfterRedoOrUndo(){}
 
 }
