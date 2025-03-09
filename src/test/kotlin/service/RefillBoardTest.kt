@@ -118,11 +118,12 @@ class RefillBoardTest {
         val gameState = game.bonsaiGameState.last()
         gameState.faceUpCards.removeAt(3)
         rootService.gameService.refillBoard()
+        assertEquals( CardType.PARCHMENTCARD, gameState.zenDeck.first().cardType)
         assertEquals(5 , gameState.faceUpCards.first().id)
         assertEquals(4 , gameState.faceUpCards[1].id)
         assertEquals(7 , gameState.faceUpCards[2].id)
         assertEquals(8 , gameState.faceUpCards[3].id)
-        assertEquals( CardType.PARCHMENTCARD, gameState.zenDeck.first().cardType)
+
     }
 
     /**
