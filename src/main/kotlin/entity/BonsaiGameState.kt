@@ -24,7 +24,7 @@ data class BonsaiGameState(var currentPlayer : Player ,
                            val botSpeed : Int ,
                            var currentState : States){
     var endGameCounter = 0
-    val zenDeck: MutableList<Card> = mutableListOf()
-    val faceUpCards : MutableList<Card> = mutableListOf()
+    var zenDeck: MutableList<Card> = mutableListOf()
+    var faceUpCards : MutableList<Card> = mutableListOf()
     var goalTiles : MutableList<MutableList<GoalTile>> = mutableListOf()
 }

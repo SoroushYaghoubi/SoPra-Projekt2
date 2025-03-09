@@ -38,7 +38,6 @@ class StartNewGameTest {
         val rootService = setUpGame()
         val game = rootService.currentGame
         assertNotNull(game)
-        // startNewGame fails if there are only 2 players
     }
 
     /**
@@ -85,7 +84,7 @@ class StartNewGameTest {
         val game = checkNotNull(rootService.currentGame)
         val bonsaiGameState = game.bonsaiGameState.last()
         assertEquals(4, bonsaiGameState.faceUpCards.size)
-        // test fails there are 0 cards in faceUpCards
+        // TODO : Check if its work now
     }
 
 }

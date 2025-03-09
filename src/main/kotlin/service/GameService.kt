@@ -33,7 +33,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                      ){
        // check required conditions
        check(rootService.currentGame == null) {"There is already a game running."}
-       require(playerOrder.size > 2) {"at least 2 Players"}
+       require(playerOrder.size >=2 ) {"at least 2 Players"}
 
        // create the zenDeck depending on the number of players
        val zenDeck = when (playerOrder.size){
