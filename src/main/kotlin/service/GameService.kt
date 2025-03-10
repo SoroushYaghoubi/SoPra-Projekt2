@@ -80,7 +80,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val setHistory = History().apply { gameStates.add(gameState) }
 
         val game = BonsaiGame().apply { history = setHistory
-            bonsaiGameState.add(gameState)}
+            currentBonsaiGameState = gameState}
 
         rootService.currentGame = game
 
@@ -105,7 +105,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         val currentIndex = gameState.players.indexOf(gameState.currentPlayer)
@@ -134,7 +134,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         // Get the winner's name using the index
@@ -161,7 +161,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     private fun getWinnerIndex(): Int {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         val maxScore = gameState.players.maxOf { it.score }
@@ -212,7 +212,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         if (gameState.zenDeck.isEmpty()) {
