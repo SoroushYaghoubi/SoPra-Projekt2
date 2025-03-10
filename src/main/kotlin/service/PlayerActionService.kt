@@ -165,8 +165,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @throws IllegalStateException if there is no existing game.
      */
     fun saveGame() {
-        val game = checkNotNull(rootService.currentGame)
-        if (!game.bonsaiGameState.last().currentPlayer.isLocal) {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+        val currentPlayer = checkNotNull(game.currentBonsaiGameState?.currentPlayer)
+        if (!currentPlayer.isLocal) {
             throw IllegalStateException("Can only be saved if played local")
         }
         val json = Json.encodeToString(game)
@@ -328,7 +330,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
     fun discardSupplyTile() {}
 
     private fun getCurrentPlayer(): Player {
-        return checkNotNull(rootService.currentGame?.bonsaiGameState?.last()?.currentPlayer)
+        return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
     }
 }
 

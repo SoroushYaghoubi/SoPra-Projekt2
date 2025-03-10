@@ -12,5 +12,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class BonsaiGame() {
     var history: History? = null
-    val bonsaiGameState: MutableList<BonsaiGameState> = mutableListOf()
+    var currentBonsaiGameState: BonsaiGameState? = null
 }
