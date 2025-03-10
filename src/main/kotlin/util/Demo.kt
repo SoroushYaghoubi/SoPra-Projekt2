@@ -33,6 +33,6 @@ fun main() {
     println(sideNode.next())
 
     println("Primitive axial vector manipulation relative to base point (0, 0): ")
-    println("(-1 to 0) rotateClockwiseAround        (0 to 0): ${(-1 to 0) rotateClockwiseAround (0 to 0)}")
-    println("(0 to -1) rotateCounterClockwiseAround (0 to 0): ${(0 to -1) rotateCounterClockwiseAround (0 to 0)}")
+    println("(-1 to 0) rotating clockwise around         (0 to 0): ${(-1 to 0) rotateClockwiseAround (0 to 0)}")
+    println("(0 to -1) rotating counter-clockwise around (0 to 0): ${(0 to -1) rotateCounterClockwiseAround (0 to 0)}")
 }
