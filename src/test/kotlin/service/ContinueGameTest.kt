@@ -2,7 +2,6 @@ package service
 
 import kotlin.test.*
 import entity.*
-import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.assertThrows
 
 /**
@@ -22,6 +21,7 @@ class ContinueGameTest {
 
         assertEquals("There is no saved gameState", exception.message)
     }
+
     /**
      * Tests if saveGame and continueGame works correctly
      */
@@ -40,8 +40,6 @@ class ContinueGameTest {
         history.currentPosition = 1
         history.gameStates.add(gameState1)
         history.gameStates.add(gameState2)
-        game.bonsaiGameState.add(gameState1)
-        game.bonsaiGameState.add(gameState2)
         game.history = history
         rootService.currentGame = game
         historyService.saveGame()
@@ -49,8 +47,6 @@ class ContinueGameTest {
         historyService.continueGame()
         val loadedGame = rootService.currentGame
         assertNotNull(loadedGame)
-        assertEquals(game.bonsaiGameState.first(), loadedGame.bonsaiGameState.first())
-        assertEquals(game.bonsaiGameState.last(), loadedGame.bonsaiGameState.last())
         assertEquals(game.history?.currentPosition, loadedGame.history?.currentPosition)
         assertEquals(game.history?.gameStates, loadedGame.history?.gameStates)
     }

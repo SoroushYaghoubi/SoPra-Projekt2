@@ -1,6 +1,7 @@
 package service
 
 import entity.BonsaiGame
+import entity.Player
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -46,7 +47,8 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
      */
     fun saveGame() {
         val game = checkNotNull(rootService.currentGame)
-        if (!game.bonsaiGameState.last().currentPlayer.isLocal) {
+        val currentPlayer = getCurrentPlayer()
+        if (!currentPlayer.isLocal) {
             throw IllegalStateException("Can only be saved if played local")
         }
         val json = Json.encodeToString(game)
@@ -97,5 +99,10 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
         val game = Json.decodeFromString<BonsaiGame>(jsonString)
         rootService.currentGame = game
         onAllRefreshables { refreshAfterGameStart() }
+    }
+
+    private fun getCurrentPlayer(): Player {
+        val currentGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
+        return currentGameState.currentPlayer
     }
 }
