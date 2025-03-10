@@ -147,7 +147,8 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * - Zen deck is empty and all players played their last action.
      * NOTE by Giang: this is already checked in endTurn of PlayerActionService
      * post conditions:
-     * - The winner is shown.
+     * - a refresh with the player order was used, where the winning player is at index 0,
+     * second place is at index 2 etc.
      *
      * @throws IllegalStateException if game isn't over yet.
      */
