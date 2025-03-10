@@ -89,7 +89,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         require(canEndTurn())
