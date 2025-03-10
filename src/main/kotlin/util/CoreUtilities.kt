@@ -3,6 +3,14 @@ package util
 import entity.Tile
 
 
+// some constants (non-primitives cannot be const todo: what to do?)
+val VECTOR_TOP_RIGHT        = (1 to -1)
+val VECTOR_RIGHT            = (1 to 0)
+val VECTOR_BOTTOM_RIGHT     = (0 to 1)
+val VECTOR_BOTTOM_LEFT      = (-1 to 1)
+val VECTOR_LEFT             = (-1 to 0)
+val VECTOR_TOP_LEFT         = (0 to -1)
+
 /**
  * Takes an axial coordinate as a parameter and acts like an iterator. It returns a generator that yields a tile around
  * the center one by one.
@@ -17,21 +25,24 @@ import entity.Tile
 infix fun MutableMap<Pair<Int, Int>, Tile>.circleAround(center: Pair<Int, Int>): Sequence<Tile?> = sequence {
     val (q, r) = center
 
-    val SIDE_VECTORS = listOf(
-        (1 to -1),  // Up-Right
-        (1 to 0),   // Right
-        (0 to 1),   // Down-Right
-        (-1 to 1),  // Down-Left
-        (-1 to  0), // Left
-        (0 to -1),  // Up-Left
+    val sideVectors = listOf(
+        VECTOR_TOP_RIGHT,
+        VECTOR_RIGHT,
+        VECTOR_BOTTOM_RIGHT,
+        VECTOR_BOTTOM_LEFT,
+        VECTOR_LEFT,
+        VECTOR_TOP_LEFT
     )
 
-    for ((dq, dr) in SIDE_VECTORS) {
+    for ((dq, dr) in sideVectors) {
         val coordinate = (q + dq) to (r + dr)
         yield(this@circleAround[coordinate])
     }
 }
 
+/**
+ * Wrapper for the [circleAround] function to iterate infinitely around a coordinate
+ */
 infix fun MutableMap<Pair<Int, Int>, Tile>.foreverCircleAround(center: Pair<Int, Int>): Sequence<Tile?> = sequence {
     while (true) {
         for (tile in this@foreverCircleAround circleAround center) {
@@ -39,3 +50,4 @@ infix fun MutableMap<Pair<Int, Int>, Tile>.foreverCircleAround(center: Pair<Int,
         }
     }
 }
+
