@@ -2,6 +2,7 @@ package service
 
 import kotlin.test.*
 import entity.*
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.assertThrows
 
 /**
@@ -12,6 +13,7 @@ class ContinueGameTest {
 
     @Test
     fun testContinueGameInvalid() {
+
         val rootService = RootService()
         val gameService = GameService(rootService)
         rootService.currentGame = null

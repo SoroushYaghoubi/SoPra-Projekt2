@@ -12,6 +12,7 @@ class RootService {
 
     val playerActionService = PlayerActionService(this)
     val gameService = GameService(this)
+    val networkService = NetworkService(this)
 
     /** current active Game, that could be Null if the game hasn't started yet*/
     var currentGame: BonsaiGame? = null
