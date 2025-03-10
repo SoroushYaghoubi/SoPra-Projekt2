@@ -3,6 +3,7 @@ package service
 import kotlin.test.*
 import entity.*
 import org.junit.jupiter.api.assertThrows
+import java.io.File
 
 /**
  * Tests if function continueGame works correctly, by checking if all gameStates are saved correct.
@@ -15,7 +16,10 @@ class ContinueGameTest {
 
         val rootService = RootService()
         val historyService = HistoryService(rootService)
-        rootService.currentGame = null
+        val savedGameState = File("./savedGameState.json")
+        if (savedGameState.exists()){
+            savedGameState.delete()
+        }
         val exception =
             assertThrows<IllegalStateException> { historyService.continueGame() }
 

@@ -80,7 +80,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val setHistory = History().apply { gameStates.add(gameState) }
 
         val game = BonsaiGame().apply { history = setHistory
-            currentBonsaiGameState = gameState}
+            bonsaiGameState.add(gameState)}
 
         rootService.currentGame = game
 
@@ -105,7 +105,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.currentBonsaiGameState
+        val gameState = game.bonsaiGameState.lastOrNull()
         checkNotNull(gameState) { "No active game state." }
 
         val currentIndex = gameState.players.indexOf(gameState.currentPlayer)
@@ -134,7 +134,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.currentBonsaiGameState
+        val gameState = game.bonsaiGameState.lastOrNull()
         checkNotNull(gameState) { "No active game state." }
 
         // Get the winner's name using the index
@@ -161,7 +161,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     private fun getWinnerIndex(): Int {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
-        val gameState = game.currentBonsaiGameState
+        val gameState = game.bonsaiGameState.lastOrNull()
         checkNotNull(gameState) { "No active game state." }
 
         val maxScore = gameState.players.maxOf { it.score }
@@ -196,37 +196,36 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     fun calculateScore(){}
 
     /**
-     * Refills the board after a player has meditated. newest card is put at index 3
+     * Refills the board after a player has meditated.
      *
      * preconditions:
      * - player has meditated.
+     * - zen deck is not empty.
      *
      * post conditions:
-     * - all faceUpCards got shifted to the right side and
-     * empty spot gets filled from the zen deck if zen deck is not empty.
+     * - all zen decks got shifted to the right side and
+     * empty spot gets filled by zen deck.
      *
-     * @throws IllegalStateException if faceUpCard has four or more cards
+     * @throws IllegalStateException if zen deck is empty.
      */
     fun refillBoard() {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.currentBonsaiGameState
+        val gameState = game.bonsaiGameState.lastOrNull()
         checkNotNull(gameState) { "No active game state." }
 
-        if (gameState.faceUpCards.size >= 4) {
-            throw IllegalStateException("Board is already full.")
+        if (gameState.zenDeck.isEmpty()) {
+            throw IllegalStateException("Zen deck is empty.")
         }
 
-        if (gameState.zenDeck.isNotEmpty()) {
+        if (gameState.faceUpCards.size < 4) {
             val newCard = gameState.zenDeck.removeAt(0)
-            // new card is added at index 3
-            gameState.faceUpCards.add(newCard)
+            gameState.faceUpCards.add( 0, newCard)
         }
 
         onAllRefreshables { refreshAfterChooseCard() }
     }
-
     /**
      * creates the Zen Deck of 2 Players
      */
