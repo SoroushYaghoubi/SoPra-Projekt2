@@ -27,34 +27,36 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @param networkGame true if game is played online otherwise false.
      */
     fun startNewGame( // playersEntries: MutableMap<String, PlayerType>,
-                     playerOrder: MutableList<Player> ,
-                     networkGame: Boolean ,
-                     goalTilesEntries : MutableList<GoalTileType>
-                     ){
-       // check required conditions
-       check(rootService.currentGame == null) {"There is already a game running."}
-       require(playerOrder.size >=2 ) {"at least 2 Players"}
+        playerOrder: MutableList<Player>,
+        networkGame: Boolean,
+        goalTilesEntries: MutableList<GoalTileType>
+    ) {
+        // check required conditions
+        check(rootService.currentGame == null) { "There is already a game running." }
+        require(playerOrder.size >= 2) { "at least 2 Players" }
 
-       // create the zenDeck depending on the number of players
-       val zenDeck = when (playerOrder.size){
-            2-> create2PlayersZenDeck().shuffled().toMutableList()
-            3-> create3PlayersZenDeck().shuffled().toMutableList()
+        // create the zenDeck depending on the number of players
+        val zenDeck = when (playerOrder.size) {
+            2 -> create2PlayersZenDeck().shuffled().toMutableList()
+            3 -> create3PlayersZenDeck().shuffled().toMutableList()
             else -> create4PlayersZenDeck().shuffled().toMutableList()
         }
 
         // put the first 4 cards face up
         val faceUpCards = mutableListOf<Card>()
         repeat(4) {
-                faceUpCards.add(zenDeck.removeAt(0))
+            faceUpCards.add(zenDeck.removeAt(0))
         }
 
-        val gameState = BonsaiGameState(currentPlayer = playerOrder.first(),
+        val gameState = BonsaiGameState(
+            currentPlayer = playerOrder.first(),
             players = playerOrder,
             1,
-            currentState = States.START_TURN)
+            currentState = States.START_TURN
+        )
 
         // create the list of goalTiles
-        gameState.goalTiles = createGoalTiles(goalTilesEntries , playerOrder.size)
+        gameState.goalTiles = createGoalTiles(goalTilesEntries, playerOrder.size)
         // assign the created zenDeck to the zenDeck of the game
         gameState.zenDeck = zenDeck
         // assign the face-up cards list to the game face-up cards
@@ -73,14 +75,17 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                 if (index >= 2) tiles.add(TileType.FLOWER)
                 if (index >= 3) tiles.add(TileType.FRUIT)
             }
-            player.personalSupply.addAll(tiles.map { Tile(null , null , it) })
+            player.personalSupply.addAll(tiles.map { Tile(null, null, it) })
         }
 
         // add the new game state to the history
         val setHistory = History().apply { gameStates.add(gameState) }
 
-        val game = BonsaiGame().apply { history = setHistory
-            bonsaiGameState.add(gameState)}
+        val game = BonsaiGame().apply {
+            history = setHistory
+            currentBonsaiGameState = gameState
+        }
+
 
         rootService.currentGame = game
 
@@ -105,7 +110,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         val currentIndex = gameState.players.indexOf(gameState.currentPlayer)
@@ -130,11 +135,11 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      *
      * @throws IllegalStateException if game isn't over yet.
      */
-    fun showWinner(){
+    fun showWinner() {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         // Get the winner's name using the index
@@ -161,7 +166,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     private fun getWinnerIndex(): Int {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         val maxScore = gameState.players.maxOf { it.score }
@@ -193,7 +198,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     /**
      * Calculates the score of the current player.
      */
-    fun calculateScore(){}
+    fun calculateScore() {}
 
     /**
      * Refills the board after a player has meditated.
@@ -212,7 +217,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
-        val gameState = game.bonsaiGameState.lastOrNull()
+        val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
         if (gameState.zenDeck.isEmpty()) {
@@ -221,15 +226,16 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         if (gameState.faceUpCards.size < 4) {
             val newCard = gameState.zenDeck.removeAt(0)
-            gameState.faceUpCards.add( 0, newCard)
+            gameState.faceUpCards.add(0, newCard)
         }
 
         onAllRefreshables { refreshAfterChooseCard() }
     }
+
     /**
      * creates the Zen Deck of 2 Players
      */
-    private fun create2PlayersZenDeck() : List<Card>{
+    private fun create2PlayersZenDeck(): List<Card> {
         var counter = 0
         val helperCards = TileType.entries
             .filter { it != TileType.ANY }
@@ -246,121 +252,122 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
             .flatMap { tileType ->
                 List(2) { GrowthCard(tileType, counter++) }
             }
-        val masterCards : List<Card> = listOf(
-            MasterCard( mutableListOf( TileType.WOOD , TileType.WOOD ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.LEAF , TileType.LEAF ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.WOOD , TileType.LEAF ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.ANY ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.ANY ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.LEAF , TileType.LEAF ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.LEAF , TileType.FRUIT ) , counter++ ) ,
+        val masterCards: List<Card> = listOf(
+            MasterCard(mutableListOf(TileType.WOOD, TileType.WOOD), counter++),
+            MasterCard(mutableListOf(TileType.LEAF, TileType.LEAF), counter++),
+            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF), counter++),
+            MasterCard(mutableListOf(TileType.ANY), counter++),
+            MasterCard(mutableListOf(TileType.ANY), counter++),
+            MasterCard(mutableListOf(TileType.LEAF, TileType.LEAF), counter++),
+            MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), counter++),
         )
-        val parchmentCards : List<Card> = listOf(
-            ParchmentCard(null , CardType.MASTERCARD ,2 , counter++ ) ,
-            ParchmentCard(null , CardType.GROWTHCARD ,2 , counter++ ) ,
-            ParchmentCard(null , CardType.HELPERCARD ,2 , counter++ ) ,
-            ParchmentCard(TileType.FLOWER , null ,2 , counter++ ) ,
-            ParchmentCard(TileType.FRUIT , null ,2 , counter++ ) ,
-            ParchmentCard(TileType.LEAF , null ,1 , counter++ ) ,
-            ParchmentCard(TileType.WOOD , null ,1 , counter++ ) ,
+        val parchmentCards: List<Card> = listOf(
+            ParchmentCard(null, CardType.MASTERCARD, 2, counter++),
+            ParchmentCard(null, CardType.GROWTHCARD, 2, counter++),
+            ParchmentCard(null, CardType.HELPERCARD, 2, counter++),
+            ParchmentCard(TileType.FLOWER, null, 2, counter++),
+            ParchmentCard(TileType.FRUIT, null, 2, counter++),
+            ParchmentCard(TileType.LEAF, null, 1, counter++),
+            ParchmentCard(TileType.WOOD, null, 1, counter++),
 
             )
-        val toolCards : List<Card> = List(3){ ToolCard(counter++)}
+        val toolCards: List<Card> = List(3) { ToolCard(counter++) }
 
         return helperCards + growthCards + masterCards + parchmentCards + toolCards
 
     }
+
     /**
      * creates ZenDeck for 3 Players
      */
-    private fun create3PlayersZenDeck() : List<Card>{
+    private fun create3PlayersZenDeck(): List<Card> {
         var counter = 32
         val additionalGrowthCards = listOf(
-            GrowthCard(TileType.WOOD, counter++) ,
-            GrowthCard(TileType.LEAF, counter++) ,
-            GrowthCard(TileType.LEAF, counter++) ,
+            GrowthCard(TileType.WOOD, counter++),
+            GrowthCard(TileType.LEAF, counter++),
+            GrowthCard(TileType.LEAF, counter++),
             GrowthCard(TileType.FLOWER, counter++)
         )
         val additionalMasterCards = listOf(
-            MasterCard( mutableListOf( TileType.ANY ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.WOOD , TileType.LEAF ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.WOOD , TileType.LEAF ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.WOOD , TileType.LEAF , TileType.FLOWER ) , counter++ ) ,
-            MasterCard( mutableListOf( TileType.WOOD , TileType.LEAF , TileType.FRUIT ) , counter++ )
+            MasterCard(mutableListOf(TileType.ANY), counter++),
+            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF), counter++),
+            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF), counter++),
+            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER), counter++),
+            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FRUIT), counter++)
         )
-        val additionalToolCard : List<Card> = List(2){ ToolCard(counter++)}
+        val additionalToolCard: List<Card> = List(2) { ToolCard(counter++) }
 
-        return create2PlayersZenDeck() + additionalGrowthCards +additionalMasterCards +additionalToolCard
+        return create2PlayersZenDeck() + additionalGrowthCards + additionalMasterCards + additionalToolCard
     }
+
     /**
      * create the zenDeck for 4 Players
      */
-    private fun create4PlayersZenDeck() : List<Card>{
+    private fun create4PlayersZenDeck(): List<Card> {
         var counter = 43
         val additionalGrowthCards = listOf(
-            GrowthCard(TileType.WOOD, counter++) ,
-            GrowthCard(TileType.FRUIT, counter++) ,
+            GrowthCard(TileType.WOOD, counter++),
+            GrowthCard(TileType.FRUIT, counter++),
         )
         val additionalMasterCards = listOf(
-            MasterCard( mutableListOf( TileType.LEAF , TileType.FLOWER , TileType.FLOWER ) , counter++ )
+            MasterCard(mutableListOf(TileType.LEAF, TileType.FLOWER, TileType.FLOWER), counter++)
         )
-        val additionalToolCard : List<Card> = listOf(ToolCard(counter++))
+        val additionalToolCard: List<Card> = listOf(ToolCard(counter++))
 
-        return create3PlayersZenDeck() + additionalGrowthCards +additionalMasterCards +additionalToolCard
+        return create3PlayersZenDeck() + additionalGrowthCards + additionalMasterCards + additionalToolCard
     }
 
     /**
      *
      */
-      private fun createGoalTiles(goalTilesTypesEntries : MutableList<GoalTileType> , playerSize: Int)
-      : MutableList<MutableList<GoalTile>>  {
+    private fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
+            : MutableList<MutableList<GoalTile>> {
 
-        val goalTiles : MutableList<MutableList<GoalTile>> = mutableListOf()
+        val goalTiles: MutableList<MutableList<GoalTile>> = mutableListOf()
 
         val brownGoalTiles = mutableListOf(
-        GoalTile(GoalTileType.BROWN , 8 , 5) ,
-        GoalTile(GoalTileType.BROWN , 10 , 10) ,
-        GoalTile(GoalTileType.BROWN , 12 , 15)
+            GoalTile(GoalTileType.BROWN, 8, 5),
+            GoalTile(GoalTileType.BROWN, 10, 10),
+            GoalTile(GoalTileType.BROWN, 12, 15)
         )
         val greenGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.GREEN , 5 , 6) ,
-            GoalTile(GoalTileType.GREEN , 7 , 9) ,
-            GoalTile(GoalTileType.GREEN , 9 , 12)
+            GoalTile(GoalTileType.GREEN, 5, 6),
+            GoalTile(GoalTileType.GREEN, 7, 9),
+            GoalTile(GoalTileType.GREEN, 9, 12)
         )
         val pinkGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.PINK , 3 , 8) ,
-            GoalTile(GoalTileType.PINK , 4 , 12) ,
-            GoalTile(GoalTileType.PINK , 5 , 16)
+            GoalTile(GoalTileType.PINK, 3, 8),
+            GoalTile(GoalTileType.PINK, 4, 12),
+            GoalTile(GoalTileType.PINK, 5, 16)
         )
         val orangeGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.ORANGE , 3 , 9) ,
-            GoalTile(GoalTileType.ORANGE , 4 , 11) ,
-            GoalTile(GoalTileType.ORANGE , 5 , 13)
+            GoalTile(GoalTileType.ORANGE, 3, 9),
+            GoalTile(GoalTileType.ORANGE, 4, 11),
+            GoalTile(GoalTileType.ORANGE, 5, 13)
         )
         val blueGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.ORANGE , 0 , 9) ,
-            GoalTile(GoalTileType.ORANGE , 0 , 11) ,
-            GoalTile(GoalTileType.ORANGE , 0 , 13)
+            GoalTile(GoalTileType.ORANGE, 0, 9),
+            GoalTile(GoalTileType.ORANGE, 0, 11),
+            GoalTile(GoalTileType.ORANGE, 0, 13)
         )
 
-        goalTilesTypesEntries.forEach {
-            goalTileType->
+        goalTilesTypesEntries.forEach { goalTileType ->
             run {
-                when (goalTileType){
+                when (goalTileType) {
                     GoalTileType.BROWN -> goalTiles.add(brownGoalTiles)
                     GoalTileType.GREEN -> goalTiles.add(greenGoalTiles)
                     GoalTileType.PINK -> goalTiles.add(pinkGoalTiles)
-                    GoalTileType.ORANGE ->goalTiles.add(orangeGoalTiles)
+                    GoalTileType.ORANGE -> goalTiles.add(orangeGoalTiles)
                     GoalTileType.BLUE -> goalTiles.add(blueGoalTiles)
                 }
             }
         }
 
-        if(playerSize==2){
-            goalTiles.forEach {
-                goalTile -> run {
+        if (playerSize == 2) {
+            goalTiles.forEach { goalTile ->
+                run {
                     goalTile.removeAt(1)
-            }
+                }
             }
         }
         println("Goal Tiles$goalTiles")
