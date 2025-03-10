@@ -48,47 +48,48 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                 faceUpCards.add(zenDeck.removeAt(0))
         }
 
-        if (!networkGame) {
+        val gameState = BonsaiGameState(currentPlayer = playerOrder.first(),
+            players = playerOrder,
+            1,
+            currentState = States.START_TURN)
 
-            val gameState = BonsaiGameState(currentPlayer = playerOrder.first(),
-                players = playerOrder,
-                1,
-                currentState = States.START_TURN)
+        // create the list of goalTiles
+        gameState.goalTiles = createGoalTiles(goalTilesEntries , playerOrder.size)
+        // assign the created zenDeck to the zenDeck of the game
+        gameState.zenDeck = zenDeck
+        // assign the face-up cards list to the game face-up cards
+        gameState.faceUpCards = faceUpCards
 
-            // create the list of goalTiles
-            gameState.goalTiles = createGoalTiles(goalTilesEntries , playerOrder.size)
-            // assign the created zenDeck to the zenDeck of the game
-            gameState.zenDeck = zenDeck
-            // assign the face-up cards list to the game face-up cards
-            gameState.faceUpCards = faceUpCards
+        // give each player the post Tiles depending on the order
+        gameState.players.forEachIndexed { index, player ->
+            val tiles = mutableListOf<TileType>()
 
-            // give each player the post Tiles depending on the order
-            gameState.players.forEachIndexed { index, player ->
-                val tiles = mutableListOf<TileType>()
+            if (index == 0) {
+                tiles.add(TileType.WOOD)
+            } else {
+                tiles.add(TileType.WOOD)
+                tiles.add(TileType.LEAF)
 
-                if (index == 0) {
-                    tiles.add(TileType.WOOD)
-                } else {
-                    tiles.add(TileType.WOOD)
-                    tiles.add(TileType.LEAF)
-
-                    if (index >= 2) tiles.add(TileType.FLOWER)
-                    if (index >= 3) tiles.add(TileType.FRUIT)
-                }
-                player.personalSupply.addAll(tiles.map { Tile(null , null , it) })
+                if (index >= 2) tiles.add(TileType.FLOWER)
+                if (index >= 3) tiles.add(TileType.FRUIT)
             }
-
-            // add the new game state to the history
-            val setHistory = History().apply { gameStates.add(gameState) }
-
-            val game = BonsaiGame().apply { history = setHistory
-                bonsaiGameState.add(gameState)}
-
-            rootService.currentGame = game
-        }else {
-            TODO()
+            player.personalSupply.addAll(tiles.map { Tile(null , null , it) })
         }
 
+        // add the new game state to the history
+        val setHistory = History().apply { gameStates.add(gameState) }
+
+        val game = BonsaiGame().apply { history = setHistory
+            bonsaiGameState.add(gameState)}
+
+        rootService.currentGame = game
+
+        if (!networkGame) {
+            //TODO()
+            println("Hallo!")
+            //val message : StartGameMessage
+            //rootService.networkService.sendStartGameMessage(message)
+        }
     }
 
     /**
@@ -333,8 +334,8 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     /**
      *
      */
-      fun createGoalTiles(goalTilesTypesEntries : MutableList<GoalTileType> , playerSize: Int)
-     : MutableList<MutableList<GoalTile>>  {
+      private fun createGoalTiles(goalTilesTypesEntries : MutableList<GoalTileType> , playerSize: Int)
+      : MutableList<MutableList<GoalTile>>  {
 
         val goalTiles : MutableList<MutableList<GoalTile>> = mutableListOf()
 
@@ -384,10 +385,9 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
             }
             }
         }
-        println("Goal Tiles" + goalTiles)
+        println("Goal Tiles$goalTiles")
 
         return goalTiles
 
     }
-
 }
