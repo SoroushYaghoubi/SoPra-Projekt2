@@ -8,32 +8,6 @@ import java.io.File
  * The service layer class which contains the player's action functions.
  */
 class PlayerActionService(private val rootService: RootService) : AbstractRefreshingService() {
-    /**
-     * Restores the last action.
-     *
-     * preconditions:
-     * - The game has started and is currently running.
-     * - Last action(s) must be undone before.
-     *
-     * post conditions:
-     * - Last action(s) is(are) restored.
-     *
-     * @throws IllegalStateException if there isn't a next game state.
-     */
-    fun redo() {}
-
-    /**
-     * Reverses the last action(s).
-     *
-     * preconditions:
-     * - A previous action must exist.
-     *
-     * post conditions:
-     * - The last action(s) is(are) reversed.
-     *
-     * @throws IllegalStateException if no previous action exists (game has just started).
-     */
-    fun undo() {}
 
     /**
      * Meditate to receive a zen card:
@@ -154,28 +128,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
     fun removeFromTree(tile: Tile, tilePosition: Pair<Int, Int>) {}
 
     /**
-     * Saves the current game state.
-     *
-     * preconditions:
-     * - The game must exist.
-     *
-     * post conditions:
-     * - The game state is saved.
-     *
-     * @throws IllegalStateException if there is no existing game.
-     */
-    fun saveGame() {
-        val game = rootService.currentGame
-        checkNotNull(game) { "No game was started." }
-        val currentPlayer = checkNotNull(game.currentBonsaiGameState?.currentPlayer)
-        if (!currentPlayer.isLocal) {
-            throw IllegalStateException("Can only be saved if played local")
-        }
-        val json = Json.encodeToString(game)
-        File("./savedGameState.json").writeText(json)
-    }
-
-    /**
      * Checks if a bonsai tile can be played based on the symbols shown on
      * Seishi tile or growth cards.
      *
@@ -281,30 +233,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
     fun claimOrRenounceGoal(claim: Boolean) {}
 
     /**
-     * Checks if player can redo his turn.
-     *
-     * preconditions:
-     * - Player has undone action(s).
-     *
-     * @return true if redo is available, otherwise false.
-     */
-    fun canRedo(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
-    }
-
-    /**
-     * Checks if player can undo his turn.
-     *
-     * preconditions:
-     * - A previous player action exists.
-     *
-     * @return true if undo is available, otherwise false.
-     */
-    fun canUndo(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
-    }
-
-    /**
      * Checks if player has played an action before ending his turn.
      *
      * preconditions:
@@ -330,7 +258,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
     fun discardSupplyTile() {}
 
     private fun getCurrentPlayer(): Player {
-        return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
+        return checkNotNull(rootService.currentGame?.bonsaiGameState?.last()?.currentPlayer)
     }
 }
 

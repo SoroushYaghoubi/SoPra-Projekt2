@@ -15,10 +15,10 @@ class ContinueGameTest {
     fun testContinueGameInvalid() {
 
         val rootService = RootService()
-        val gameService = GameService(rootService)
+        val historyService = HistoryService(rootService)
         rootService.currentGame = null
         val exception =
-            assertThrows<IllegalStateException> { gameService.continueGame() }
+            assertThrows<IllegalStateException> { historyService.continueGame() }
 
         assertEquals("There is no saved gameState", exception.message)
     }
@@ -28,8 +28,8 @@ class ContinueGameTest {
     @Test
     fun testContinueGame() {
         val rootService = RootService()
-        val gameService = GameService(rootService)
-        val playerActionService = PlayerActionService(rootService)
+        val historyService = HistoryService(rootService)
+
         val game = BonsaiGame()
 
         val player1 = Player("Tom", PlayerType.HUMAN, true)
@@ -44,9 +44,9 @@ class ContinueGameTest {
         game.bonsaiGameState.add(gameState2)
         game.history = history
         rootService.currentGame = game
-        playerActionService.saveGame()
+        historyService.saveGame()
         rootService.currentGame = null
-        gameService.continueGame()
+        historyService.continueGame()
         val loadedGame = rootService.currentGame
         assertNotNull(loadedGame)
         assertEquals(game.bonsaiGameState.first(), loadedGame.bonsaiGameState.first())

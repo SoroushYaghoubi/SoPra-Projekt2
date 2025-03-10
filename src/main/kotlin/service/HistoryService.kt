@@ -1,0 +1,101 @@
+package service
+
+import entity.BonsaiGame
+import kotlinx.serialization.json.Json
+import java.io.File
+
+class HistoryService (private val rootService: RootService) : AbstractRefreshingService() {
+
+    /**
+     * Restores the last action.
+     *
+     * preconditions:
+     * - The game has started and is currently running.
+     * - Last action(s) must be undone before.
+     *
+     * post conditions:
+     * - Last action(s) is(are) restored.
+     *
+     * @throws IllegalStateException if there isn't a next game state.
+     */
+    fun redo() {}
+
+    /**
+     * Reverses the last action(s).
+     *
+     * preconditions:
+     * - A previous action must exist.
+     *
+     * post conditions:
+     * - The last action(s) is(are) reversed.
+     *
+     * @throws IllegalStateException if no previous action exists (game has just started).
+     */
+    fun undo() {}
+
+    /**
+     * Saves the current game state.
+     *
+     * preconditions:
+     * - The game must exist.
+     *
+     * post conditions:
+     * - The game state is saved.
+     *
+     * @throws IllegalStateException if there is no existing game.
+     */
+    fun saveGame() {
+        val game = checkNotNull(rootService.currentGame)
+        if (!game.bonsaiGameState.last().currentPlayer.isLocal) {
+            throw IllegalStateException("Can only be saved if played local")
+        }
+        val json = Json.encodeToString(game)
+        File("./savedGameState.json").writeText(json)
+    }
+
+    /**
+     * Checks if player can redo his turn.
+     *
+     * preconditions:
+     * - Player has undone action(s).
+     *
+     * @return true if redo is available, otherwise false.
+     */
+    fun canRedo(): Boolean {
+        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+    }
+
+    /**
+     * Checks if player can undo his turn.
+     *
+     * preconditions:
+     * - A previous player action exists.
+     *
+     * @return true if undo is available, otherwise false.
+     */
+    fun canUndo(): Boolean {
+        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+    }
+
+    /**
+     * Continues a previously saved game state.
+     *
+     * preconditions:
+     * - There is an existing game which was saved before.
+     *
+     * post conditions:
+     * - Game has continued with old game state.
+     *
+     * @throws IllegalStateException if there is no previously saved game.
+     */
+    fun continueGame(){
+        val savedGameState = File("./savedGameState.json")
+        if (!savedGameState.exists()){
+            throw IllegalStateException ("There is no saved gameState")
+        }
+        val jsonString = savedGameState.readText()
+        val game = Json.decodeFromString<BonsaiGame>(jsonString)
+        rootService.currentGame = game
+        onAllRefreshables { refreshAfterGameStart() }
+    }
+}

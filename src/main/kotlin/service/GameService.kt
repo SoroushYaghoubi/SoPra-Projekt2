@@ -93,28 +93,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     * Continues a previously saved game state.
-     *
-     * preconditions:
-     * - There is an existing game which was saved before.
-     *
-     * post conditions:
-     * - Game has continued with old game state.
-     *
-     * @throws IllegalStateException if there is no previously saved game.
-     */
-    fun continueGame(){
-        val savedGameState = File("./savedGameState.json")
-        if (!savedGameState.exists()){
-            throw IllegalStateException ("There is no saved gameState")
-        }
-        val jsonString = savedGameState.readText()
-        val game = Json.decodeFromString<BonsaiGame>(jsonString)
-        rootService.currentGame = game
-        onAllRefreshables { refreshAfterGameStart() }
-    }
-
-    /**
      * Switches the turn to the next player. Assuming player list is in correct turn order
      *
      * preconditions:
