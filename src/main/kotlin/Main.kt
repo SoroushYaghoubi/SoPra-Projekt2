@@ -1,3 +1,7 @@
+import util.translateToolCardsFromCSV
+
 fun main() {
-    println("Application ended. Goodbye")
+    translateToolCardsFromCSV(4).forEach {
+        println(it.id)
+    }
 }

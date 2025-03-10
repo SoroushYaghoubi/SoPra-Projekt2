@@ -1,0 +1,14 @@
+minPlayerAmount,type1,type2,type3
+2,log,log,
+2,leaf,leaf,
+2,log,leaf,
+2,all,,
+2,all,,
+2,leaf,leaf,
+2,leaf,fruit,
+3,all,,
+3,log,leaf,
+3,log,leaf,
+3,log,leaf,blossom
+3,log,leaf,fruit
+4,leaf,blossom,blossom
