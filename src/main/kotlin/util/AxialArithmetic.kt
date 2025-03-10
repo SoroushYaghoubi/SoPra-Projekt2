@@ -2,13 +2,86 @@ package util
 
 import entity.Tile
 
-// some constants (non-primitives cannot be const todo: what to do?)
-val VECTOR_TOP_RIGHT    = (1 to -1)
-val VECTOR_RIGHT        = (1 to 0)
-val VECTOR_BOTTOM_RIGHT = (0 to 1)
-val VECTOR_BOTTOM_LEFT  = (-1 to 1)
-val VECTOR_LEFT         = (-1 to 0)
-val VECTOR_TOP_LEFT     = (0 to -1)
+// -----------------------------------------
+// -----------------------------------------
+// --------------- CONSTANTS ---------------
+// -----------------------------------------
+// -----------------------------------------
+    // hex-movement vectors
+private val VECTOR_TOP_RIGHT    =  1 to -1
+private val VECTOR_RIGHT        =  1 to  0
+private val VECTOR_BOTTOM_RIGHT =  0 to  1
+private val VECTOR_BOTTOM_LEFT  = -1 to  1
+private val VECTOR_LEFT         = -1 to  0
+private val VECTOR_TOP_LEFT     =  0 to -1
+
+    // set of possible direction vector
+private val SIDE_VECTORS = listOf(
+        VECTOR_TOP_RIGHT,
+        VECTOR_RIGHT,
+        VECTOR_BOTTOM_RIGHT,
+        VECTOR_BOTTOM_LEFT,
+        VECTOR_LEFT,
+        VECTOR_TOP_LEFT
+    )
+
+    // root
+val ROOT = (0 to 0)
+
+    // pot tiles (todo: make sure the values are correct)
+val POT = setOf(
+         ROOT,
+        -2 to 1,
+        -1 to 1,
+         0 to 1,
+         1 to 1,
+        -2 to 2,
+        -1 to 2,
+         0 to 2,
+    )
+
+// ------------------------------------------------
+// ------------------------------------------------
+// --------------- AXIAL ARITHMETIC ---------------
+// ------------------------------------------------
+// ------------------------------------------------
+/**
+ * BFS. First element in the queue is to be processed. New nodes added in the end. Change queue conditions
+ * based on design.
+ *
+ * @param bfsRoot is where the traversal starts
+ *
+ * @return tiles as a lazy sequence
+ */
+infix fun MutableMap<Pair<Int, Int>, Tile?>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Tile?> = sequence {
+    // init
+    val visited = mutableSetOf<Pair<Int, Int>>()
+    val queue   =   ArrayDeque<Pair<Int, Int>>()
+    queue.add(bfsRoot)
+    visited.add(bfsRoot)
+
+    // traverse
+    while (queue.isNotEmpty()) {
+        // fetch current node
+        val currentNode = queue.removeFirst()
+
+        // process current node
+        yield(this@traverseFrom[currentNode])
+
+        // add neighbour nodes to queue
+        for (neighbour in (circleAround(currentNode))) {
+            // add any conditions here to filter nodes
+            if (neighbour !in visited &&
+                neighbour !in POT &&
+                this@traverseFrom[neighbour] != null
+            ) {
+                visited.add(neighbour)
+                queue.add(neighbour)
+            }
+        }
+    }
+}
+
 
 /**
  * Takes an axial coordinate as a parameter and acts like an iterator. It returns a generator that yields a tile around
@@ -21,37 +94,24 @@ val VECTOR_TOP_LEFT     = (0 to -1)
  *
  * @see `Demo` in the same dir for example usage.
  */
-infix fun MutableMap<Pair<Int, Int>, Tile>.circleAround(center: Pair<Int, Int>): Sequence<Tile?> = sequence {
+fun circleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
     val (q, r) = center
 
-    val sideVectors = listOf(
-        VECTOR_TOP_RIGHT,
-        VECTOR_RIGHT,
-        VECTOR_BOTTOM_RIGHT,
-        VECTOR_BOTTOM_LEFT,
-        VECTOR_LEFT,
-        VECTOR_TOP_LEFT
-    )
-
-    for ((dq, dr) in sideVectors) {
-        val coordinate = (q + dq) to (r + dr)
-        yield(this@circleAround[coordinate])
-    }
+    for ((dq, dr) in SIDE_VECTORS)
+        yield((q + dq) to (r + dr))
 }
 
 /**
  * Wrapper for the [circleAround] function to iterate infinitely around a coordinate
  */
-infix fun MutableMap<Pair<Int, Int>, Tile>.foreverCircleAround(center: Pair<Int, Int>): Sequence<Tile?> = sequence {
-    while (true) {
-        for (tile in this@foreverCircleAround circleAround center) {
+fun foreverCircleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
+    while (true)
+        for (tile in circleAround(center))
             yield(tile)
-        }
-    }
 }
 
 /**
- * Clockwise rotation around an adjacent center point
+ * Single-step clockwise rotation around an adjacent center point
  */
 infix fun Pair<Int, Int>.rotateClockwiseAround(center: Pair<Int, Int>): Pair<Int, Int> =
     when (this - center) {
@@ -65,7 +125,7 @@ infix fun Pair<Int, Int>.rotateClockwiseAround(center: Pair<Int, Int>): Pair<Int
     }
 
 /**
- * Clockwise rotation around an adjacent center point
+ * Single-step counter-clockwise rotation around an adjacent center point
  */
 infix fun Pair<Int, Int>.rotateCounterClockwiseAround(center: Pair<Int, Int>): Pair<Int, Int> =
     when (this - center) {
