@@ -1,11 +1,12 @@
 package service
 
 import entity.BonsaiGame
+import entity.BonsaiGameState
 import entity.Player
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class HistoryService (private val rootService: RootService) : AbstractRefreshingService() {
+class HistoryService(private val rootService: RootService) : AbstractRefreshingService() {
 
     /**
      * Restores the last action.
@@ -19,7 +20,15 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
      *
      * @throws IllegalStateException if there isn't a next game state.
      */
-    fun redo() {}
+    fun redo() {
+        if (!canRedo()){
+            return
+        }
+        val game = checkNotNull(rootService.currentGame)
+        val history = checkNotNull(rootService.currentGame?.history)
+        history.currentPosition += 1
+        game.currentBonsaiGameState = history.gameStates[history.currentPosition]
+    }
 
     /**
      * Reverses the last action(s).
@@ -32,7 +41,15 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
      *
      * @throws IllegalStateException if no previous action exists (game has just started).
      */
-    fun undo() {}
+    fun undo() {
+        if (!canUndo()){
+            return
+        }
+        val game = checkNotNull(rootService.currentGame)
+        val history = checkNotNull(rootService.currentGame?.history)
+        history.currentPosition -= 1
+        game.currentBonsaiGameState = history.gameStates[history.currentPosition]
+    }
 
     /**
      * Saves the current game state.
@@ -64,7 +81,8 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
      * @return true if redo is available, otherwise false.
      */
     fun canRedo(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+        val history = checkNotNull(rootService.currentGame?.history)
+        return history.gameStates.isNotEmpty() && history.currentPosition < history.gameStates.size - 1
     }
 
     /**
@@ -76,7 +94,8 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
      * @return true if undo is available, otherwise false.
      */
     fun canUndo(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+        val history = checkNotNull(rootService.currentGame?.history)
+        return history.gameStates.isNotEmpty() && history.currentPosition > 0
     }
 
     /**
@@ -90,10 +109,10 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
      *
      * @throws IllegalStateException if there is no previously saved game.
      */
-    fun continueGame(){
+    fun continueGame() {
         val savedGameState = File("./savedGameState.json")
-        if (!savedGameState.exists()){
-            throw IllegalStateException ("There is no saved gameState")
+        if (!savedGameState.exists()) {
+            throw IllegalStateException("There is no saved gameState")
         }
         val jsonString = savedGameState.readText()
         val game = Json.decodeFromString<BonsaiGame>(jsonString)
@@ -101,8 +120,14 @@ class HistoryService (private val rootService: RootService) : AbstractRefreshing
         onAllRefreshables { refreshAfterGameStart() }
     }
 
+    // help function to get current player
     private fun getCurrentPlayer(): Player {
-        val currentGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
-        return currentGameState.currentPlayer
+        return getCurrentGameState().currentPlayer
     }
+
+    // help function to get current game state
+    private fun getCurrentGameState(): BonsaiGameState {
+        return checkNotNull(rootService.currentGame?.currentBonsaiGameState)
+    }
+
 }
