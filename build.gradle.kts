@@ -5,8 +5,7 @@ import org.gradle.kotlin.dsl.application
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.1.10"
-    kotlin("plugin.serialization") version "2.1.10"
+    kotlin("jvm") version "1.9.25"
     application
     id("org.jetbrains.dokka") version "1.9.20"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
@@ -31,7 +30,6 @@ application {
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     implementation(group = "tools.aqua", name = "bgw-gui", version = "0.9-9-5ef7d86-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-common", version = "0.9-9-5ef7d86-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-client", version = "0.9-9-5ef7d86-SNAPSHOT")
@@ -81,10 +79,6 @@ tasks.detektTest {
 }
 
 tasks.dokkaHtml.configure {
-    outputDirectory.set(projectDir.resolve("public/dokka"))
-}
-
-tasks.dokkaGfm.configure {
     outputDirectory.set(projectDir.resolve("public/dokka"))
 }
 
