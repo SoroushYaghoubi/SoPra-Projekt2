@@ -3,12 +3,12 @@ package util
 import entity.Tile
 
 // some constants (non-primitives cannot be const todo: what to do?)
-val VECTOR_TOP_RIGHT = (1 to -1)
-val VECTOR_RIGHT = (1 to 0)
+val VECTOR_TOP_RIGHT    = (1 to -1)
+val VECTOR_RIGHT        = (1 to 0)
 val VECTOR_BOTTOM_RIGHT = (0 to 1)
-val VECTOR_BOTTOM_LEFT = (-1 to 1)
-val VECTOR_LEFT = (-1 to 0)
-val VECTOR_TOP_LEFT = (0 to -1)
+val VECTOR_BOTTOM_LEFT  = (-1 to 1)
+val VECTOR_LEFT         = (-1 to 0)
+val VECTOR_TOP_LEFT     g= (0 to -1)
 
 /**
  * Takes an axial coordinate as a parameter and acts like an iterator. It returns a generator that yields a tile around
