@@ -9,12 +9,17 @@ import java.io.File
  */
 const val HEADERS: Boolean = true
 
+/**
+ * Edit this if you move the CSV Dir
+ */
+const val CSV_PATH: String = "./src/main/kotlin/util/zen"
+
 fun translateToolCardsFromCSV(playerCount: Int): MutableList<Card>{
-    val csvLines = parseCSVLines("./src/main/kotlin/util/zen/zentool.csv")
+    val csvLines = parseCSVLines("$CSV_PATH/zentool.csv")
     val toolCards = mutableListOf<Card>()
 
     for ((index, line) in csvLines.withIndex()) {
-        // filter unwanted cards
+        // discard unwanted cards
         val playerCountRule = line.toInt()
         if (playerCount < playerCountRule) continue
 
@@ -23,7 +28,6 @@ fun translateToolCardsFromCSV(playerCount: Int): MutableList<Card>{
 
     return toolCards
 }
-
 
 private fun parseCSVLines(path: String) =
     if (HEADERS) File(path).readLines().drop(1)
