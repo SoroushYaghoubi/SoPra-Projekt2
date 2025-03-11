@@ -58,4 +58,30 @@ class ContinueGameTest {
         assertEquals(game.history?.gameStates, loadedGame.history?.gameStates)
     }
 
+    /**
+     * Tests if player can not save if not played local
+     */
+    @Test
+    fun testSaveGameIfPlayerNotLocal(){
+        val rootService = RootService()
+        val game = BonsaiGame()
+        val historyService = HistoryService(rootService)
+        val player1 = Player("Tom", PlayerType.HUMAN, false)
+        val player2 = Player("Tomy", PlayerType.HUMAN, false)
+        val gameState1 = BonsaiGameState(player1, mutableListOf(player1, player2), 2, States.MEDITATE)
+        val gameState2 = BonsaiGameState(player2, mutableListOf(player1, player2), 2, States.CULTIVATE)
+        val history = History()
+        history.currentPosition = 1
+        history.gameStates.add(gameState1)
+        history.gameStates.add(gameState2)
+        game.currentBonsaiGameState = gameState2
+        game.history = history
+        rootService.currentGame = game
+        val exception =
+            assertThrows<IllegalStateException> { historyService.saveGame() }
+
+        assertEquals("Can only be saved if played local", exception.message)
+
+    }
+
 }
