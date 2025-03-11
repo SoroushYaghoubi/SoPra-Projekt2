@@ -5,7 +5,11 @@ import tools.aqua.bgw.net.common.notification.PlayerJoinedNotification
 import tools.aqua.bgw.net.common.response.CreateGameResponse
 import tools.aqua.bgw.net.common.response.JoinGameResponse
 
-
+/**
+ * [BoardGameClient] implementation for network communication.
+ *
+ * @param networkService the [NetworkService] to potentially forward received messages to.
+ */
 class BonsaiNetworkClient(private val networkService: NetworkService) :
     BoardGameClient("playerName", "host", "secret") {
     //TODO(the parameters from BoardGameClient's constructor are not final)
