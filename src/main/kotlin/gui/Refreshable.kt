@@ -1,7 +1,15 @@
 package gui
 
 import entity.TileType
+import service.AbstractRefreshingService
 
+/**
+ * This interface provides a mechanism for the service layer classes to communicate
+ * that certain changes have been made to the entity layer, so that the user
+ * can be updated accordingly
+ *
+ * @see AbstractRefreshingService
+ */
 interface Refreshable {
 
     /**
