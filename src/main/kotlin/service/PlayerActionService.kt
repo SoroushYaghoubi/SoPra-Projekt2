@@ -1,8 +1,8 @@
 package service
 
 import entity.*
-import kotlinx.serialization.json.Json
-import java.io.File
+//import kotlinx.serialization.json.Json
+//import java.io.File
 
 /**
  * The service layer class which contains the player's action functions.
@@ -350,7 +350,65 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param claim true if player accepts goal tile, otherwise false.
      *
      */
-    fun claimOrRenounceGoal(claim: Boolean) {}
+    fun claimOrRenounceGoal(claim: Boolean) {
+        val game = checkNotNull(rootService.currentGame) { "No game was started." }
+
+        val gameState = checkNotNull(game.currentBonsaiGameState)
+
+        val player = gameState.currentPlayer
+        val playersBonsaiTree = player.bonsaiTree
+
+        // checks if a player has already claimed a goal tile from a specific tile type
+        for (goalTile in gameState.goalTiles.flatten()){
+            if (player.claimedGoals.any{it.goalTileType == goalTile.goalTileType}) {
+                continue
+            }
+
+            val conditionValid = when (goalTile.goalTileType) {
+                GoalTileType.BROWN -> playersBonsaiTree.values.count {it.tileType == TileType.WOOD} >= goalTile.tier
+                GoalTileType.GREEN -> playersBonsaiTree.values.count{it.tileType == TileType.LEAF} >= goalTile.tier
+                GoalTileType.PINK -> playersBonsaiTree.values.count{it.tileType == TileType.FLOWER} >= goalTile.tier
+                GoalTileType.ORANGE -> playersBonsaiTree.values.count { it.tileType == TileType.FRUIT } >= goalTile.tier
+                GoalTileType.BLUE -> hasReachedBlueGoal(playersBonsaiTree, goalTile.tier)
+            }
+
+            if (conditionValid) {
+                if (claim) {
+                    player.claimedGoals.add(goalTile)
+                    for (goalTileList in gameState.goalTiles) {
+                        if (goalTileList.contains(goalTile)) {
+                            goalTileList.remove(goalTile)
+                            break
+                        }
+                    }
+                } else {
+                    player.renouncedGoals.add(goalTile)
+                }
+            }
+        }
+
+    }
+
+    /**
+     * checks if a player has reached on of the blue goal tiles.
+     *
+     * @param bonsaiTree is the bonsai tree of the active player
+     * @param tier the tier of the blue goal tile
+     *
+     * return true if the [tier] of the blue goal tile is reached, otherwise false
+     */
+    private fun hasReachedBlueGoal(bonsaiTree : MutableMap<Pair<Int, Int>, Tile>, tier : Int) : Boolean{
+        val leftProtrude = bonsaiTree.keys.any { it.first  <= -3}
+        val rightProtrude = bonsaiTree.keys.any { it.first  >= 4}
+        val bellowProtrude = bonsaiTree.keys.any { it.second >= 3 }
+
+        return when(tier) {
+            7 -> leftProtrude || rightProtrude
+            10 -> leftProtrude && rightProtrude
+            14 -> (leftProtrude || rightProtrude) && bellowProtrude
+            else -> false
+        }
+    }
 
     /**
      * Checks if player has played an action before ending his turn.
