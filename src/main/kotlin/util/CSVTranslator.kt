@@ -15,7 +15,7 @@ const val HEADERS: Boolean = true
 const val CSV_PATH: String = "./src/main/kotlin/util/zen"
 
 fun translateToolCardsFromCSV(playerCount: Int): MutableList<Card>{
-    val csvLines = parseCSVLines("$CSV_PATH/zentool.csv")
+    val csvLines = parseCSVLines("$CSV_PATH/zentool1.csv")
     val toolCards = mutableListOf<Card>()
 
     for ((index, line) in csvLines.withIndex()) {
