@@ -266,22 +266,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
     }
 
-    /**
-     * Removes bonsai tile from players bonsai tree.
-     *
-     * preconditions:
-     * - The game has started and is currently running.
-     * - Bonsai tree has tiles to be removed from (bonsai tree is not empty).
-     *
-     * post conditions:
-     * - The bonsai tile is removed from the bonsai tree.
-     *
-     * @param tile The bonsai tile(s) to be removed.
-     * @param tilePosition The position of the bonsai tile to be removed from.
-     * @throws IllegalStateException if there is no tile (bonsai tree is empty).
-     */
-    fun removeFromTree(tile: Tile, tilePosition: Pair<Int, Int>) {}
-
 
     /**
      * Checks if player can claim a goal tile.
