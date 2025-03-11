@@ -35,6 +35,11 @@ dependencies {
     implementation(group = "tools.aqua", name = "bgw-gui", version = "0.9-9-5ef7d86-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-common", version = "0.9-9-5ef7d86-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-client", version = "0.9-9-5ef7d86-SNAPSHOT")
+
+    // dependencies for jackson csv
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.18.3")
+
 }
 
 tasks.distZip {
