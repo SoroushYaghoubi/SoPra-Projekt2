@@ -8,4 +8,7 @@ import tools.aqua.bgw.core.MenuScene
  * of a game of bonsai in hot seat mode
  */
 class ConfigureGameMenuScene : MenuScene() , Refreshable {
+
+
+
 }
