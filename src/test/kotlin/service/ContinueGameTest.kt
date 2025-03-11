@@ -2,8 +2,8 @@ package service
 
 import kotlin.test.*
 import entity.*
-import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.assertThrows
+import java.io.File
 
 /**
  * Tests if function continueGame works correctly, by checking if all gameStates are saved correct.
@@ -15,21 +15,25 @@ class ContinueGameTest {
     fun testContinueGameInvalid() {
 
         val rootService = RootService()
-        val gameService = GameService(rootService)
-        rootService.currentGame = null
+        val historyService = HistoryService(rootService)
+        val savedGameState = File("./savedGameState.json")
+        if (savedGameState.exists()){
+            savedGameState.delete()
+        }
         val exception =
-            assertThrows<IllegalStateException> { gameService.continueGame() }
+            assertThrows<IllegalStateException> { historyService.continueGame() }
 
         assertEquals("There is no saved gameState", exception.message)
     }
+
     /**
      * Tests if saveGame and continueGame works correctly
      */
     @Test
     fun testContinueGame() {
         val rootService = RootService()
-        val gameService = GameService(rootService)
-        val playerActionService = PlayerActionService(rootService)
+        val historyService = HistoryService(rootService)
+
         val game = BonsaiGame()
 
         val player1 = Player("Tom", PlayerType.HUMAN, true)
@@ -40,17 +44,13 @@ class ContinueGameTest {
         history.currentPosition = 1
         history.gameStates.add(gameState1)
         history.gameStates.add(gameState2)
-        game.bonsaiGameState.add(gameState1)
-        game.bonsaiGameState.add(gameState2)
         game.history = history
         rootService.currentGame = game
-        playerActionService.saveGame()
+        historyService.saveGame()
         rootService.currentGame = null
-        gameService.continueGame()
+        historyService.continueGame()
         val loadedGame = rootService.currentGame
         assertNotNull(loadedGame)
-        assertEquals(game.bonsaiGameState.first(), loadedGame.bonsaiGameState.first())
-        assertEquals(game.bonsaiGameState.last(), loadedGame.bonsaiGameState.last())
         assertEquals(game.history?.currentPosition, loadedGame.history?.currentPosition)
         assertEquals(game.history?.gameStates, loadedGame.history?.gameStates)
     }

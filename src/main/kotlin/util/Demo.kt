@@ -4,35 +4,52 @@ import entity.Tile
 import entity.TileType
 
 fun main() {
-    // Example case of why having map coordinates AND tile coordinates is error-prone: "
-    val tree = mutableMapOf(
-        (0 to 0) to Tile(0, 0, TileType.WOOD),    // center
-        (1 to -1) to Tile(0, 0, TileType.LEAF),   // top right
-        (1 to 0) to Tile(0, 0, TileType.FLOWER),  // right
-        (0 to 1) to Tile(0, 0, TileType.EMPTY),   // bottom right
-                                                        // bottom left (null)
-        (-1 to 0) to Tile(0, 0, TileType.FRUIT),  // left
-        (0 to -1) to Tile(0, 0, TileType.ANY),    // top left
-    )
+    // --------------- safe append ---------------
+    val tree = mutableMapOf<Pair<Int, Int>, Tile?>()
+    // radius 1
+    tree.safelyAppendTile(Tile(0, 0, TileType.WOOD), 0 to 0)
+    tree.safelyAppendTile(Tile(1, -1, TileType.WOOD), 1 to -1)
+    tree.safelyAppendTile(Tile(1, 0, TileType.WOOD), 1 to 0)
+    tree.safelyAppendTile(Tile(0, 1, TileType.WOOD), 0 to 1)
+    tree.safelyAppendTile(Tile(-1, 0, TileType.WOOD), -1 to 0)
+    tree.safelyAppendTile(Tile(0, -1, TileType.WOOD), 0 to -1)
+    // radius 2
+    tree.safelyAppendTile(Tile(-2, 0, TileType.LEAF), -2 to 0)
+    tree.safelyAppendTile(Tile(-1, -1, TileType.LEAF), -1 to -1)
+    tree.safelyAppendTile(Tile(0, -2, TileType.LEAF), 0 to -2)
+    tree.safelyAppendTile(Tile(2, 0, TileType.FLOWER), 2 to 0)
+        // (these following two will be ignored on traverse because they will be on pot)
+    tree.safelyAppendTile(Tile(1, 1, TileType.FLOWER), 1 to 1)
+    tree.safelyAppendTile(Tile(0, 2, TileType.FLOWER), 0 to 2)
 
-    println("       Example use case of iterating the side tiles once: ")
-    for (tile in tree circleAround (0 to 0)) {
+    // --------------- single iterator ---------------
+    println("       Iterating the side coordinates once: ")
+    for (tile in circleAround(ROOT)) {
         println(tile)
     }
 
-    println("       Example use case of iterating the side tiles for n times: ")
-    (tree foreverCircleAround (0 to 0))
+    // --------------- infinite iterator ---------------
+    println("       Iterating the side coordinates for n times: ")
+    (foreverCircleAround(ROOT))
         .take(8)
         .forEach {
             println(it)
         }
 
-    println("       Example use case, manually using iterator: ")
-    val sideNode = (tree foreverCircleAround (0 to 0)).iterator()
-    println(sideNode)
-    println(sideNode.next())
+    // --------------- manual iteration ---------------
+    println("       Manually using iterator: ")
+    val axialIterator = (foreverCircleAround(ROOT)).iterator()
+    println(axialIterator.next())
+    println(axialIterator.next())
 
+    // --------------- atomic axial arithmetic ---------------
     println("       Primitive axial vector manipulation relative to base point (0, 0): ")
-    println("(-1 to 0) rotating clockwise around         (0 to 0): ${(-1 to 0) rotateClockwiseAround (0 to 0)}")
-    println("(0 to -1) rotating counter-clockwise around (0 to 0): ${(0 to -1) rotateCounterClockwiseAround (0 to 0)}")
+    println("(-1 to 0) rotating clockwise around         ROOT: ${(-1 to 0) rotateClockwiseAround (ROOT)}")
+    println("(0 to -1) rotating counter-clockwise around ROOT: ${(0 to -1) rotateCounterClockwiseAround (ROOT)}")
+
+    // --------------- bfs on tree ---------------
+    println("       Traversing tiles starting from base (0, 0): ")
+    for (tile in (tree traverseFrom (ROOT))) {
+        println(tile)
+    }
 }

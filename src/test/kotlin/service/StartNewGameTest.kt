@@ -46,8 +46,8 @@ class StartNewGameTest {
     @Test
     fun testPlayerSize() {
         val rootService = setUpGame()
-        val game = checkNotNull(rootService.currentGame)
-        val players = game.bonsaiGameState.last().players
+        val game = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
+        val players = game.players
         assertEquals(3, players.size)
     }
 
@@ -57,8 +57,7 @@ class StartNewGameTest {
     @Test
     fun testPlayerOrder() {
         val rootService = setUpGame()
-        val game = checkNotNull(rootService.currentGame)
-        val bonsaiGameState = game.bonsaiGameState.last()
+        val bonsaiGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
         assertEquals("Tom", bonsaiGameState.currentPlayer.name)
         assertNotEquals("Tomy", bonsaiGameState.currentPlayer.name)
     }
@@ -69,8 +68,8 @@ class StartNewGameTest {
     @Test
     fun testIfNamesCorrect() {
         val rootService = setUpGame()
-        val game = checkNotNull(rootService.currentGame)
-        val players = game.bonsaiGameState.last().players
+        val bonsaiGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
+        val players = bonsaiGameState.players
         assertEquals("Tom", players.first().name)
         assertEquals("Tomi", players.last().name)
     }
@@ -81,8 +80,7 @@ class StartNewGameTest {
     @Test
     fun testFaceUpCardsSize() {
         val rootService = setUpGame()
-        val game = checkNotNull(rootService.currentGame)
-        val bonsaiGameState = game.bonsaiGameState.last()
+        val bonsaiGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
         assertEquals(4, bonsaiGameState.faceUpCards.size)
     }
 
