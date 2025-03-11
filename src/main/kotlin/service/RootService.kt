@@ -13,9 +13,12 @@ class RootService {
     val playerActionService = PlayerActionService(this)
     val gameService = GameService(this)
     val networkService = NetworkService(this)
+    val historyService = HistoryService(this)
+    val treeService = TreeService(this)
 
     /** current active Game, that could be Null if the game hasn't started yet*/
     var currentGame: BonsaiGame? = null
+
 
     /**
      * Adds the provided [newRefreshable] to all services connected
