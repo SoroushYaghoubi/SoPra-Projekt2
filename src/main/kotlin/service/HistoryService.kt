@@ -6,6 +6,14 @@ import entity.Player
 import kotlinx.serialization.json.Json
 import java.io.File
 
+/**
+ * The service layer class which contains all actions related to the game states
+ * of the bonsai game, including:
+ * - redo
+ * - undo
+ * - save game
+ * - continue game
+ */
 class HistoryService(private val rootService: RootService) : AbstractRefreshingService() {
 
     /**

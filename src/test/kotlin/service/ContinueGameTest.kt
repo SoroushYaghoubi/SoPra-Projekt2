@@ -11,13 +11,15 @@ import java.io.File
  */
 class ContinueGameTest {
 
+    /**
+     * Tests if continueGame throws error if there is no saved game
+     */
     @Test
     fun testContinueGameInvalid() {
-
         val rootService = RootService()
         val historyService = HistoryService(rootService)
         val savedGameState = File("./savedGameState.json")
-        if (savedGameState.exists()){
+        if (savedGameState.exists()) {
             savedGameState.delete()
         }
         val exception =
@@ -29,7 +31,7 @@ class ContinueGameTest {
     /**
      * Tests if saveGame and continueGame works correctly
      */
-   @Test
+    @Test
     fun testContinueGame() {
         val rootService = RootService()
         val historyService = HistoryService(rootService)
