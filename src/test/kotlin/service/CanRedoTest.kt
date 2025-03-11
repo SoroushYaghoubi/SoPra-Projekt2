@@ -4,11 +4,10 @@ import entity.*
 import kotlin.test.*
 
 /**
- * Tests if canUndo works correctly:
- * - should be true, if there game state size greater than 0
- * - should be false, if the game has just started
+ * Tests if canRedo works correctly:
+ * - should be true, if there has been undone before
  */
-class CanUndoTest {
+class CanRedoTest {
 
     /**
      * Initialises a new game for to do some tests with
@@ -34,30 +33,31 @@ class CanUndoTest {
     }
 
     /**
-     * Tests if player can undo if there are previous game states
+     * Tests if player can redo if currentPos smaller than history size - 1
      */
     @Test
-    fun testCanUndoIfHistoryPosGreater0() {
-        val rootService = setUpGame(1)
-        val historyService = HistoryService(rootService)
-        assertTrue(historyService.canUndo())
-    }
-
-    /**
-     * Tests if player can not undo if game has just started
-     */
-    @Test
-    fun testCanNotUndoIfHistoryPos0() {
+    fun testCanRedoIfHistoryPosSmallerSize() {
         val rootService = setUpGame(0)
         val historyService = HistoryService(rootService)
-        assertFalse(historyService.canUndo())
+        assertTrue(historyService.canRedo())
     }
 
     /**
-     * Tests if player can not undo if there are no game states yet
+     * Tests if player can not redo if currentPos bigger than history size - 1
      */
     @Test
-    fun testCanNotUndoIfGameStateEmpty() {
+    fun testCanNotRedoIfHistoryPosGreaterSize() {
+        val rootService = setUpGame(2)
+        val historyService = HistoryService(rootService)
+        assertFalse(historyService.canRedo())
+    }
+
+
+    /**
+     * Tests if player can not redo if there are no game states yet
+     */
+    @Test
+    fun testCanNotRedoIfGameStateEmpty() {
         val rootService = RootService()
         val game = BonsaiGame()
         val historyService = HistoryService(rootService)
@@ -65,7 +65,6 @@ class CanUndoTest {
         history.currentPosition = 0
         game.history = history
         rootService.currentGame = game
-        assertFalse(historyService.canUndo())
+        assertFalse(historyService.canRedo())
     }
-
 }
