@@ -303,6 +303,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 continue
             }
 
+            // checks if one of the goal tiles is reached
             val conditionValid = when (goalTile.goalTileType) {
                 GoalTileType.BROWN -> playersBonsaiTree.values.count {it.tileType == TileType.WOOD} >= goalTile.tier
                 GoalTileType.GREEN -> playersBonsaiTree.values.count{it.tileType == TileType.LEAF} >= goalTile.tier
@@ -311,6 +312,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 GoalTileType.BLUE -> hasReachedBlueGoal(playersBonsaiTree, goalTile.tier)
             }
 
+            // if goal tile requirement is reached then take actions based on claim
             if (conditionValid) {
                 if (claim) {
                     player.claimedGoals.add(goalTile)
@@ -378,6 +380,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         player.personalSupply.removeAll(tilesToDiscard)
     }
 
+    // returns the current player
     private fun getCurrentPlayer(): Player {
         return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
     }
