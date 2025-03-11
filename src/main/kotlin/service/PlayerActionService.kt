@@ -294,7 +294,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val gameState = checkNotNull(game.currentBonsaiGameState)
 
-        val player = gameState.currentPlayer
+        val player = getCurrentPlayer()
         val playersBonsaiTree = player.bonsaiTree
 
         // checks if a player has already claimed a goal tile from a specific tile type
@@ -372,7 +372,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @throws IllegalStateException if personal supply is not over capacity limit.
      */
-    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {}
+    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+        val player = getCurrentPlayer()
+        check(player.personalSupply.size > player.tileCapacity) {"The personal supply tiles hasn't reached the capacity."}
+        player.personalSupply.removeAll(tilesToDiscard)
+    }
 
     private fun getCurrentPlayer(): Player {
         return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
