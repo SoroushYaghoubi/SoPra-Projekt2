@@ -29,7 +29,6 @@ class ContinueGameTest {
     /**
      * Tests if saveGame and continueGame works correctly
      */
-    /*
    @Test
     fun testContinueGame() {
         val rootService = RootService()
@@ -45,6 +44,7 @@ class ContinueGameTest {
         history.currentPosition = 1
         history.gameStates.add(gameState1)
         history.gameStates.add(gameState2)
+        game.currentBonsaiGameState = gameState2
         game.history = history
         rootService.currentGame = game
         historyService.saveGame()
@@ -56,5 +56,4 @@ class ContinueGameTest {
         assertEquals(game.history?.gameStates, loadedGame.history?.gameStates)
     }
 
-     */
 }
