@@ -31,7 +31,127 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param cardPosition The position of the selected zen card.
      * @throws IllegalStateException if player has already done an action during his current turn.
      */
-    fun meditate(cardPosition: Int) {}
+    fun meditate(cardPosition: Int) {
+
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+
+        val actPlayer = gameState.currentPlayer
+
+        // Player draw 1 card among face up cards in the board
+        val drawnCard = gameState.faceUpCards.removeAt(cardPosition)
+        actPlayer.collectedCards.add(drawnCard)
+
+        // Refill the board
+        rootService.gameService.refillBoard()
+
+
+        // Constructor of Tile needs re-discussion
+        when (cardPosition) {
+            1 -> {
+            }
+
+            2 -> {
+                //val chosenTile = playerChooseTile(TileType.WOOD, TileType.LEAF)
+                // actPlayer.personalSupply.add(Tile(null, null, chosenTile)) // Need consideration
+            }
+
+            3 -> {
+                actPlayer.personalSupply.add(Tile(null, null, TileType.WOOD))
+                actPlayer.personalSupply.add(Tile(null, null, TileType.FLOWER))
+            }
+
+            4 -> {
+                actPlayer.personalSupply.add(Tile(null, null, TileType.LEAF))
+                actPlayer.personalSupply.add(Tile(null, null, TileType.FRUIT))
+            }
+        }
+
+        when (drawnCard) {
+            is ParchmentCard -> {
+            }
+
+            is ToolCard -> {
+                actPlayer.tileCapacity += 2
+            }
+
+            is GrowthCard -> {
+                actPlayer.playableTiles.add(drawnCard.tileType)
+            }
+
+            is MasterCard -> {
+                gameState.currentState = States.USING_MASTER
+                playMasterCard(drawnCard)
+
+            }
+
+            is HelperCard -> {
+                //playHelperCard(drawnCard)
+            }
+
+        }
+
+        // Check personal supply limit
+        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
+            gameState.currentState = States.DISCARDING
+            rootService.playerActionService.discardSupplyTile()
+        }
+
+
+        //gameState.currentState = States.MEDITATE
+        actPlayer.hasPlayed = true
+
+    }
+
+    // NOTES: Maybe GUI does instead
+//    private fun chooseTile(chosenTile: TileType): TileType {
+//       getCurrentPlayer().
+//    }
+
+    private fun playMasterCard(drawnCard: MasterCard) {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+
+        val actPlayer = gameState.currentPlayer
+
+        val toAddTile = Tile(null, null, drawnCard.tileTypes[0])
+        val toAddTile1 = Tile(null, null, drawnCard.tileTypes[1])
+        val toAddTile2 = Tile(null, null, drawnCard.tileTypes[2])
+
+        actPlayer.personalSupply.add(toAddTile)
+        actPlayer.personalSupply.add(toAddTile1)
+        actPlayer.personalSupply.add(toAddTile2)
+
+
+    }
+
+    private fun playHelperCard(drawnCard: HelperCard, tilePosition: Pair<Int, Int>) {
+
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+
+        // move tiles shown on it from personal supply direct to the tree
+        val tileTypeToPlay1 = drawnCard.tileTypes[0]
+        val tileTypeToPlay2 = drawnCard.tileTypes[1]
+        val tileToPlace1 = Tile(null, null, tileTypeToPlay1)
+        val tileToPlace2 = Tile(null, null, tileTypeToPlay2)
+
+        //  Hmm
+        rootService.treeService.playTile(tileToPlace1, tilePosition)
+        rootService.treeService.playTile(tileToPlace2, tilePosition)
+
+        //gameState.currentState = States.USING_HELPER
+    }
+
 
     /**
      * Action to place a tile from personal supply on bonsai tree.
@@ -181,26 +301,26 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             tree.getOrDefault(Pair(q, r - 1), null)?.tileType,
             tree.getOrDefault(Pair(q + 1, r - 1), null)?.tileType,
         ).filterNotNull()
-        if (neighbourTiles.isEmpty()){
+        if (neighbourTiles.isEmpty()) {
             throw IllegalArgumentException("There are no adjacent cards")
         }
-        if (tile.tileType == TileType.WOOD){
+        if (tile.tileType == TileType.WOOD) {
             return neighbourTiles.contains(TileType.WOOD)
         }
-        if (tile.tileType == TileType.LEAF){
+        if (tile.tileType == TileType.LEAF) {
             return neighbourTiles.contains(TileType.WOOD)
         }
-        if (tile.tileType == TileType.FLOWER){
+        if (tile.tileType == TileType.FLOWER) {
             return neighbourTiles.contains(TileType.LEAF)
         }
-        if (tile.tileType == TileType.FRUIT){
-            if (neighbourTiles.first() == TileType.LEAF && neighbourTiles.last() == TileType.LEAF){
+        if (tile.tileType == TileType.FRUIT) {
+            if (neighbourTiles.first() == TileType.LEAF && neighbourTiles.last() == TileType.LEAF) {
                 return true
             }
-            for (i in 0..<neighbourTiles.size - 1){
+            for (i in 0..<neighbourTiles.size - 1) {
                 val currentTile = neighbourTiles[i]
                 val nextTile = neighbourTiles[i + 1]
-                if (currentTile == TileType.LEAF && nextTile == TileType.LEAF){
+                if (currentTile == TileType.LEAF && nextTile == TileType.LEAF) {
                     return true
                 }
             }
