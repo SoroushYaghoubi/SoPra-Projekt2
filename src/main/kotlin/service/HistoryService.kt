@@ -28,6 +28,7 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
         val history = checkNotNull(rootService.currentGame?.history)
         history.currentPosition += 1
         game.currentBonsaiGameState = history.gameStates[history.currentPosition]
+        onAllRefreshables { refreshAfterRedoOrUndo() }
     }
 
     /**
@@ -49,6 +50,7 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
         val history = checkNotNull(rootService.currentGame?.history)
         history.currentPosition -= 1
         game.currentBonsaiGameState = history.gameStates[history.currentPosition]
+        onAllRefreshables { refreshAfterRedoOrUndo() }
     }
 
     /**
