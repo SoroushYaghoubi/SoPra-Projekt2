@@ -1,8 +1,8 @@
-points,targetType
-2,master
-2,growth
-2,helper
-2,blossom
-2,fruit
-1,leaf
-1,log
+id,points,targetType
+34,2,master
+35,2,growth
+36,2,helper
+37,2,blossom
+38,2,fruit
+39,1,leaf
+40,1,log
