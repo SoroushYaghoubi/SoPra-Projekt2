@@ -34,7 +34,8 @@ class SwitchPlayerTurnTest {
           val rootService = setUpGame()
         val game = rootService.currentGame
         checkNotNull(game)
-        val gameState = game.bonsaiGameState.last()
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
 
         assertEquals("Tom", gameState.currentPlayer.name)
 
