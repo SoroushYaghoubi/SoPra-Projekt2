@@ -133,7 +133,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      *
      * @throws IllegalStateException if game isn't over yet.
      */
-    fun showWinner() {
+    fun showWinner() : String {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -141,7 +141,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         checkNotNull(gameState) { "No active game state." }
 
         // Get the winner's name using the index
-        gameState.players[getWinnerIndex()].name
+       return gameState.players[getWinnerIndex()].name
     }
 
     // Dennis implemented showWinner with a return value to test it
@@ -168,7 +168,9 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         checkNotNull(gameState) { "No active game state." }
 
         val maxScore = gameState.players.maxOf { it.score }
-        val playerOrder: MutableList<Player> = mutableListOf()
+
+        //val playerOrder: MutableList<Player> = mutableListOf()
+        val playerOrder = gameState.players
 
         // List of players as candidate for winner: those with highest score
         val candidates = gameState.players.filter { it.score == maxScore }

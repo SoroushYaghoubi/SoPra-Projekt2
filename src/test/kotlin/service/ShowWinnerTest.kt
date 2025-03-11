@@ -2,6 +2,7 @@ package service
 
 import kotlin.test.*
 import entity.*
+import org.junit.jupiter.api.Assertions.assertEquals
 
 /**
  * Tests if showWinner works correctly:
@@ -19,13 +20,13 @@ class ShowWinnerTest {
         val player1 = Player("Tom", PlayerType.HUMAN, true)
         val player2 = Player("Tom2", PlayerType.HUMAN, true)
         val player3 = Player("Tom3", PlayerType.HUMAN, true)
-        val player4 = Player("Tome4", PlayerType.HUMAN, true)
+        val player4 = Player("Tom4", PlayerType.HUMAN, true)
         val playerOrder = mutableListOf(player1, player2, player3, player4)
         val goalTiles = mutableListOf(GoalTileType.BLUE, GoalTileType.PINK, GoalTileType.GREEN)
         gameService.startNewGame(playerOrder, false, goalTiles)
         return rootService
     }
-    /*
+
 
     /**
      * Tests if player with the highest score wins
@@ -35,7 +36,7 @@ class ShowWinnerTest {
     fun testSingleWinner() {
         val rootService = setUpGame()
         val gameService = rootService.gameService
-        val gameState = rootService.currentGame?.bonsaiGameState?.lastOrNull()
+        val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is null." }
 
         // Set scores
@@ -55,7 +56,7 @@ class ShowWinnerTest {
     fun testTieWithTwoPlayers() {
         val rootService = setUpGame()
         val gameService = rootService.gameService
-        val gameState = rootService.currentGame?.bonsaiGameState?.lastOrNull()
+        val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is null." }
 
         // Set scores (two players tied)
@@ -76,7 +77,7 @@ class ShowWinnerTest {
     fun testTieWithThreePlayers() {
         val rootService = setUpGame()
         val gameService = rootService.gameService
-        val gameState = rootService.currentGame?.bonsaiGameState?.lastOrNull()
+        val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is null." }
 
         // Set scores (three players tied)
@@ -97,7 +98,7 @@ class ShowWinnerTest {
     fun testTieWithAllPlayers() {
         val rootService = setUpGame()
         val gameService = rootService.gameService
-        val gameState = rootService.currentGame?.bonsaiGameState?.lastOrNull()
+        val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is null." }
 
         // Set scores (all players tied)
@@ -126,5 +127,5 @@ class ShowWinnerTest {
         assertEquals("No game was started.", exception.message)
     }
 
-     */
+
 }
