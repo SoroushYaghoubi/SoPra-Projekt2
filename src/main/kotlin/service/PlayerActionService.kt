@@ -360,7 +360,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *  @return true if player can end his turn.
      */
     fun canEndTurn(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+        val player = getCurrentPlayer()
+
+        return player.hasPlayed
     }
 
     /**
