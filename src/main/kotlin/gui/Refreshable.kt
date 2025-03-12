@@ -1,5 +1,6 @@
 package gui
 
+import entity.Tile
 import entity.TileType
 import service.AbstractRefreshingService
 
@@ -50,11 +51,16 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player has chosen a HelperCard
      */
-    fun refreshAfterDrawingHelperCard(firstTileTypeToPlace : TileType , secondTileTypeToPlace : TileType ){}
+    fun refreshAfterDrawingHelperCard(secondTileTypeToPlace : TileType ){}
     /**
-     * perform refreshes that are necessary after a player has chosen a tile or has received tiles
+     * perform refreshes that are necessary after a player has received tiles
      */
-    fun refreshAfterChoseOrReceivedTile(discard : Boolean){}
+    fun refreshAfterReceivedTile(discard : Boolean){}
+
+    /**
+     * perform refreshes that are necessary after a player has received tiles
+     */
+    fun refreshAfterChooseTileToPlay(tile: Tile) {}
 
     /**
      * perform refreshes that are necessary after a player has ended his turn

@@ -100,7 +100,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // Check personal supply limit
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterChoseOrReceivedTile(true) }
+            onAllRefreshables { refreshAfterReceivedTile(true) }
             return
         }
 
@@ -148,12 +148,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // Check personal supply limit
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterChoseOrReceivedTile(true) }
+            onAllRefreshables { refreshAfterReceivedTile(true) }
             return
         }
         actPlayer.hasPlayed = true
         gameState.currentState = States.END_TURN
-        onAllRefreshables { refreshAfterChoseOrReceivedTile(false) }
+        onAllRefreshables { refreshAfterReceivedTile(false) }
 
     }
 
@@ -161,7 +161,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * chose ANY Type
      * @param tileType : the TileType that the player has chosen
      */
-    fun choseTile(tileType: TileType): Tile {
+    fun choseTile(tileType: TileType) {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -173,7 +173,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         require(
             gameState.currentState == States.USING_MASTER ||
                     gameState.currentState == States.USING_HELPER
-        ) { "currentState should be Using_Master" }
+        ) { "currentState should be Using_Master or Using_Helper" }
 
         if (gameState.currentState == States.USING_MASTER) {
             actPlayer.personalSupply.add(Tile(null, null, tileType))
@@ -181,16 +181,14 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             // Check personal supply limit
             if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
                 gameState.currentState = States.DISCARDING
-                onAllRefreshables { refreshAfterChoseOrReceivedTile(true) }
-                return Tile(null, null, tileType)
+                onAllRefreshables { refreshAfterReceivedTile(true)  }
             }
 
             actPlayer.hasPlayed = true
             gameState.currentState = States.END_TURN
-            onAllRefreshables { refreshAfterChoseOrReceivedTile(false) }
-            return Tile(null, null, tileType)
+            onAllRefreshables { refreshAfterReceivedTile(false) }
         } else {
-            return Tile(null, null, tileType)
+            onAllRefreshables { refreshAfterChooseTileToPlay(Tile(null ,null, tileType)) }
         }
 
 
@@ -209,7 +207,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val tileTypeToPlay2 = drawnCard.tileTypes[1]
 
-        onAllRefreshables { refreshAfterDrawingHelperCard(TileType.ANY, tileTypeToPlay2) }
+        onAllRefreshables { refreshAfterDrawingHelperCard( tileTypeToPlay2) }
+        gameState.currentPlayer.hasPlayed = true
 
     }
 
@@ -285,7 +284,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             rootService.gameService.calculateScore()
             rootService.gameService.switchPlayerTurn()
         }
-
+         // TODO : update State to END_TURN
         // TODO: Update history -> later
 
     }
@@ -375,7 +374,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
     }
 
-
     /**
      * Checks if player has played an action before ending his turn.
      *
@@ -385,7 +383,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *  @return true if player can end his turn.
      */
     fun canEndTurn(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+        val player = getCurrentPlayer()
+
+        return player.hasPlayed
     }
 
     /**
@@ -405,8 +405,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         player.personalSupply.removeAll(tilesToDiscard)
     }
 
-
+    // returns the current player
     private fun getCurrentPlayer(): Player {
         return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
     }
 }
+
