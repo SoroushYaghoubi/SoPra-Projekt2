@@ -385,7 +385,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
          */
         fun canEndTurn(): Boolean {
             val player = getCurrentPlayer()
-
             return player.hasPlayed
         }
 
