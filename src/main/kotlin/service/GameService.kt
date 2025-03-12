@@ -208,7 +208,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         return farthestIndex
     }
 
-
     /**
      * Calculates the score of the current player.
      */
