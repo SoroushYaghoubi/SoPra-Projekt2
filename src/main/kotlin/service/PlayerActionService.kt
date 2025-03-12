@@ -2,6 +2,7 @@ package service
 
 import edu.udo.cs.sopra.ntf.MeditateMessage
 import entity.*
+import kotlin.math.max
 
 /**
  * The service layer class which contains the player's action functions.
@@ -309,9 +310,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
             // checks if one of the goal tiles is reached
             val conditionValid = when (goalTile.goalTileType) {
-                GoalTileType.BROWN -> playersBonsaiTree.values.count { it.tileType == TileType.WOOD } >= goalTile.tier
-                GoalTileType.GREEN -> playersBonsaiTree.values.count { it.tileType == TileType.LEAF } >= goalTile.tier
-                GoalTileType.PINK -> playersBonsaiTree.values.count { it.tileType == TileType.FLOWER } >= goalTile.tier
+                GoalTileType.BROWN -> playersBonsaiTree.values.count {it.tileType == TileType.WOOD} >= goalTile.tier
+                GoalTileType.GREEN -> countLeafs(playersBonsaiTree) >= goalTile.tier
+                GoalTileType.PINK -> countFlowers(playersBonsaiTree) >= goalTile.tier
                 GoalTileType.ORANGE -> playersBonsaiTree.values.count { it.tileType == TileType.FRUIT } >= goalTile.tier
                 GoalTileType.BLUE -> hasReachedBlueGoal(playersBonsaiTree, goalTile.tier)
             }
@@ -335,6 +336,26 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
     }
 
+    private fun countLeafs(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>) : Int {
+
+        return 10
+    }
+
+
+    /**
+     * count the amount of flower tile types that protrudes from the tree.
+     *
+     * @param bonsaiTree is the bonsai tree of the active player
+     *
+     * @return the maximus amount of flowers the protrudes from the tree
+     */
+    private fun countFlowers(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>) : Int{
+        val leftProtrude = bonsaiTree.keys.count { it.first  <= -3 && bonsaiTree[it]?.tileType == TileType.FLOWER}
+        val rightProtrude = bonsaiTree.keys.count { it.first  >= 4 && bonsaiTree[it]?.tileType == TileType.FLOWER}
+
+        return max(leftProtrude, rightProtrude)
+    }
+
     /**
      * checks if a player has reached on of the blue goal tiles.
      *
@@ -343,12 +364,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * return true if the [tier] of the blue goal tile is reached, otherwise false
      */
-    private fun hasReachedBlueGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
-        val leftProtrude = bonsaiTree.keys.any { it.first <= -3 }
-        val rightProtrude = bonsaiTree.keys.any { it.first >= 4 }
+    private fun hasReachedBlueGoal(bonsaiTree : MutableMap<Pair<Int, Int>, Tile>, tier : Int) : Boolean{
+        val leftProtrude = bonsaiTree.keys.any { it.first  <= -3}
+        val rightProtrude = bonsaiTree.keys.any { it.first  >= 4}
         val bellowProtrude = bonsaiTree.keys.any { it.second >= 3 }
 
-        return when (tier) {
+        return when(tier) {
             7 -> leftProtrude || rightProtrude
             10 -> leftProtrude && rightProtrude
             14 -> (leftProtrude || rightProtrude) && bellowProtrude
@@ -384,7 +405,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      */
     fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
         val player = getCurrentPlayer()
-        check(player.personalSupply.size > player.tileCapacity) { "The personal supply tiles hasn't reached the capacity." }
+        check(player.personalSupply.size > player.tileCapacity) {"The personal supply tiles hasn't reached the capacity."}
         player.personalSupply.removeAll(tilesToDiscard)
     }
 
