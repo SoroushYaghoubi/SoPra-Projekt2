@@ -1,5 +1,15 @@
 package gui
 
+import entity.TileType
+import service.AbstractRefreshingService
+
+/**
+ * This interface provides a mechanism for the service layer classes to communicate
+ * that certain changes have been made to the entity layer, so that the user
+ * can be updated accordingly
+ *
+ * @see AbstractRefreshingService
+ */
 interface Refreshable {
 
     /**
@@ -23,14 +33,28 @@ interface Refreshable {
     fun refreshAfterMeditate(){}
 
     /**
+     * perform refreshes that are necessary after a player has cultivated
+     */
+     fun refreshAfterCultivate(){}
+
+    /**
      * perform refreshes that are necessary after a player has chosen a card
      */
     fun refreshAfterChooseCard(){}
 
     /**
-     * perform refreshes that are necessary after a player has chosen a tile
+     * perform refreshes that are necessary after a player has chosen a MasterCard
      */
-    fun refreshAfterChooseTile(){}
+    fun refreshAfterDrawingMasterCardAny(){}
+
+    /**
+     * perform refreshes that are necessary after a player has chosen a HelperCard
+     */
+    fun refreshAfterDrawingHelperCard(firstTileTypeToPlace : TileType , secondTileTypeToPlace : TileType ){}
+    /**
+     * perform refreshes that are necessary after a player has chosen a tile or has received tiles
+     */
+    fun refreshAfterChoseOrReceivedTile(discard : Boolean){}
 
     /**
      * perform refreshes that are necessary after a player has ended his turn

@@ -23,7 +23,18 @@ kotlin {
 repositories {
     mavenCentral()
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    maven {
+        url = uri("https://sopra-gitlab.cs.tu-dortmund.de/api/v4/projects/2128/packages/maven")
+        credentials(HttpHeaderCredentials::class) {
+            name = "Private-Token"
+            value = "glpat-t95XRsqvU899Px-tGG8G"
+        }
+        authentication {
+            create<HttpHeaderAuthentication>("header")
+        }
+    }
 }
+
 
 application {
     mainClass.set("MainKt")
@@ -35,6 +46,14 @@ dependencies {
     implementation(group = "tools.aqua", name = "bgw-gui", version = "0.9-9-5ef7d86-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-common", version = "0.9-9-5ef7d86-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-client", version = "0.9-9-5ef7d86-SNAPSHOT")
+
+    // dependencies for jackson csv
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.18.3")
+
+    // dependencies for the network messages
+    implementation(group = "edu.udo.cs.sopra", name = "ntf", version = "1.0")
+
 }
 
 tasks.distZip {

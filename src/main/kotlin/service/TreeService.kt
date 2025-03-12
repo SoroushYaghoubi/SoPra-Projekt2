@@ -25,16 +25,39 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalArgumentException if the tile position is invalid.
      */
     fun playTile(tile: Tile, tilePosition: Pair<Int, Int>) {
+
         if (!canPlayTile(tile, tilePosition)) {
             throw IllegalArgumentException("Tile can not be played")
         }
+
         val currentPlayer = getCurrentPlayer()
         currentPlayer.bonsaiTree[tilePosition] = tile
         currentPlayer.personalSupply.remove(tile)
-        currentPlayer.playableTilesCopy.remove(tile.tileType)
+
+        if (tile.tileType in currentPlayer.playableTilesCopy) {
+            currentPlayer.playableTilesCopy.remove(tile.tileType)
+        } else if (TileType.ANY in currentPlayer.playableTilesCopy) {
+            currentPlayer.playableTilesCopy.remove(TileType.ANY)
+        }
         // TODO: check if player has achieved a goal tile
         onAllRefreshables { refreshAfterPlayTile() }
     }
+
+    /**
+     * Removes bonsai tile from players bonsai tree.
+     *
+     * preconditions:
+     * - The game has started and is currently running.
+     * - Bonsai tree has tiles to be removed from (bonsai tree is not empty).
+     *
+     * post conditions:
+     * - The bonsai tile is removed from the bonsai tree.
+     *
+     * @param tile The bonsai tile(s) to be removed.
+     * @param tilePosition The position of the bonsai tile to be removed from.
+     * @throws IllegalStateException if there is no tile (bonsai tree is empty).
+     */
+    fun removeFromTree(tile: Tile, tilePosition: Pair<Int, Int>) {}
 
     /**
      * Checks if a bonsai tile can be played based on the symbols shown on

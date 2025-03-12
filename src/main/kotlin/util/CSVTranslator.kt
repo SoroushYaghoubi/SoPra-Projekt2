@@ -12,7 +12,7 @@ const val HEADERS: Boolean = true
 /**
  * Edit this if you move the CSV Dir
  */
-const val CSV_PATH: String = "./src/main/kotlin/util/zen"
+const val CSV_PATH: String = "./src/main/resources"
 
 fun translateToolCardsFromCSV(playerCount: Int): MutableList<Card>{
     val csvLines = parseCSVLines("$CSV_PATH/zentool.csv")
