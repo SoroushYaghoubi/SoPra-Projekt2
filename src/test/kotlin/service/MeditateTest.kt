@@ -101,7 +101,7 @@ class MeditateTest {
         assertEquals(1, gameState.currentPlayer.collectedCards.size)
         assertEquals(1, gameState.currentPlayer.personalSupply.size)
 
-        //rootService.playerActionService.meditate(1, Tile(null, null, TileType.WOOD))
+        rootService.playerActionService.meditate(1, TileType.LEAF)
         assertEquals(5, gameState.currentPlayer.tileCapacity)
 //        assertEquals(3, gameState.currentPlayer.playableTiles.size)
         assertEquals(2, gameState.currentPlayer.collectedCards.size)
