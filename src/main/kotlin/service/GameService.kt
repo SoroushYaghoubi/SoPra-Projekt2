@@ -1,5 +1,6 @@
 package service
 
+import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 
 /**
@@ -89,8 +90,9 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         if (!networkGame) {
             //TODO()
-            println("Hallo!")
-            //val message : StartGameMessage
+
+            val message : StartGameMessage
+
             //rootService.networkService.sendStartGameMessage(message)
         }
     }
