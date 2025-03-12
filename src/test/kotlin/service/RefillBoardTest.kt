@@ -17,9 +17,9 @@ class RefillBoardTest {
         val rootService = RootService()
 
         val players = mutableListOf(
-            Player("Tom", PlayerType.HUMAN, true),
-            Player("Tomy", PlayerType.HUMAN, true),
-            Player("Tomi", PlayerType.HUMAN, true)
+            Player("Tom", PlayerType.HUMAN, true, ColorType.RED),
+            Player("Tomy", PlayerType.HUMAN, true, ColorType.BLUE),
+            Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
         )
 
         val zenDeck = mutableListOf(

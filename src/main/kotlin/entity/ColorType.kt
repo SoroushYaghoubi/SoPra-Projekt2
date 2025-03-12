@@ -6,7 +6,7 @@ package entity
 enum class ColorType {
     RED,
 
-    Purple,
+    PURPLE,
 
     BLACK,
 
