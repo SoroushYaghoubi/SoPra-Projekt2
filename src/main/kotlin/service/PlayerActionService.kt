@@ -374,6 +374,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
     }
 
+
     /**
      * Checks if player has played an action before ending his turn.
      *
@@ -410,4 +411,3 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
     }
 }
-
