@@ -248,7 +248,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // change game state to CULTIVATE
         gameState.currentState = States.CULTIVATE
 
-        onAllRefreshables { refreshAfterCultivate() }
+        onAllRefreshables { refreshAfterCultivateStart() }
 
     }
 
