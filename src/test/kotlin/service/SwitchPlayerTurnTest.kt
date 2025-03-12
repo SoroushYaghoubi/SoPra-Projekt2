@@ -1,5 +1,6 @@
 package service
 
+import entity.ColorType
 import entity.GoalTileType
 import entity.Player
 import entity.PlayerType
@@ -17,9 +18,9 @@ class SwitchPlayerTurnTest {
     private fun setUpGame(): RootService {
         val rootService = RootService()
         val gameService = GameService(rootService)
-        val player1 = Player("Tom", PlayerType.HUMAN, true)
-        val player2 = Player("Tomy", PlayerType.HUMAN, true)
-        val player3 = Player("Tomi", PlayerType.HUMAN, true)
+        val player1 = Player("Tom", PlayerType.HUMAN, true, ColorType.RED)
+        val player2 = Player("Tomy", PlayerType.HUMAN, true, ColorType.BLACK)
+        val player3 = Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
         val playerOrder = mutableListOf(player1, player2, player3)
         val goalTiles = mutableListOf(GoalTileType.BLUE, GoalTileType.PINK, GoalTileType.GREEN)
         gameService.startNewGame(playerOrder, false, goalTiles)

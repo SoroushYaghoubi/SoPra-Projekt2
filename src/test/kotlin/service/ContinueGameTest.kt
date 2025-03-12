@@ -38,8 +38,8 @@ class ContinueGameTest {
 
         val game = BonsaiGame()
 
-        val player1 = Player("Tom", PlayerType.HUMAN, true)
-        val player2 = Player("Tomy", PlayerType.HUMAN, true)
+        val player1 = Player("Tom", PlayerType.HUMAN, true, ColorType.RED)
+        val player2 = Player("Tomy", PlayerType.HUMAN, true, ColorType.BLUE)
         val gameState1 = BonsaiGameState(player1, mutableListOf(player1, player2), 2, States.MEDITATE)
         val gameState2 = BonsaiGameState(player2, mutableListOf(player1, player2), 2, States.CULTIVATE)
         val history = History()
@@ -62,12 +62,12 @@ class ContinueGameTest {
      * Tests if player can not save if not played local
      */
     @Test
-    fun testSaveGameIfPlayerNotLocal(){
+    fun testSaveGameIfPlayerNotLocal() {
         val rootService = RootService()
         val game = BonsaiGame()
         val historyService = HistoryService(rootService)
-        val player1 = Player("Tom", PlayerType.HUMAN, false)
-        val player2 = Player("Tomy", PlayerType.HUMAN, false)
+        val player1 = Player("Tom", PlayerType.HUMAN, false, ColorType.RED)
+        val player2 = Player("Tomy", PlayerType.HUMAN, false, ColorType.BLUE)
         val gameState1 = BonsaiGameState(player1, mutableListOf(player1, player2), 2, States.MEDITATE)
         val gameState2 = BonsaiGameState(player2, mutableListOf(player1, player2), 2, States.CULTIVATE)
         val history = History()

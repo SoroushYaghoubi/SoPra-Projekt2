@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.kotlinModule
 
 
 /**
- * see the main function from this data and try with it
+ * this class translate a given csv into a dataclass
  */
 class CSVLoader {
     val csvMapper = CsvMapper().apply {

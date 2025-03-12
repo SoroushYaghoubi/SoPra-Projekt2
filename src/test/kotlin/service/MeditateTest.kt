@@ -15,9 +15,9 @@ class MeditateTest {
 
         //SETUP for game
         val players = mutableListOf(
-            Player("Alice", PlayerType.HUMAN, true),
-            Player("Bob", PlayerType.HUMAN, true),
-            Player("Tomi", PlayerType.HUMAN, true)
+            Player("Alice", PlayerType.HUMAN, true, ColorType.RED),
+            Player("Bob", PlayerType.HUMAN, true, ColorType.BLUE),
+            Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
         )
 
         val zenDeck = mutableListOf(

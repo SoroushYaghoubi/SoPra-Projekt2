@@ -17,8 +17,8 @@ class CanRedoTest {
     private fun setUpGame(currentPos: Int): RootService {
         val rootService = RootService()
         val game = BonsaiGame()
-        val player1 = Player("Tom", PlayerType.HUMAN, true)
-        val player2 = Player("Tomy", PlayerType.HUMAN, true)
+        val player1 = Player("Tom", PlayerType.HUMAN, true, ColorType.RED)
+        val player2 = Player("Tomy", PlayerType.HUMAN, true, ColorType.BLUE)
         val gameState1 = BonsaiGameState(player1, mutableListOf(player1, player2), 2, States.MEDITATE)
         val gameState2 = BonsaiGameState(player2, mutableListOf(player1, player2), 2, States.CULTIVATE)
         val history = History()
