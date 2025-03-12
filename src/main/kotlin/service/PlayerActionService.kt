@@ -311,7 +311,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * - goal tile gets locked from player
      *
      * @param claim true if player accepts goal tile, otherwise false.
-     *
      */
     fun claimOrRenounceGoal(claim: Boolean) {
         val game = checkNotNull(rootService.currentGame) { "No game was started." }
@@ -348,6 +347,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                     }
                 } else {
                     player.renouncedGoals.add(goalTile)
+                    break
                 }
             }
         }
@@ -385,7 +385,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *  @return true if player can end his turn.
      */
     fun canEndTurn(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+        val player = getCurrentPlayer()
+        return player.hasPlayed
     }
 
     /**
