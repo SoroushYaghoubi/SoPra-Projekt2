@@ -344,4 +344,3 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
     }
 }
-
