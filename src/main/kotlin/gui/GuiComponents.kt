@@ -1,7 +1,5 @@
 package gui
 
-import util.PRIMARY_COLOUR
-import util.SECONDARY_COLOUR
 import tools.aqua.bgw.components.uicomponents.Button
 import tools.aqua.bgw.components.uicomponents.CheckBox
 import tools.aqua.bgw.components.uicomponents.Label
@@ -10,8 +8,7 @@ import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.visual.ColorVisual
 import tools.aqua.bgw.style.BorderRadius
-import util.QUATERNARY_COLOUR
-import util.TERTIARY_COLOUR
+import util.*
 
 class ButtonStyle1(
     posX : Int = 0, posY: Int = 0, text: String = "Button"
@@ -108,6 +105,20 @@ class SquareButton(
     text = "X",
     font = Font(48.0, Color(0x000000), "Arial Black", Font.FontWeight.BOLD),
     visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
+        style.borderRadius = BorderRadius(20.0)
+    }
+)
+
+class ColourButton(
+    posX : Int = 0, posY : Int = 0,
+) : Button(
+    posX = posX,
+    posY = posY,
+    width = 90,
+    height = 90,
+    text = "",
+    font = Font(48.0, Color(0x000000), "Arial Black", Font.FontWeight.BOLD),
+    visual = ColorVisual(Color(COLOUR_RED)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
 )
