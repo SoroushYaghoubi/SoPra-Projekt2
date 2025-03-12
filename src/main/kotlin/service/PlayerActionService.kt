@@ -1,5 +1,6 @@
 package service
 
+import edu.udo.cs.sopra.ntf.MeditateMessage
 import entity.*
 
 /**
@@ -336,6 +337,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                     }
                 } else {
                     player.renouncedGoals.add(goalTile)
+                    break
                 }
             }
         }
