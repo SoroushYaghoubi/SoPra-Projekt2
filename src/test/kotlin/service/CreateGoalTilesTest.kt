@@ -2,10 +2,11 @@ package service
 
 import entity.*
 import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
+/**
+ * Class to test the [GameService.createGoalTiles] function in [GameService].
+ */
 class CreateGoalTilesTest {
 
     /**
@@ -30,5 +31,7 @@ class CreateGoalTilesTest {
         val goalTiles = rootService.gameService.createGoalTiles(mutableListOf(GoalTileType.BROWN, GoalTileType.ORANGE, GoalTileType.GREEN), 2)
 
         assertFalse(goalTiles.flatten().contains(GoalTile(GoalTileType.ORANGE, 4, 11)))
+        assertFalse(goalTiles.flatten().contains(GoalTile(GoalTileType.BROWN, 10, 10)))
+        assertFalse(goalTiles.flatten().contains(GoalTile(GoalTileType.GREEN, 7, 9)))
     }
 }
