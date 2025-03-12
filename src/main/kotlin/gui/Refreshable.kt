@@ -58,6 +58,10 @@ interface Refreshable {
     fun refreshAfterReceivedTile(discard : Boolean){}
 
     /**
+     *  perform refreshes that are necessary after apply card effects
+     */
+    fun refreshAfterApplyCardEffects(){}
+    /**
      * perform refreshes that are necessary after a player has received tiles
      */
     fun refreshAfterChooseTileToPlay(tile: Tile) {}
