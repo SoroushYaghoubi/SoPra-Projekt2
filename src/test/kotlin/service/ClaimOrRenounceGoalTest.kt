@@ -127,7 +127,7 @@ class ClaimOrRenounceGoalTest {
     }
 
     /**
-     * Tests if player can claim blue goal tile
+     * Tests if player renounce goals get added in list
      */
     @Test
     fun testGoalTileRenounce() {
