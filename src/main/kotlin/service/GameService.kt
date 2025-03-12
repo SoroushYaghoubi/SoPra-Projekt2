@@ -1,6 +1,10 @@
 package service
 
+import edu.udo.cs.sopra.ntf.*
+
+import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
+import util.ZenCardLoader
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
@@ -34,11 +38,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         require(playerOrder.size >= 2) { "at least 2 Players" }
 
         // create the zenDeck depending on the number of players
-        val zenDeck = when (playerOrder.size) {
-            2 -> create2PlayersZenDeck().shuffled().toMutableList()
-            3 -> create3PlayersZenDeck().shuffled().toMutableList()
-            else -> create4PlayersZenDeck().shuffled().toMutableList()
-        }
+        val zenDeck = ZenCardLoader().readAllZenCards(playerOrder.size).shuffled().toMutableList()
 
         // put the first 4 cards face up
         val faceUpCards = mutableListOf<Card>()
@@ -87,12 +87,19 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         rootService.currentGame = game
 
-        if (!networkGame) {
-            //TODO()
-            println("Hallo!")
-            //val message : StartGameMessage
-            //rootService.networkService.sendStartGameMessage(message)
+        if (networkGame) {
+
+            val message = StartGameMessage(
+                orderedPlayerNames = playerOrder.map { player -> Pair(player.name, ColorTypeMessage.valueOf(player.color.name))},
+                chosenGoalTiles = goalTilesEntries.map { GoalTileTypeMessage.valueOf(it.name) },
+                orderedCards = zenDeck.mapIndexed { index, card ->
+                    Pair(CardTypeMessage.valueOf(card.cardType.name), index)
+                }
+            )
+            rootService.networkService.sendStartGameMessage(message)
         }
+
+        onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
@@ -230,91 +237,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         }
 
         onAllRefreshables { refreshAfterChooseCard() }
-    }
-
-    /**
-     * creates the Zen Deck of 2 Players
-     */
-    private fun create2PlayersZenDeck(): List<Card> {
-        var counter = 0
-        val helperCards = TileType.entries
-            .filter { it != TileType.ANY }
-            .flatMap { tileType ->
-                when (tileType) {
-                    TileType.WOOD -> List(3) { HelperCard(tileType, counter++) } // 3 WOOD HelperCards
-                    TileType.LEAF -> List(2) { HelperCard(tileType, counter++) } // 2 LEAF HelperCards
-                    TileType.FLOWER -> List(1) { HelperCard(tileType, counter++) } // 1 FLOWER HelperCard
-                    else -> List(1) { HelperCard(tileType, counter++) } // 1 FRUIT HelperCard
-                }
-            }
-        val growthCards = TileType.entries
-            .filter { it != TileType.ANY }
-            .flatMap { tileType ->
-                List(2) { GrowthCard(tileType, counter++) }
-            }
-        val masterCards: List<Card> = listOf(
-            MasterCard(mutableListOf(TileType.WOOD, TileType.WOOD), counter++),
-            MasterCard(mutableListOf(TileType.LEAF, TileType.LEAF), counter++),
-            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF), counter++),
-            MasterCard(mutableListOf(TileType.ANY), counter++),
-            MasterCard(mutableListOf(TileType.ANY), counter++),
-            MasterCard(mutableListOf(TileType.LEAF, TileType.LEAF), counter++),
-            MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), counter++),
-        )
-        val parchmentCards: List<Card> = listOf(
-            ParchmentCard(null, CardType.MASTERCARD, 2, counter++),
-            ParchmentCard(null, CardType.GROWTHCARD, 2, counter++),
-            ParchmentCard(null, CardType.HELPERCARD, 2, counter++),
-            ParchmentCard(TileType.FLOWER, null, 2, counter++),
-            ParchmentCard(TileType.FRUIT, null, 2, counter++),
-            ParchmentCard(TileType.LEAF, null, 1, counter++),
-            ParchmentCard(TileType.WOOD, null, 1, counter++),
-
-            )
-        val toolCards: List<Card> = List(3) { ToolCard(counter++) }
-
-        return helperCards + growthCards + masterCards + parchmentCards + toolCards
-
-    }
-
-    /**
-     * creates ZenDeck for 3 Players
-     */
-    private fun create3PlayersZenDeck(): List<Card> {
-        var counter = 32
-        val additionalGrowthCards = listOf(
-            GrowthCard(TileType.WOOD, counter++),
-            GrowthCard(TileType.LEAF, counter++),
-            GrowthCard(TileType.LEAF, counter++),
-            GrowthCard(TileType.FLOWER, counter++)
-        )
-        val additionalMasterCards = listOf(
-            MasterCard(mutableListOf(TileType.ANY), counter++),
-            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF), counter++),
-            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF), counter++),
-            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER), counter++),
-            MasterCard(mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FRUIT), counter++)
-        )
-        val additionalToolCard: List<Card> = List(2) { ToolCard(counter++) }
-
-        return create2PlayersZenDeck() + additionalGrowthCards + additionalMasterCards + additionalToolCard
-    }
-
-    /**
-     * create the zenDeck for 4 Players
-     */
-    private fun create4PlayersZenDeck(): List<Card> {
-        var counter = 43
-        val additionalGrowthCards = listOf(
-            GrowthCard(TileType.WOOD, counter++),
-            GrowthCard(TileType.FRUIT, counter++),
-        )
-        val additionalMasterCards = listOf(
-            MasterCard(mutableListOf(TileType.LEAF, TileType.FLOWER, TileType.FLOWER), counter++)
-        )
-        val additionalToolCard: List<Card> = listOf(ToolCard(counter++))
-
-        return create3PlayersZenDeck() + additionalGrowthCards + additionalMasterCards + additionalToolCard
     }
 
     /**

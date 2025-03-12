@@ -2,6 +2,14 @@ package util
 
 import entity.*
 
+
+/**
+ * this class is to create the zenDeck
+ * usage sees [readAllZenCards]
+ *
+ * the private functions read the csv files then map the data class to our zenCard
+ * at the end it returns a list of the chosen cards
+ */
 class ZenCardLoader {
     val csvLoader = CSVLoader()
 
@@ -108,6 +116,11 @@ class ZenCardLoader {
         }
     }
 
+    /**
+     * this function returns a [List] of [Card] for a given amount of [playerAmount]
+     *
+     * @param [playerAmount] of how many players are there in the game
+     */
     fun readAllZenCards(playerAmount : Int) : List<Card> {
         val fullZenDeck = readAllGrowthCards(playerAmount) +
                 readAllHelperCards() +

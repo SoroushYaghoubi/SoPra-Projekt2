@@ -1,5 +1,6 @@
 package service
 
+import edu.udo.cs.sopra.ntf.MeditateMessage
 import entity.*
 
 /**
@@ -27,10 +28,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * - sets the current state to cultivate
      *
      * @param cardPosition The position of the selected zen card.
+     * @param chosenTile The wood or leaf tile if the card is drawn from position 1
      * @throws IllegalStateException if player has already done an action during his current turn.
      */
     fun meditate(cardPosition: Int, chosenTile: Tile?) {
-
 
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
@@ -47,13 +48,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         // Refill the board
         rootService.gameService.refillBoard()
-
         onAllRefreshables { refreshAfterChooseCard() }
 
-        // Constructor of Tile needs re-discussion
+        // Check the card position in board to claim tile(s)
         when (cardPosition) {
-
             1 -> {
+                // Here player has to choose wood tile or leaf tile
                 checkNotNull(chosenTile)
                 actPlayer.personalSupply.add(chosenTile)
             }
@@ -69,8 +69,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             }
         }
 
+        // Play the already drawn card
         when (drawnCard) {
-
             is ToolCard -> {
                 actPlayer.tileCapacity += 2
             }
@@ -96,24 +96,17 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             }
         }
 
-
         // Check personal supply limit
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterChoseOrReceivedTile(true) }
+            onAllRefreshables { refreshAfterReceivedTile(true) }
             return
         }
-
 
         actPlayer.hasPlayed = true
         gameState.currentState = States.END_TURN
 
     }
-
-    // NOTES: Maybe GUI does instead
-//    private fun chooseTile(chosenTile: TileType): TileType {
-//       getCurrentPlayer().
-//    }
 
     /**
      * apply MasterCard effects
@@ -148,20 +141,19 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // Check personal supply limit
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterChoseOrReceivedTile(true) }
+            onAllRefreshables { refreshAfterReceivedTile(true) }
             return
         }
         actPlayer.hasPlayed = true
-        gameState.currentState = States.END_TURN
-        onAllRefreshables { refreshAfterChoseOrReceivedTile(false) }
+        onAllRefreshables { refreshAfterReceivedTile(false) }
 
     }
 
     /**
-     * chose ANY Type
+     * player chooses a tile in case of ANY in Master or Helper card
      * @param tileType : the TileType that the player has chosen
      */
-    fun choseTile(tileType: TileType): Tile {
+    fun chooseTile(tileType: TileType) {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -173,7 +165,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         require(
             gameState.currentState == States.USING_MASTER ||
                     gameState.currentState == States.USING_HELPER
-        ) { "currentState should be Using_Master" }
+        ) { "currentState should be Using_Master or Using_Helper" }
 
         if (gameState.currentState == States.USING_MASTER) {
             actPlayer.personalSupply.add(Tile(null, null, tileType))
@@ -181,26 +173,22 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             // Check personal supply limit
             if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
                 gameState.currentState = States.DISCARDING
-                onAllRefreshables { refreshAfterChoseOrReceivedTile(true) }
-                return Tile(null, null, tileType)
+                onAllRefreshables { refreshAfterReceivedTile(true) }
             }
 
             actPlayer.hasPlayed = true
-            gameState.currentState = States.END_TURN
-            onAllRefreshables { refreshAfterChoseOrReceivedTile(false) }
-            return Tile(null, null, tileType)
+            onAllRefreshables { refreshAfterReceivedTile(false) }
         } else {
-            return Tile(null, null, tileType)
+            onAllRefreshables { refreshAfterChooseTileToPlay(Tile(null, null, tileType)) }
         }
-
 
     }
 
     /**
-     *
+     * apply Helper card effects
+     * @param drawnCard : the drawn Helper Card
      */
     private fun playHelperCard(drawnCard: HelperCard) {
-
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -209,10 +197,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val tileTypeToPlay2 = drawnCard.tileTypes[1]
 
-        onAllRefreshables { refreshAfterDrawingHelperCard(TileType.ANY, tileTypeToPlay2) }
+        onAllRefreshables { refreshAfterDrawingHelperCard(tileTypeToPlay2) }
+        gameState.currentPlayer.hasPlayed = true
 
     }
-
 
     /**
      * Action to place a tile from personal supply on bonsai tree.
@@ -252,7 +240,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
     }
 
-
     /**
      * Ends the turn of the current player.
      *
@@ -286,18 +273,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             rootService.gameService.switchPlayerTurn()
         }
 
+        gameState.currentState = States.START_TURN
+        onAllRefreshables { refreshAfterEndTurn() }
+
         // TODO: Update history -> later
 
-    }
-
-
-    /**
-     * Checks if player can claim a goal tile.
-     *
-     * @return true if player reached conditions to claim a goal tile.
-     */
-    fun canClaimGoalTile(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
     }
 
     /**
@@ -313,7 +293,69 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param claim true if player accepts goal tile, otherwise false.
      *
      */
-    fun claimOrRenounceGoal(claim: Boolean) {}
+    fun claimOrRenounceGoal(claim: Boolean) {
+        val game = checkNotNull(rootService.currentGame) { "No game was started." }
+
+        val gameState = checkNotNull(game.currentBonsaiGameState)
+
+        val player = getCurrentPlayer()
+        val playersBonsaiTree = player.bonsaiTree
+
+        // checks if a player has already claimed a goal tile from a specific tile type
+        for (goalTile in gameState.goalTiles.flatten()) {
+            if (player.claimedGoals.any { it.goalTileType == goalTile.goalTileType }) {
+                continue
+            }
+
+            // checks if one of the goal tiles is reached
+            val conditionValid = when (goalTile.goalTileType) {
+                GoalTileType.BROWN -> playersBonsaiTree.values.count { it.tileType == TileType.WOOD } >= goalTile.tier
+                GoalTileType.GREEN -> playersBonsaiTree.values.count { it.tileType == TileType.LEAF } >= goalTile.tier
+                GoalTileType.PINK -> playersBonsaiTree.values.count { it.tileType == TileType.FLOWER } >= goalTile.tier
+                GoalTileType.ORANGE -> playersBonsaiTree.values.count { it.tileType == TileType.FRUIT } >= goalTile.tier
+                GoalTileType.BLUE -> hasReachedBlueGoal(playersBonsaiTree, goalTile.tier)
+            }
+
+            // if goal tile requirement is reached then take actions based on claim
+            if (conditionValid) {
+                if (claim) {
+                    player.claimedGoals.add(goalTile)
+                    for (goalTileList in gameState.goalTiles) {
+                        if (goalTileList.contains(goalTile)) {
+                            goalTileList.remove(goalTile)
+                            break
+                        }
+                    }
+                } else {
+                    player.renouncedGoals.add(goalTile)
+                    break
+                }
+            }
+        }
+
+    }
+
+    /**
+     * checks if a player has reached on of the blue goal tiles.
+     *
+     * @param bonsaiTree is the bonsai tree of the active player
+     * @param tier the tier of the blue goal tile
+     *
+     * return true if the [tier] of the blue goal tile is reached, otherwise false
+     */
+    private fun hasReachedBlueGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
+        val leftProtrude = bonsaiTree.keys.any { it.first <= -3 }
+        val rightProtrude = bonsaiTree.keys.any { it.first >= 4 }
+        val bellowProtrude = bonsaiTree.keys.any { it.second >= 3 }
+
+        return when (tier) {
+            7 -> leftProtrude || rightProtrude
+            10 -> leftProtrude && rightProtrude
+            14 -> (leftProtrude || rightProtrude) && bellowProtrude
+            else -> false
+        }
+    }
+
 
     /**
      * Checks if player has played an action before ending his turn.
@@ -324,7 +366,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *  @return true if player can end his turn.
      */
     fun canEndTurn(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
+        val player = getCurrentPlayer()
+
+        return player.hasPlayed
     }
 
     /**
@@ -338,8 +382,13 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @throws IllegalStateException if personal supply is not over capacity limit.
      */
-    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {}
+    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+        val player = getCurrentPlayer()
+        check(player.personalSupply.size > player.tileCapacity) { "The personal supply tiles hasn't reached the capacity." }
+        player.personalSupply.removeAll(tilesToDiscard)
+    }
 
+    // returns the current player
     private fun getCurrentPlayer(): Player {
         return checkNotNull(rootService.currentGame?.currentBonsaiGameState?.currentPlayer)
     }

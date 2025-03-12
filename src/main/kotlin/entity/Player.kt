@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
  * @property name is name of the player
  * @property playerType distinguishes between human and bot (and their difficulty levels)
  * @property isLocal signifies if this is a hotseat game or via network
+ * @property color the color of the player
  * @property bonsaiTree is tree the player owns
  * @property personalSupply contains bonsai tiles that the player owns
  * @property collectedCards contains zen cards that the player draws from zen stack
@@ -23,7 +24,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Player(val name : String ,
                   val playerType: PlayerType,
-                  val isLocal: Boolean)
+                  val isLocal: Boolean,
+                  val color : ColorType)
 {
     val bonsaiTree : MutableMap<Pair<Int,Int> , Tile> = mutableMapOf()
     var personalSupply    : MutableList<Tile>     = mutableListOf()
