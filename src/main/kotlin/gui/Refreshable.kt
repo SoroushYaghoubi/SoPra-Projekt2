@@ -33,6 +33,11 @@ interface Refreshable {
     fun refreshAfterMeditate(){}
 
     /**
+     * perform refreshes that are necessary after a player has cultivated
+     */
+     fun refreshAfterCultivate(){}
+
+    /**
      * perform refreshes that are necessary after a player has chosen a card
      */
     fun refreshAfterChooseCard(){}

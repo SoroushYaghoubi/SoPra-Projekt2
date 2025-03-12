@@ -25,13 +25,20 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalArgumentException if the tile position is invalid.
      */
     fun playTile(tile: Tile, tilePosition: Pair<Int, Int>) {
+
         if (!canPlayTile(tile, tilePosition)) {
             throw IllegalArgumentException("Tile can not be played")
         }
+
         val currentPlayer = getCurrentPlayer()
         currentPlayer.bonsaiTree[tilePosition] = tile
         currentPlayer.personalSupply.remove(tile)
-        currentPlayer.playableTilesCopy.remove(tile.tileType)
+
+        if (tile.tileType in currentPlayer.playableTilesCopy) {
+            currentPlayer.playableTilesCopy.remove(tile.tileType)
+        } else if (TileType.ANY in currentPlayer.playableTilesCopy) {
+            currentPlayer.playableTilesCopy.remove(TileType.ANY)
+        }
         // TODO: check if player has achieved a goal tile
         onAllRefreshables { refreshAfterPlayTile() }
     }
