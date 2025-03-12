@@ -5,6 +5,7 @@ import edu.udo.cs.sopra.ntf.*
 import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 import util.ZenCardLoader
+import kotlin.math.max
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
@@ -90,7 +91,12 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         if (networkGame) {
 
             val message = StartGameMessage(
-                orderedPlayerNames = playerOrder.map { player -> Pair(player.name, ColorTypeMessage.valueOf(player.color.name))},
+                orderedPlayerNames = playerOrder.map { player ->
+                    Pair(
+                        player.name,
+                        ColorTypeMessage.valueOf(player.color.name)
+                    )
+                },
                 chosenGoalTiles = goalTilesEntries.map { GoalTileTypeMessage.valueOf(it.name) },
                 orderedCards = zenDeck.mapIndexed { index, card ->
                     Pair(CardTypeMessage.valueOf(card.cardType.name), index)
@@ -140,7 +146,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      *
      * @throws IllegalStateException if game isn't over yet.
      */
-    fun showWinner() : String {
+    fun showWinner(): String {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -148,7 +154,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         checkNotNull(gameState) { "No active game state." }
 
         // Get the winner's name using the index
-       return gameState.players[getWinnerIndex()].name
+        return gameState.players[getWinnerIndex()].name
     }
 
     // Dennis implemented showWinner with a return value to test it
@@ -205,7 +211,82 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     /**
      * Calculates the score of the current player.
      */
-    fun calculateScore() {}
+    fun calculateScore(): Int {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+
+        val actPlayer = gameState.currentPlayer
+        val playersBonsaiTree = actPlayer.bonsaiTree
+        val playersCollectedCards = actPlayer.collectedCards
+        val claimGoals = actPlayer.claimedGoals
+
+        // Tile
+        val leaf = countTilesType(playersBonsaiTree, TileType.LEAF)
+        val flower = countTilesType(playersBonsaiTree, TileType.FLOWER)
+        val fruit = countTilesType(playersBonsaiTree, TileType.FRUIT)
+        val wood = countTilesType(playersBonsaiTree, TileType.WOOD)
+
+        val scoreOfLeaf = leaf * 3
+        val scoreOfFlower = calculateFlowerPoints(playersBonsaiTree)
+        val scoreOfFruit = fruit * 7
+
+        val scoreTiles = scoreOfLeaf + scoreOfFlower + scoreOfFruit
+
+        // Parchment
+        val masterCard = 2 * countZencardType(playersCollectedCards, CardType.MASTERCARD)
+        val growthCard = 2 * countZencardType(playersCollectedCards, CardType.GROWTHCARD)
+        val helperCard = 2 * countZencardType(playersCollectedCards, CardType.HELPERCARD)
+        val flowerTile = 2 * flower
+        val leafTile = 2 * leaf
+        val woodTile = 2 * wood
+
+        val scoreParchment = masterCard + growthCard + helperCard + flowerTile + leafTile + woodTile
+
+        // Goal
+        val scoreOfGoal = claimGoals.sumOf { it.score }
+
+        return scoreTiles + scoreParchment + scoreOfGoal
+    }
+
+
+    private fun countTilesType(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, type: TileType): Int {
+        return bonsaiTree.values.count { it.tileType == type }
+    }
+
+    private fun countZencardType(collectedZenCard: MutableList<Card>, type: CardType): Int {
+        return collectedZenCard.count { it.cardType == type }
+    }
+
+    private fun calculateFlowerPoints(bonsaiTree: Map<Pair<Int, Int>, Tile>): Int {
+        var totalPoints = 0
+
+        for ((position, tile) in bonsaiTree) {
+            if (tile.tileType == TileType.FLOWER) {
+                val (q, r) = position
+
+                // Define neighbor positions
+                val neighbors = listOf(
+                    Pair(q + 1, r),
+                    Pair(q, r + 1),
+                    Pair(q - 1, r + 1),
+                    Pair(q - 1, r),
+                    Pair(q, r - 1),
+                    Pair(q + 1, r - 1)
+                )
+
+                // Count sides that are NOT touching other tiles
+                val emptySides = neighbors.count { neighborPos -> !bonsaiTree.containsKey(neighborPos) }
+
+                // Add points (1 point per empty side)
+                totalPoints += emptySides
+            }
+        }
+
+        return totalPoints
+    }
+
 
     /**
      * Refills the board after a player has meditated.
