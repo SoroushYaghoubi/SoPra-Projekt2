@@ -125,4 +125,20 @@ class ClaimOrRenounceGoalTest {
         assertTrue(player.claimedGoals.isNotEmpty())
         assertEquals(GoalTileType.BLUE, player.claimedGoals.first().goalTileType)
     }
+
+    /**
+     * Tests if player can claim blue goal tile
+     */
+    @Test
+    fun testGoalTileRenounce() {
+        val rootService = setUpGame()
+        val playerActionService = PlayerActionService(rootService)
+        val player = getCurrentPlayer(rootService)
+        player.bonsaiTree[Pair(-3, 0)] = Tile(-3, 0, TileType.FLOWER)
+        playerActionService.claimOrRenounceGoal(false)
+        assertTrue(player.renouncedGoals.isNotEmpty())
+        assertTrue(player.claimedGoals.isEmpty())
+    }
+
+
 }
