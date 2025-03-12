@@ -43,9 +43,11 @@ application {
 dependencies {
     testImplementation(kotlin("test-junit5"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
-    implementation(group = "tools.aqua", name = "bgw-gui", version = "0.9-9-5ef7d86-SNAPSHOT")
+    implementation(group = "tools.aqua", name = "bgw-gui", version = "0.9-17-b7de59c-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-common", version = "0.9-9-5ef7d86-SNAPSHOT")
     implementation(group = "tools.aqua", name = "bgw-net-client", version = "0.9-9-5ef7d86-SNAPSHOT")
+
+
 
     // dependencies for jackson csv
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
