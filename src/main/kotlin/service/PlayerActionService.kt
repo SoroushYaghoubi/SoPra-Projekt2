@@ -174,6 +174,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
                 gameState.currentState = States.DISCARDING
                 onAllRefreshables { refreshAfterReceivedTile(true) }
+                return
             }
 
             actPlayer.hasPlayed = true
@@ -192,7 +193,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             checkNotNull(gameState) { "No active game state." }
 
             val tileTypeToPlay2 = drawnCard.tileTypes[1]
-
+           gameState.currentPlayer.playableTilesCopy = gameState.currentPlayer.playableTiles.toMutableList()
             onAllRefreshables { refreshAfterDrawingHelperCard(tileTypeToPlay2) }
             gameState.currentPlayer.hasPlayed = true
 
