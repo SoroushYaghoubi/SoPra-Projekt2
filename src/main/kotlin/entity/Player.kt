@@ -23,7 +23,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Player(val name : String ,
                   val playerType: PlayerType,
-                  val isLocal: Boolean)
+                  val isLocal: Boolean,
+                  val color : ColorType)
 {
     val bonsaiTree : MutableMap<Pair<Int,Int> , Tile> = mutableMapOf()
     var personalSupply    : MutableList<Tile>     = mutableListOf()
