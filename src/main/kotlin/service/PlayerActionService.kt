@@ -288,16 +288,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
     }
 
-
-    /**
-     * Checks if player can claim a goal tile.
-     *
-     * @return true if player reached conditions to claim a goal tile.
-     */
-    fun canClaimGoalTile(): Boolean {
-        TODO("just remove this todo. this is only for kotlin compiler to stop complaining")
-    }
-
     /**
      * Player claims or renounces goal tile.
      *
