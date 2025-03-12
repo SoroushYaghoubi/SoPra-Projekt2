@@ -152,7 +152,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
         actPlayer.hasPlayed = true
-        gameState.currentState = States.END_TURN
         onAllRefreshables { refreshAfterReceivedTile(false) }
 
     }
@@ -185,7 +184,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             }
 
             actPlayer.hasPlayed = true
-            gameState.currentState = States.END_TURN
             onAllRefreshables { refreshAfterReceivedTile(false) }
         } else {
             onAllRefreshables { refreshAfterChooseTileToPlay(Tile(null ,null, tileType)) }
@@ -284,6 +282,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             rootService.gameService.calculateScore()
             rootService.gameService.switchPlayerTurn()
         }
+         // TODO : Refresh after end Turn
          // TODO : update State to END_TURN
         // TODO: Update history -> later
 
