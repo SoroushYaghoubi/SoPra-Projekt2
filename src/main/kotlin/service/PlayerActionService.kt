@@ -291,6 +291,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
          *
          * @param claim true if player accepts goal tile, otherwise false.
          *
+         * TODO: this class claims or renounces two goals at the same time if possible. this might be bad
+         *
          */
         fun claimOrRenounceGoal(claim: Boolean) {
             val game = checkNotNull(rootService.currentGame) { "No game was started." }
@@ -305,13 +307,17 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 if (player.claimedGoals.any { it.goalTileType == goalTile.goalTileType }) {
                     continue
                 }
+            // checks if player has renounced the current goal tile
+                if (goalTile in player.renouncedGoals) {
+                    continue
+                }
 
                 // checks if one of the goal tiles is reached
                 val conditionValid = when (goalTile.goalTileType) {
-                    GoalTileType.BROWN -> playersBonsaiTree.values.count { it.tileType == TileType.WOOD } >= goalTile.tier
-                    GoalTileType.GREEN -> countLeafs(playersBonsaiTree) >= goalTile.tier
-                    GoalTileType.PINK -> countFlowers(playersBonsaiTree) >= goalTile.tier
-                    GoalTileType.ORANGE -> playersBonsaiTree.values.count { it.tileType == TileType.FRUIT } >= goalTile.tier
+                    GoalTileType.BROWN -> hasReachedBrownGoal(playersBonsaiTree, goalTile.tier)
+                    GoalTileType.GREEN -> hasReachedGreenGoal(playersBonsaiTree, goalTile.tier)
+                    GoalTileType.PINK -> hasReachedPinkGoal(playersBonsaiTree, goalTile.tier)
+                    GoalTileType.ORANGE -> hasReachedOrangeGoal(playersBonsaiTree, goalTile.tier)
                     GoalTileType.BLUE -> hasReachedBlueGoal(playersBonsaiTree, goalTile.tier)
                 }
 
@@ -334,28 +340,127 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         }
 
-        private fun countLeafs(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>): Int {
+        /**
+        * count the amount of wood tiles in the players tree and compare it do the necessary amount for the tier.
+        *
+        * @param bonsaiTree is the bonsai tree of the active player
+        * @param tier the tier of the brown goal tile
+        *
+        * @return whether the goal tile can be claimed or not
+        */
+        private fun hasReachedBrownGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
+            val brownTiles = bonsaiTree.keys.count { bonsaiTree[it]?.tileType == TileType.WOOD }
+            return when (tier) {
+            0 -> brownTiles >= 8
+            1 -> brownTiles >= 10
+            2 -> brownTiles >= 12
+            else -> false
+            }
+        }
 
-            return 10
+    /**
+     * count the amount of adjacent leaf tiles in the players tree and compare it do the necessary amount for the tier.
+     *
+     * @param bonsaiTree is the bonsai tree of the active player
+     * @param tier the tier of the green goal tile
+     *
+     * @return whether the goal tile can be claimed or not
+     */
+
+        private fun hasReachedGreenGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
+            // Directions for hexagonal grid adjacency
+            val directions = listOf(
+                Pair(1, 0), Pair(0, 1), Pair(-1, 1),
+                Pair(-1, 0), Pair(0, -1), Pair(1, -1)
+            )
+
+            // Set to keep track of visited tiles so that there are no redundant calculations
+            val visited = mutableSetOf<Pair<Int, Int>>()
+
+            // Function to perform depth-first search and count the size of a cluster
+            fun dfs(tilePos: Pair<Int, Int>): Int {
+                //stack to keep track of all the tiles
+                val stack = mutableListOf(tilePos)
+                var count = 0
+
+                while (stack.isNotEmpty()) {
+                    val (q, r) = stack.removeLast()
+                    // Skip already visited tiles
+                    if (!visited.add(Pair(q, r))) continue
+
+                    count++
+                    // find adjacent tiles
+                    for ((dq, dr) in directions) {
+                        val neighbor = Pair(q + dq, r + dr)
+                        if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType == TileType.LEAF && neighbor !in visited) {
+                            stack.add(neighbor)
+                        }
+                    }
+                }
+                return count
+            }
+
+            // Find the size of the largest cluster of LEAF tiles
+            var maxLeafCluster = 0
+            for ((pos, tile) in bonsaiTree) {
+                if (tile.tileType == TileType.LEAF && pos !in visited) {
+                    maxLeafCluster = maxOf(maxLeafCluster, dfs(pos))
+                }
+            }
+
+            // Check if the largest cluster meets the tier requirement
+            return when (tier) {
+                0 -> maxLeafCluster >= 5
+                1 -> maxLeafCluster >= 7
+                2 -> maxLeafCluster >= 9
+                else -> false
+            }
         }
 
 
-        /**
-         * count the amount of flower tile types that protrudes from the tree.
-         *
-         * @param bonsaiTree is the bonsai tree of the active player
-         *
-         * @return the maximus amount of flowers the protrudes from the tree
-         */
-        private fun countFlowers(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>): Int {
-            val leftProtrude = bonsaiTree.keys.count { it.first <= -3 && bonsaiTree[it]?.tileType == TileType.FLOWER }
-            val rightProtrude = bonsaiTree.keys.count { it.first >= 4 && bonsaiTree[it]?.tileType == TileType.FLOWER }
+    /**
+     * count the amount of flower tiles in the players tree and compare it do the necessary amount for the tier.
+     *
+     * @param bonsaiTree is the bonsai tree of the active player
+     * @param tier the tier of the pink goal tile
+     *
+     * @return whether the goal tile can be claimed or not
+     */
+        private fun hasReachedPinkGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
+            val leftProtrude = bonsaiTree.keys.count { it.first <= -2 && bonsaiTree[it]?.tileType == TileType.FLOWER }
+            val rightProtrude = bonsaiTree.keys.count { (it.first >= 4 || it.first ==3 && (it.second) % 2 ==0) && bonsaiTree[it]?.tileType == TileType.FLOWER }
 
-            return max(leftProtrude, rightProtrude)
+            val pinkProtruding = max(leftProtrude, rightProtrude)
+
+            return when (tier) {
+                0 -> pinkProtruding>=3
+                1 -> pinkProtruding>=4
+                2 -> pinkProtruding>=5
+                else -> false
+            }
         }
 
         /**
-         * checks if a player has reached on of the blue goal tiles.
+        * count the amount of fruit tiles in the players tree and compare it do the necessary amount for the tier.
+        *
+        * @param bonsaiTree is the bonsai tree of the active player
+        * @param tier the tier of the orange goal tile
+        *
+        * @return whether the goal tile can be claimed or not
+        */
+
+        private fun hasReachedOrangeGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
+            val orangeTiles = bonsaiTree.keys.count { bonsaiTree[it]?.tileType == TileType.FRUIT }
+            return when (tier) {
+                0 -> orangeTiles >= 3
+                1 -> orangeTiles >= 4
+                2 -> orangeTiles >= 5
+                else -> false
+            }
+        }
+
+        /**
+         * checks if a player has reached one of the blue goal tiles.
          *
          * @param bonsaiTree is the bonsai tree of the active player
          * @param tier the tier of the blue goal tile
@@ -363,14 +468,15 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
          * return true if the [tier] of the blue goal tile is reached, otherwise false
          */
         private fun hasReachedBlueGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
-            val leftProtrude = bonsaiTree.keys.any { it.first <= -3 }
-            val rightProtrude = bonsaiTree.keys.any { it.first >= 4 }
-            val bellowProtrude = bonsaiTree.keys.any { it.second >= 3 }
+            val leftProtrude = bonsaiTree.keys.any { it.first <= -2 }
+            val rightProtrude = bonsaiTree.keys.any { it.first >= 4 || it.first ==3 && (it.second) % 2 ==0 }
+            val bellowLeftProtrude = bonsaiTree.keys.any { it.first <= -2 && it.second >= 2 }
+            val bellowRightProtrude = bonsaiTree.keys.any { it.first >= 4 && it.second >= 2 }
 
             return when (tier) {
-                7 -> leftProtrude || rightProtrude
-                10 -> leftProtrude && rightProtrude
-                14 -> (leftProtrude || rightProtrude) && bellowProtrude
+                0 -> rightProtrude
+                1 -> leftProtrude && rightProtrude
+                2 -> (leftProtrude && bellowRightProtrude) || (rightProtrude && bellowLeftProtrude)
                 else -> false
             }
         }

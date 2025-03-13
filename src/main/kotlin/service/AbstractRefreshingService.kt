@@ -11,6 +11,7 @@ import gui.Refreshable
  */
 abstract class AbstractRefreshingService {
 
+
     private val refreshables = mutableListOf<Refreshable>()
 
     /**
