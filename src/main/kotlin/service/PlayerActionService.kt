@@ -125,6 +125,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         when (drawnCard.tileTypes.size) {
             1 -> {
+                //actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 onAllRefreshables { refreshAfterDrawingMasterCardAny() }
                 return
             }
