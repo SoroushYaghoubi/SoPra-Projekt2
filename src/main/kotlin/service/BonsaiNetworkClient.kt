@@ -106,19 +106,28 @@ class BonsaiNetworkClient(
         }
     }
 
-
-
-    fun onCultivateMessage(message: CultivateMessage) {
-        //TODO()
+    /**
+     * handle a [CultivateMessage] sent by the server
+     */
+    @GameActionReceiver
+    fun onCultivateMessage(message: CultivateMessage, sender: String) {
+        BoardGameApplication.run {
+            networkService.receiveCultivateMessage(message, sender)
+        }
     }
 
-    fun onMeditateMessage(message: MeditateMessage) {
-        //TODO()
+    /**
+     * handle a [MeditateMessage] sent by the server
+     */
+    @GameActionReceiver
+    fun onMeditateMessage(message: MeditateMessage, sender: String) {
+        BoardGameApplication.run {
+            networkService.receiveMeditateMessage(message, sender)
+        }
     }
 
     private fun disconnectAndError(message: Any) {
         networkService.disconnect()
         error(message)
     }
-
 }
