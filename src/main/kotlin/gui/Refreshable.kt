@@ -1,5 +1,6 @@
 package gui
 
+import entity.Player
 import entity.Tile
 import entity.TileType
 import service.AbstractRefreshingService
@@ -90,5 +91,10 @@ interface Refreshable {
      * perform refreshes that are necessary after a player has redone or undone his turn
      */
     fun refreshAfterRedoOrUndo(){}
+
+    /**
+     * perform refreshes that are necessary to show the final score
+     */
+    fun refreshAfterShowWinner(players: List<Player>){}
 
 }
