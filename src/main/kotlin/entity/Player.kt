@@ -27,12 +27,12 @@ data class Player(val name : String ,
                   val isLocal: Boolean,
                   val color : ColorType)
 {
-    val bonsaiTree : MutableMap<Pair<Int,Int> , Tile> = mutableMapOf((0 to 0) to Tile(null, null, TileType.WOOD))
+    var bonsaiTree : MutableMap<Pair<Int,Int> , Tile> = mutableMapOf((0 to 0) to Tile(null, null, TileType.WOOD))
     var personalSupply    : MutableList<Tile>     = mutableListOf()
     var collectedCards    : MutableList<Card>     = mutableListOf()
-    val claimedGoals      : MutableList<GoalTile> = mutableListOf()
-    val renouncedGoals    : MutableList<GoalTile> = mutableListOf()
-    val playableTiles     : MutableList<TileType> = mutableListOf(TileType.ANY, TileType.WOOD, TileType.LEAF)
+    var claimedGoals      : MutableList<GoalTile> = mutableListOf()
+    var renouncedGoals    : MutableList<GoalTile> = mutableListOf()
+    var playableTiles     : MutableList<TileType> = mutableListOf(TileType.ANY, TileType.WOOD, TileType.LEAF)
     var playableTilesCopy : MutableList<TileType> = mutableListOf()
 
     var tileCapacity = 5
