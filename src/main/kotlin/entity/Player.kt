@@ -1,6 +1,7 @@
 package entity
 
 import kotlinx.serialization.Serializable
+
 /**
  * This class represents a human or non-human [Player] for this game
  * and stores all the players assets and actions
@@ -22,20 +23,24 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-data class Player(val name : String ,
-                  val playerType: PlayerType,
-                  val isLocal: Boolean,
-                  val color : ColorType)
-{
-    var bonsaiTree : MutableMap<Pair<Int,Int> , Tile> = mutableMapOf((0 to 0) to Tile(null, null, TileType.WOOD))
-    var personalSupply    : MutableList<Tile>     = mutableListOf()
-    var collectedCards    : MutableList<Card>     = mutableListOf()
-    var claimedGoals      : MutableList<GoalTile> = mutableListOf()
-    var renouncedGoals    : MutableList<GoalTile> = mutableListOf()
-    var playableTiles     : MutableList<TileType> = mutableListOf(TileType.ANY, TileType.WOOD, TileType.LEAF)
-    var playableTilesCopy : MutableList<TileType> = mutableListOf()
+data class Player(
+    val name: String,
+    val playerType: PlayerType,
+    val isLocal: Boolean,
+    val color: ColorType
+) {
+    var bonsaiTree: MutableMap<Pair<Int, Int>, Tile> = mutableMapOf((0 to 0) to Tile(null, null, TileType.WOOD))
+
+    var personalSupply: MutableList<Tile> = mutableListOf()
+    var collectedCards: MutableList<Card> = mutableListOf()
+
+    var claimedGoals: MutableList<GoalTile> = mutableListOf()
+    var renouncedGoals: MutableList<GoalTile> = mutableListOf()
+
+    var playableTiles: MutableList<TileType> = mutableListOf(TileType.ANY, TileType.WOOD, TileType.LEAF)
+    var playableTilesCopy: MutableList<TileType> = mutableListOf()
 
     var tileCapacity = 5
     var score = 0
-    var hasPlayed : Boolean = false
+    var hasPlayed: Boolean = false
 }

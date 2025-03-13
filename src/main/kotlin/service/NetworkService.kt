@@ -1,12 +1,9 @@
 package service
 
-
 import edu.udo.cs.sopra.ntf.*
 import entity.GoalTileType
 import gui.Refreshable
 import entity.*
-
-
 
 /**
  * Service layer class that realizes the necessary logic for sending and receiving messages
@@ -17,17 +14,18 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
     companion object {
         /** URL of the BGW net server hosted for SoPra participants */
         const val SERVER_ADDRESS = "sopra.cs.tu-dortmund.de:80/bgw-net/connect"
+
         /** Name of the game as registered with the server */
         const val GAME_ID = "Bonsai"
     }
 
     /** Network client. Nullable for offline games. */
-    var client : BonsaiNetworkClient? = null
-    private set
+    var client: BonsaiNetworkClient? = null
+        private set
 
     /** current state of the connection in a network game. */
-    var connectionState : ConnectionState = ConnectionState.DISCONNECTED
-    private set
+    var connectionState: ConnectionState = ConnectionState.DISCONNECTED
+        private set
 
     // our own name
     val myName = client?.playerName
@@ -42,7 +40,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      *
      * @throws IllegalStateException if already connected to another game or connection attempt fails
      */
-    fun createGame(secret : String, name : String, sessionID : String?) {
+    fun createGame(secret: String, name: String, sessionID: String?) {
         if (!connect(secret, name)) {
             error("Connection failed")
         }
@@ -65,7 +63,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      *
      * @throws IllegalStateException if already connected to another game or connection attempt fails
      */
-    fun joinGame(secret : String, name : String, sessionID : String) {
+    fun joinGame(secret: String, name: String, sessionID: String) {
         if (!connect(secret, name)) {
             error("Connection failed")
         }
@@ -85,26 +83,26 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * @throws IllegalStateException if [connectionState] != [ConnectionState.WAITING_FOR_GUEST]
      * @throws IllegalStateException if player size < 2 or player size > 4
      */
-    fun sendStartGameMessage(playerOrder : MutableList<Player>,goalTilesEntries: MutableList<GoalTileType>) {
+    fun sendStartGameMessage(playerOrder: MutableList<Player>, goalTilesEntries: MutableList<GoalTileType>) {
         check(connectionState == ConnectionState.WAITING_FOR_GUEST)
-        {"currently not prepared to start a new hosted game."}
+        { "currently not prepared to start a new hosted game." }
 
         val playerNames = client?.otherPlayerNames
         checkNotNull(playerNames)
 
-        if(playerNames.size < 2 || playerNames.size > 4) {
+        if (playerNames.size < 2 || playerNames.size > 4) {
             throw IllegalStateException("there should be 2 to 4 players")
         }
 
         rootService.gameService.startNewGame(playerOrder, true, goalTilesEntries)
         val game = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(game) {"game should not be null right after starting it."}
+        checkNotNull(game) { "game should not be null right after starting it." }
 
         val nameColorPair = playerOrder.map {
             Pair(it.name, it.color.toColorMessage())
         }
 
-        val chosenGoalTiles = goalTilesEntries.map{it ->
+        val chosenGoalTiles = goalTilesEntries.map { it ->
             it.toColor()
         }
 
@@ -115,7 +113,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val message = StartGameMessage(nameColorPair, chosenGoalTiles, zenDeckMessage)
         //TODO(still needs to be checked if it's correct)
 
-        if(myName == playerOrder.first().name) {
+        if (myName == playerOrder.first().name) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
             client?.sendGameActionMessage(message)
         } else {
@@ -124,11 +122,11 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
     }
 
-    fun sendMeditateMessage(message : MeditateMessage) {
+    fun sendMeditateMessage(message: MeditateMessage) {
         //TODO
     }
 
-    fun sendCultivateMessage(message : CultivateMessage) {
+    fun sendCultivateMessage(message: CultivateMessage) {
         //TODO
 
         //get removedTilesPosition
@@ -142,9 +140,9 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      *
      * @throws IllegalStateException if not currently waiting for an init message
      */
-    fun receiveStartGameMessage(message : StartGameMessage) {
+    fun receiveStartGameMessage(message: StartGameMessage) {
         check(connectionState == ConnectionState.WAITING_FOR_INIT)
-        {"not waiting for game init message"}
+        { "not waiting for game init message" }
 
         val orderedPair = message.orderedPlayerNames
         //decode message
@@ -155,7 +153,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val colorType = message.orderedPlayerNames.first().second.toColor()
 
 
-        if(myName == orderedPair.first().first) {
+        if (myName == orderedPair.first().first) {
             //do something
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
         } else {
@@ -170,7 +168,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
 
     fun receiveCultivateMessage(message: CultivateMessage, sender: String) {
         check(connectionState == ConnectionState.WAITING_FOR_OPPONENT)
-        {"currently not expecting an opponent's turn."}
+        { "currently not expecting an opponent's turn." }
 
         // reproduce what the other player has done
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -186,19 +184,19 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * Updates the [connectionState] to [newState] and notifies
      * all refreshables via [Refreshable.refreshConnectionState]
      */
-    fun updateConnectionState(newState : ConnectionState) {
+    fun updateConnectionState(newState: ConnectionState) {
         this.connectionState = newState
         onAllRefreshables {
             refreshConnectionState(newState)
         }
     }
 
-    private fun connect(secret: String, name : String) : Boolean {
+    private fun connect(secret: String, name: String): Boolean {
         require(connectionState == ConnectionState.DISCONNECTED && client == null)
         { "already connected to another game" }
 
-        require(secret.isNotBlank()) {"server secret must be given"}
-        require(name.isNotBlank()) {"player name must be given"}
+        require(secret.isNotBlank()) { "server secret must be given" }
+        require(name.isNotBlank()) { "player name must be given" }
 
         val newClient =
             BonsaiNetworkClient(

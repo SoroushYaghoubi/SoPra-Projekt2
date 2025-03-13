@@ -1,6 +1,7 @@
 package entity
 
 import kotlinx.serialization.Serializable
+
 /**
  * Represents a bonsai [Tile], which has shape of a hexagon
  *

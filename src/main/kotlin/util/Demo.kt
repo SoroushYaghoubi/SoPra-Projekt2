@@ -18,7 +18,7 @@ fun main() {
     tree.safelyAppendTile(Tile(-1, -1, TileType.LEAF), -1 to -1)
     tree.safelyAppendTile(Tile(0, -2, TileType.LEAF), 0 to -2)
     tree.safelyAppendTile(Tile(2, 0, TileType.FLOWER), 2 to 0)
-        // (these following two will be ignored on traverse because they will be on pot)
+    // (these following two will be ignored on traverse because they will be on pot)
     tree.safelyAppendTile(Tile(1, 1, TileType.FLOWER), 1 to 1)
     tree.safelyAppendTile(Tile(0, 2, TileType.FLOWER), 0 to 2)
 

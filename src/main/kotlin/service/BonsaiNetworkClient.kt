@@ -11,7 +11,6 @@ import tools.aqua.bgw.net.common.annotations.GameActionReceiver
 import tools.aqua.bgw.net.common.response.CreateGameResponseStatus
 import tools.aqua.bgw.net.common.response.JoinGameResponseStatus
 
-
 /**
  * [BoardGameClient] implementation for network communication.
  *
@@ -41,13 +40,14 @@ class BonsaiNetworkClient(
     override fun onCreateGameResponse(response: CreateGameResponse) {
         BoardGameApplication.run {
             check(networkService.connectionState == ConnectionState.WAITING_FOR_HOST_CONFIRMATION)
-            {"unexpected CreateGameResponse"}
+            { "unexpected CreateGameResponse" }
 
-            when(response.status) {
+            when (response.status) {
                 CreateGameResponseStatus.SUCCESS -> {
                     networkService.updateConnectionState(ConnectionState.WAITING_FOR_GUEST)
                     sessionID = response.sessionID
                 }
+
                 else -> disconnectAndError(response.status)
             }
         }
@@ -64,13 +64,14 @@ class BonsaiNetworkClient(
     override fun onJoinGameResponse(response: JoinGameResponse) {
         BoardGameApplication.run {
             check(networkService.connectionState == ConnectionState.WAITING_FOR_JOIN_CONFIRMATION)
-            {"unexpected JoinGameResponse"}
+            { "unexpected JoinGameResponse" }
 
-            when(response.status) {
+            when (response.status) {
                 JoinGameResponseStatus.SUCCESS -> {
                     sessionID = response.sessionID
                     networkService.updateConnectionState((ConnectionState.WAITING_FOR_INIT))
                 }
+
                 else -> disconnectAndError(response.status)
             }
         }
@@ -83,12 +84,12 @@ class BonsaiNetworkClient(
      * @throws IllegalStateException if there are more than other 3 players.
      */
     override fun onPlayerJoined(notification: PlayerJoinedNotification) {
-        BoardGameApplication.run{
+        BoardGameApplication.run {
             check(networkService.connectionState == ConnectionState.WAITING_FOR_GUEST)
-            {"not awaiting any guests."}
+            { "not awaiting any guests." }
 
             check(otherPlayerNames.size <= 3)
-            {"more than 4 players."}
+            { "more than 4 players." }
 
             otherPlayerNames.add(notification.sender)
         }
@@ -99,7 +100,7 @@ class BonsaiNetworkClient(
      */
     @GameActionReceiver
     fun onStartGameMessageReceived(message: StartGameMessage) {
-        BoardGameApplication.run{
+        BoardGameApplication.run {
             networkService.receiveStartGameMessage(
                 message = message
             )

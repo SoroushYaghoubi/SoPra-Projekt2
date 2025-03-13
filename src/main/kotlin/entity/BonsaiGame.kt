@@ -1,6 +1,7 @@
 package entity
 
 import kotlinx.serialization.Serializable
+
 /**
  * Game instance that manages the [BonsaiGameState] of a game and the saved states of the game
  * that are saved in [History]
@@ -10,7 +11,7 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-class BonsaiGame() {
+class BonsaiGame {
     var history: History? = null
     var currentBonsaiGameState: BonsaiGameState? = null
 }

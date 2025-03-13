@@ -28,7 +28,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @param playerOrder A list of Players deciding the player order.
      * @param networkGame true if game is played online otherwise false.
      */
-    fun startNewGame( // playersEntries: MutableMap<String, PlayerType>,
+    fun startNewGame(
         playerOrder: MutableList<Player>,
         networkGame: Boolean,
         goalTilesEntries: MutableList<GoalTileType>
@@ -83,7 +83,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
             history = setHistory
             currentBonsaiGameState = gameState
         }
-
 
         rootService.currentGame = game
 
@@ -145,7 +144,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         onAllRefreshables { refreshAfterShowWinner(winnerOrder) }
     }
-
 
 
     /**

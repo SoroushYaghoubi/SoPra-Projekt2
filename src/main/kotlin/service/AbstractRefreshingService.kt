@@ -11,15 +11,13 @@ import gui.Refreshable
  */
 abstract class AbstractRefreshingService {
 
-
     private val refreshables = mutableListOf<Refreshable>()
 
     /**
      * adds a [Refreshable] to the list that gets called
      * whenever [onAllRefreshables] is used.
      */
-    fun addRefreshable(newRefreshable : Refreshable) {
-
+    fun addRefreshable(newRefreshable: Refreshable) {
         refreshables += newRefreshable
     }
 

@@ -27,6 +27,8 @@ class RootService {
     fun addRefreshable(newRefreshable: Refreshable) {
         gameService.addRefreshable(newRefreshable)
         playerActionService.addRefreshable(newRefreshable)
+        historyService.addRefreshable(newRefreshable)
+        treeService.addRefreshable(newRefreshable)
     }
 
     /**
