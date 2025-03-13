@@ -3,6 +3,7 @@ package gui
 import entity.Tile
 import entity.TileType
 import service.AbstractRefreshingService
+import service.ConnectionState
 
 /**
  * This interface provides a mechanism for the service layer classes to communicate
@@ -91,4 +92,8 @@ interface Refreshable {
      */
     fun refreshAfterRedoOrUndo(){}
 
+    /**
+     * perform refreshes that are necessary after the [ConnectionState] was changed
+     */
+    fun refreshConnectionState(newState: ConnectionState) {}
 }
