@@ -2,7 +2,10 @@ package service
 
 import entity.*
 import kotlin.test.Test
+import kotlin.test.assertFails
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+import kotlin.test.assertEquals
 
 /**
  * Test class for [TreeService.playTile], [TreeService.canPlayTile]
@@ -108,7 +111,6 @@ class PlayTileTest {
         val tileFlower = Tile(null, null, TileType.FLOWER)
         val tileFruit = Tile(null, null, TileType.FRUIT)
 
-
         gameState.currentPlayer.personalSupply.add(tileWood)
         gameState.currentPlayer.personalSupply.add(tileLeaf)
         gameState.currentPlayer.personalSupply.add(tileFlower)
@@ -127,8 +129,91 @@ class PlayTileTest {
         assertTrue(rootService.treeService.canPlayTile(tileFruit, Pair(2, -4)))
     }
 
+    /**
+     * test canPlayTile(tile) fails
+     */
+    @Test
+    fun `test when tile not in hand`() {
+        val rootService = setUpGame()
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+
+        val tile = Tile(null, null, TileType.FLOWER)
+        gameState.currentPlayer.playableTilesCopy.add(TileType.FLOWER)
+
+        assertFails { rootService.treeService.canPlayTile(tile) }
+    }
+
+    /**
+     * test canPlayTile(tile, position) fails
+     */
+    @Test
+    fun `test when position is occupied`() {
+        val rootService = setUpGame()
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+
+        val tile = Tile(null, null, TileType.WOOD)
+
+        gameState.currentPlayer.personalSupply.add(tile)
+        gameState.currentPlayer.playableTilesCopy.add(TileType.WOOD)
+
+        assertFails { rootService.treeService.canPlayTile(tile, Pair(0, -2)) }
+    }
+
+    /**
+     * test playTile(tile, position) successfully
+     */
+
+    @Test
+    fun `test place tile`() {
+        val rootService = setUpGame()
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+
+        val tile = Tile(null, null, TileType.FLOWER)
+        gameState.currentPlayer.personalSupply.add(tile)
+        gameState.currentPlayer.playableTilesCopy.add(TileType.FLOWER)
+
+        assertTrue(gameState.currentPlayer.personalSupply.contains(tile))
+        assertTrue(gameState.currentPlayer.playableTilesCopy.contains(TileType.FLOWER))
+
+        rootService.treeService.playTile(tile, Pair(3, -3))
+
+        assertEquals(tile, gameState.currentPlayer.bonsaiTree[Pair(3, -3)])
+        assertFalse(gameState.currentPlayer.personalSupply.contains(tile))
+        assertFalse(gameState.currentPlayer.playableTilesCopy.contains(TileType.FLOWER))
+
+    }
+
+    /**
+     * test playTile(tile, position) fails
+     */
+    @Test
+    fun `test place tile fail`() {
+        val rootService = setUpGame()
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+
+        val tile = Tile(null, null, TileType.FLOWER)
+        gameState.currentPlayer.personalSupply.add(tile)
+        gameState.currentPlayer.playableTilesCopy.add(TileType.FLOWER)
+
+        assertFails { rootService.treeService.playTile(tile, Pair(-1, -1)) }
+    }
 
 }
+
+
+
 
 
 
