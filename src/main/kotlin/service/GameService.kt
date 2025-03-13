@@ -5,7 +5,6 @@ import edu.udo.cs.sopra.ntf.*
 import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 import util.ZenCardLoader
-import kotlin.math.max
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
@@ -139,7 +138,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      *
      * preconditions:
      * - Zen deck is empty and all players played their last action.
-     * NOTE by Giang: this is already checked in endTurn of PlayerActionService
+     *
      * post conditions:
      * - a refresh with the player order was used, where the winning player is at index 0,
      * second place is at index 2 etc.
@@ -222,7 +221,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val playersCollectedCards = actPlayer.collectedCards
         val claimGoals = actPlayer.claimedGoals
 
-        // Tile
+        // Calculate score for each tile
         val leaf = countTilesType(playersBonsaiTree, TileType.LEAF)
         val flower = countTilesType(playersBonsaiTree, TileType.FLOWER)
         val fruit = countTilesType(playersBonsaiTree, TileType.FRUIT)
@@ -234,28 +233,44 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         val scoreTiles = scoreOfLeaf + scoreOfFlower + scoreOfFruit
 
-        // Parchment
-        val masterCard = 2 * countZencardType(playersCollectedCards, CardType.MASTERCARD)
-        val growthCard = 2 * countZencardType(playersCollectedCards, CardType.GROWTHCARD)
-        val helperCard = 2 * countZencardType(playersCollectedCards, CardType.HELPERCARD)
-        val flowerTile = 2 * flower
-        val leafTile = 2 * leaf
-        val woodTile = 2 * wood
+        // Calculate score for parchment
+        var scoreParchment = 0
 
-        val scoreParchment = masterCard + growthCard + helperCard + flowerTile + leafTile + woodTile
+        // Filter all parchment cards
+        val parchmentCards = playersCollectedCards.filterIsInstance<ParchmentCard>()
 
-        // Goal
+        for (parchment in parchmentCards) {
+            val basePoints = parchment.basePoints
+
+            // If parchment is based on TileType
+            parchment.parchmentTileType?.let { tileType ->
+                val tileCount = countTilesType(playersBonsaiTree, tileType) ?: 0
+                val points = tileCount * basePoints
+                scoreParchment += points
+            }
+
+            // If parchment is based on CardType
+            parchment.parchmentCardType?.let { cardType ->
+                val cardCount = countZenCardType(playersCollectedCards, cardType)
+                val points = cardCount * basePoints
+                scoreParchment += points
+            }
+        }
+
+        // Calculate score for Goal
         val scoreOfGoal = claimGoals.sumOf { it.score }
 
+        // Total
         return scoreTiles + scoreParchment + scoreOfGoal
     }
 
+    // Help functions for calculating score
 
     private fun countTilesType(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, type: TileType): Int {
         return bonsaiTree.values.count { it.tileType == type }
     }
 
-    private fun countZencardType(collectedZenCard: MutableList<Card>, type: CardType): Int {
+    private fun countZenCardType(collectedZenCard: MutableList<Card>, type: CardType): Int {
         return collectedZenCard.count { it.cardType == type }
     }
 
