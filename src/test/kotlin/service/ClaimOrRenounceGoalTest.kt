@@ -3,7 +3,6 @@ package service
 import entity.*
 import kotlin.test.*
 
-// EITHER TEST IS WRONG OR METHOD IS IMPLEMENTED WRONG
 
 /**
  * Tests if method claimOrRenounceGoal works correctly
@@ -20,17 +19,37 @@ class ClaimOrRenounceGoalTest {
         val game = BonsaiGame()
         val player1 = Player("Tom", PlayerType.HUMAN, true, ColorType.BLUE)
         val player2 = Player("Tomy", PlayerType.HUMAN, true, ColorType.RED)
-        val goalTileBrown = GoalTile(GoalTileType.BROWN, 1, 5)
-        val goalTileGreen = GoalTile(GoalTileType.GREEN, 1, 6)
-        val goalTilePink = GoalTile(GoalTileType.PINK, 1, 8)
-        val goalTileOrange = GoalTile(GoalTileType.ORANGE, 1, 9)
-        val goalTileBlue = GoalTile(GoalTileType.BLUE, 1, 7)
+        val goalTileBrownT0 = GoalTile(GoalTileType.BROWN, 0, 5)
+        val goalTileBrownT1 = GoalTile(GoalTileType.BROWN, 1, 10)
+        val goalTileBrownT2 = GoalTile(GoalTileType.BROWN, 2, 15)
+        val goalTileGreenT0 = GoalTile(GoalTileType.GREEN, 0, 6)
+        val goalTileGreenT1 = GoalTile(GoalTileType.GREEN, 1, 9)
+        val goalTileGreenT2 = GoalTile(GoalTileType.GREEN, 2, 12)
+        val goalTilePinkT0 = GoalTile(GoalTileType.PINK, 0, 8)
+        val goalTilePinkT1 = GoalTile(GoalTileType.PINK, 1, 12)
+        val goalTilePinkT2 = GoalTile(GoalTileType.PINK, 2, 16)
+        val goalTileOrangeT0 = GoalTile(GoalTileType.ORANGE, 0, 9)
+        val goalTileOrangeT1 = GoalTile(GoalTileType.ORANGE, 1, 11)
+        val goalTileOrangeT2 = GoalTile(GoalTileType.ORANGE, 2, 13)
+        val goalTileBlueT0 = GoalTile(GoalTileType.BLUE, 0, 7)
+        val goalTileBlueT1 = GoalTile(GoalTileType.BLUE, 1, 10)
+        val goalTileBlueT2 = GoalTile(GoalTileType.BLUE, 2, 14)
         val gameState1 = BonsaiGameState(player1, mutableListOf(player1, player2), 2, States.MEDITATE)
-        gameState1.goalTiles.add(mutableListOf(goalTileBrown))
-        gameState1.goalTiles.add(mutableListOf(goalTileOrange))
-        gameState1.goalTiles.add(mutableListOf(goalTileGreen))
-        gameState1.goalTiles.add(mutableListOf(goalTilePink))
-        gameState1.goalTiles.add(mutableListOf(goalTileBlue))
+        gameState1.goalTiles.add(mutableListOf(goalTileBrownT0))
+        gameState1.goalTiles.add(mutableListOf(goalTileBrownT1))
+        gameState1.goalTiles.add(mutableListOf(goalTileBrownT2))
+        gameState1.goalTiles.add(mutableListOf(goalTileOrangeT0))
+        gameState1.goalTiles.add(mutableListOf(goalTileOrangeT1))
+        gameState1.goalTiles.add(mutableListOf(goalTileOrangeT2))
+        gameState1.goalTiles.add(mutableListOf(goalTileGreenT0))
+        gameState1.goalTiles.add(mutableListOf(goalTileGreenT1))
+        gameState1.goalTiles.add(mutableListOf(goalTileGreenT2))
+        gameState1.goalTiles.add(mutableListOf(goalTilePinkT0))
+        gameState1.goalTiles.add(mutableListOf(goalTilePinkT1))
+        gameState1.goalTiles.add(mutableListOf(goalTilePinkT2))
+        gameState1.goalTiles.add(mutableListOf(goalTileBlueT0))
+        gameState1.goalTiles.add(mutableListOf(goalTileBlueT1))
+        gameState1.goalTiles.add(mutableListOf(goalTileBlueT2))
         val history = History()
         history.currentPosition = 1
         history.gameStates.add(gameState1)
@@ -49,15 +68,15 @@ class ClaimOrRenounceGoalTest {
 
 
     /**
-     * Tests if player can claim brown goal tile
+     * Tests if player can claim brown tier 0 goal tile
      */
     @Test
-    fun testGoalTileBrown() {
+    fun testGoalTileBrownT0() {
         val rootService = setUpGame()
         val playerActionService = PlayerActionService(rootService)
         val player = getCurrentPlayer(rootService)
         for (i in 0..7) {
-            player.bonsaiTree[Pair(i, i)] = Tile(i, i, TileType.WOOD)
+            player.bonsaiTree[Pair(1, -i)] = Tile(1, -i, TileType.WOOD)
         }
         playerActionService.claimOrRenounceGoal(true)
         assertTrue(player.claimedGoals.isNotEmpty())
@@ -65,15 +84,15 @@ class ClaimOrRenounceGoalTest {
     }
 
     /**
-     * Tests if player can claim brown orange tile
+     * Tests if player can claim tier 0 orange goal tile
      */
     @Test
-    fun testGoalTileOrange() {
+    fun testGoalTileOrangeT0() {
         val rootService = setUpGame()
         val playerActionService = PlayerActionService(rootService)
         val player = getCurrentPlayer(rootService)
         for (i in 0..2) {
-            player.bonsaiTree[Pair(i, i)] = Tile(i, i, TileType.FRUIT)
+            player.bonsaiTree[Pair(i, -i)] = Tile(i, -i, TileType.FRUIT)
         }
         playerActionService.claimOrRenounceGoal(true)
         assertTrue(player.claimedGoals.isNotEmpty())
@@ -81,10 +100,10 @@ class ClaimOrRenounceGoalTest {
     }
 
     /**
-     * Tests if player can claim green goal tile
+     * Tests if player can claim tier 0 green goal tile
      */
     @Test
-    fun testGoalTileGreen() {
+    fun testGoalTileGreenT0() {
         val rootService = setUpGame()
         val playerActionService = PlayerActionService(rootService)
         val player = getCurrentPlayer(rootService)
@@ -97,10 +116,54 @@ class ClaimOrRenounceGoalTest {
     }
 
     /**
-     * Tests if player can claim pink goal tile
+     * Tests if player can claim tier 1 green goal tile after renouncing the tier 0 version
      */
     @Test
-    fun testGoalTilePink() {
+    fun testGoalTileGreenT1() {
+        val rootService = setUpGame()
+        val playerActionService = PlayerActionService(rootService)
+        val player = getCurrentPlayer(rootService)
+        for (i in 1..5) {
+            player.bonsaiTree[Pair(1, -i)] = Tile(1, -i, TileType.LEAF)
+        }
+        playerActionService.claimOrRenounceGoal(false)
+        assertTrue(player.claimedGoals.isEmpty())
+        for (i in 7..10) {
+            player.bonsaiTree[Pair(1, -i)] = Tile(1, -i, TileType.LEAF)
+        }
+        player.bonsaiTree[Pair(1, -6)] = Tile(1, -6, TileType.LEAF)
+        playerActionService.claimOrRenounceGoal(true)
+        assertTrue(player.claimedGoals.isNotEmpty())
+        assertEquals(GoalTileType.GREEN, player.claimedGoals.first().goalTileType)
+    }
+
+    /**
+     * Tests if player can claim tier 1 green goal tile after claiming the tier 0 version
+     */
+    @Test
+    fun testGoalTileGreenT1withT0() {
+        val rootService = setUpGame()
+        val playerActionService = PlayerActionService(rootService)
+        val player = getCurrentPlayer(rootService)
+        for (i in 1..5) {
+            player.bonsaiTree[Pair(1, -i)] = Tile(1, -i, TileType.LEAF)
+        }
+        playerActionService.claimOrRenounceGoal(true)
+        assertTrue(player.claimedGoals.isNotEmpty())
+        for (i in 7..10) {
+            player.bonsaiTree[Pair(1, -i)] = Tile(1, -i, TileType.LEAF)
+        }
+        player.bonsaiTree[Pair(1, -6)] = Tile(1, -6, TileType.LEAF)
+        playerActionService.claimOrRenounceGoal(true)
+        assertTrue(player.claimedGoals.size==1)
+        assertEquals(GoalTileType.GREEN, player.claimedGoals.first().goalTileType)
+    }
+
+    /**
+     * Tests if player can claim pink tier 0 goal tile
+     */
+    @Test
+    fun testGoalTilePinkT0() {
         val rootService = setUpGame()
         val playerActionService = PlayerActionService(rootService)
         val player = getCurrentPlayer(rootService)
@@ -113,14 +176,14 @@ class ClaimOrRenounceGoalTest {
     }
 
     /**
-     * Tests if player can claim blue goal tile
+     * Tests if player can claim blue tier 0 goal tile
      */
     @Test
-    fun testGoalTileBlue() {
+    fun testGoalTileBlueT0() {
         val rootService = setUpGame()
         val playerActionService = PlayerActionService(rootService)
         val player = getCurrentPlayer(rootService)
-        player.bonsaiTree[Pair(-3, 0)] = Tile(-3, 0, TileType.FLOWER)
+        player.bonsaiTree[Pair(3, -2)] = Tile(3, -2, TileType.FLOWER)
         playerActionService.claimOrRenounceGoal(true)
         assertTrue(player.claimedGoals.isNotEmpty())
         assertEquals(GoalTileType.BLUE, player.claimedGoals.first().goalTileType)
@@ -134,8 +197,23 @@ class ClaimOrRenounceGoalTest {
         val rootService = setUpGame()
         val playerActionService = PlayerActionService(rootService)
         val player = getCurrentPlayer(rootService)
-        player.bonsaiTree[Pair(-3, 0)] = Tile(-3, 0, TileType.FLOWER)
+        player.bonsaiTree[Pair(3, -2)] = Tile(3, -2, TileType.FLOWER)
         playerActionService.claimOrRenounceGoal(false)
+        assertTrue(player.renouncedGoals.isNotEmpty())
+        assertTrue(player.claimedGoals.isEmpty())
+    }
+
+    /**
+     * Tests if player renounce goals get added in list
+     */
+    @Test
+    fun testClaimAfterRenounce() {
+        val rootService = setUpGame()
+        val playerActionService = PlayerActionService(rootService)
+        val player = getCurrentPlayer(rootService)
+        player.bonsaiTree[Pair(3, -2)] = Tile(3, -2, TileType.FLOWER)
+        playerActionService.claimOrRenounceGoal(false)
+        playerActionService.claimOrRenounceGoal(true)
         assertTrue(player.renouncedGoals.isNotEmpty())
         assertTrue(player.claimedGoals.isEmpty())
     }
