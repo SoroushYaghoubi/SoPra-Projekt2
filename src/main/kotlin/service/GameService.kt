@@ -117,78 +117,36 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     * Shows the winner of the game.
+     * refreshes with a list of the best placed players in order
      *
      * preconditions:
      * - Zen deck is empty and all players played their last action.
      *
      * post conditions:
      * - a refresh with the player order was used, where the winning player is at index 0,
-     * second place is at index 2 etc.
+     * second place is at index 1 etc.
      *
      * @throws IllegalStateException if game isn't over yet.
      */
-    fun showWinner(): String {
+    fun showWinner() {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
-        // Get the winner's name using the index
-        return gameState.players[getWinnerIndex()].name
-    }
-
-    // Dennis implemented showWinner with a return value to test it
-    /*
-    fun showWinner(): String {
-        val game = rootService.currentGame
-        checkNotNull(game) { "No game was started." }
-
-        val gameState = game.bonsaiGameState.lastOrNull()
-        checkNotNull(gameState) { "No active game state." }
-
-        // Get the winner's name using the index and return it
-        return gameState.players[getWinnerIndex()].name
-    }
-    */
-
-    /**
-     * Help function to get the index of the winner
-     */
-    private fun getWinnerIndex(): Int {
-        val game = rootService.currentGame
-        checkNotNull(game) { "No game was started." }
-        val gameState = game.currentBonsaiGameState
-        checkNotNull(gameState) { "No active game state." }
-
-        val maxScore = gameState.players.maxOf { it.score }
-
-        //val playerOrder: MutableList<Player> = mutableListOf()
-        val playerOrder = gameState.players
-
-        // List of players as candidate for winner: those with highest score
-        val candidates = gameState.players.filter { it.score == maxScore }
-
-        // If only one has the highest score
-        if (candidates.size == 1) {
-            return gameState.players.indexOf(candidates[0])
+        if (gameState.endGameCounter != gameState.players.size) {
+            throw IllegalStateException("Game is not over yet.")
         }
 
-        // In case of a tie, find the candidate who is farthest from the starting player in the playOrder list
-        var farthestIndex = 0
-        var maxDistance = 0
+        // Get the order of players by score with tiebreak included
+        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+            .thenByDescending { gameState.players.indexOf(it) })
 
-        // Checking the position of candidates in playerOrder, the player with the highest index is then the farthest
-        for (candidate in candidates) {
-            val candidateIndexInOrder = playerOrder.indexOf(candidate)
-            if (candidateIndexInOrder > maxDistance) {
-                maxDistance = candidateIndexInOrder
-                farthestIndex = gameState.players.indexOf(candidate)
-            }
-        }
-        return farthestIndex
+        onAllRefreshables { refreshAfterShowWinner(winnerOrder) }
     }
+
+
 
     /**
      * Calculates the score of the current player.

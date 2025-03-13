@@ -3,6 +3,8 @@ package service
 import kotlin.test.*
 import entity.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.assertThrows
+
 
 /**
  * Tests if showWinner works correctly:
@@ -27,6 +29,19 @@ class ShowWinnerTest {
         return rootService
     }
 
+    /**
+     * Tests if showWinner works correctly if the game is not over yet
+     */
+    @Test
+    fun testGameOver() {
+        val rootService = setUpGame()
+        val gameService = rootService.gameService
+
+        assertThrows<IllegalStateException> {
+            gameService.showWinner()
+        }
+    }
+
 
     /**
      * Tests if player with the highest score wins
@@ -38,6 +53,7 @@ class ShowWinnerTest {
         val gameService = rootService.gameService
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is null." }
+        gameState.endGameCounter = gameState.players.size
 
         // Set scores
         gameState.players[0].score = 10
@@ -45,32 +61,49 @@ class ShowWinnerTest {
         gameState.players[2].score = 70
         gameState.players[3].score = 5
 
-        // Verify the winner
-        assertEquals("Tom3", gameService.showWinner())
+        gameService.showWinner()
+
+        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+            .thenByDescending { gameState.players.indexOf(it) })
+
+        val winnerNames = winnerOrder.map { it.name }
+
+        val expectedWinnerNames = listOf("Tom3", "Tom", "Tom2", "Tom4")
+
+        assertEquals(expectedWinnerNames, winnerNames)
     }
      /**
-     * Tests if the player furthest from the starting player wins in case of a two player tie
+     * Tests if the winner order is correct in case of a two player tie
      */
 
     @Test
     fun testTieWithTwoPlayers() {
-        val rootService = setUpGame()
-        val gameService = rootService.gameService
-        val gameState = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(gameState) { "Game state is null." }
+         val rootService = setUpGame()
+         val gameService = rootService.gameService
+         val gameState = rootService.currentGame?.currentBonsaiGameState
+         checkNotNull(gameState) { "Game state is null." }
+         gameState.endGameCounter = gameState.players.size
 
-        // Set scores (two players tied)
-        gameState.players[0].score = 7
-        gameState.players[1].score = 10
-        gameState.players[2].score = 10
-        gameState.players[3].score = 5
+         // Set scores
+         gameState.players[0].score = 10
+         gameState.players[1].score = 70
+         gameState.players[2].score = 70
+         gameState.players[3].score = 5
 
-        // Verify the winner (player farthest from the starting player)
-        assertEquals("Tom3", gameService.showWinner())
-    }
+         gameService.showWinner()
+
+         val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+             .thenByDescending { gameState.players.indexOf(it) })
+
+         val winnerNames = winnerOrder.map { it.name }
+
+         val expectedWinnerNames = listOf("Tom3", "Tom2", "Tom", "Tom4")
+
+         assertEquals(expectedWinnerNames, winnerNames)
+     }
 
     /**
-     * Tests if the player furthest from the starting player wins in case of a three player tie
+     * Tests if the winner order is correct in case of a three player tie
      */
 
     @Test
@@ -79,19 +112,28 @@ class ShowWinnerTest {
         val gameService = rootService.gameService
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is null." }
+        gameState.endGameCounter = gameState.players.size
 
-        // Set scores (three players tied)
+        // Set scores
         gameState.players[0].score = 70
-        gameState.players[1].score = 100
-        gameState.players[2].score = 100
-        gameState.players[3].score = 100
+        gameState.players[1].score = 8
+        gameState.players[2].score = 70
+        gameState.players[3].score = 70
 
-        // Verify the winner (player farthest from the starting player)
-        assertEquals("Tom4", gameService.showWinner())
+        gameService.showWinner()
+
+        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+            .thenByDescending { gameState.players.indexOf(it) })
+
+        val winnerNames = winnerOrder.map { it.name }
+
+        val expectedWinnerNames = listOf("Tom4", "Tom3", "Tom", "Tom2")
+
+        assertEquals(expectedWinnerNames, winnerNames)
     }
 
     /**
-     * Tests if the player furthest from the starting player wins in case of a four player tie
+     * Tests if the winner order is correct in case of a four player tie
      */
 
     @Test
@@ -100,15 +142,24 @@ class ShowWinnerTest {
         val gameService = rootService.gameService
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is null." }
+        gameState.endGameCounter = gameState.players.size
 
-        // Set scores (all players tied)
+        // Set scores
         gameState.players[0].score = 10
         gameState.players[1].score = 10
         gameState.players[2].score = 10
         gameState.players[3].score = 10
 
-        // Verify the winner (player farthest from the starting player)
-        assertEquals("Tom4", gameService.showWinner())
+        gameService.showWinner()
+
+        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+            .thenByDescending { gameState.players.indexOf(it) })
+
+        val winnerNames = winnerOrder.map { it.name }
+
+        val expectedWinnerNames = listOf("Tom4", "Tom3", "Tom2", "Tom")
+
+        assertEquals(expectedWinnerNames, winnerNames)
     }
 
      /**
