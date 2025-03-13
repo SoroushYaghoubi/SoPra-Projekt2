@@ -1,8 +1,8 @@
 package service
 
-import edu.udo.cs.sopra.ntf.*
+//import edu.udo.cs.sopra.ntf.*
 
-import edu.udo.cs.sopra.ntf.StartGameMessage
+//import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 import util.ZenCardLoader
 
@@ -86,23 +86,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
 
         rootService.currentGame = game
-
-        if (networkGame) {
-
-            val message = StartGameMessage(
-                orderedPlayerNames = playerOrder.map { player ->
-                    Pair(
-                        player.name,
-                        ColorTypeMessage.valueOf(player.color.name)
-                    )
-                },
-                chosenGoalTiles = goalTilesEntries.map { GoalTileTypeMessage.valueOf(it.name) },
-                orderedCards = zenDeck.mapIndexed { index, card ->
-                    Pair(CardTypeMessage.valueOf(card.cardType.name), index)
-                }
-            )
-            rootService.networkService.sendStartGameMessage(message)
-        }
 
         onAllRefreshables { refreshAfterGameStart() }
     }
@@ -338,7 +321,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     /**
      * TODO needs to be checked by network, if tiers are correct
      */
-    private fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
+    fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
             : MutableList<MutableList<GoalTile>> {
 
         val goalTiles: MutableList<MutableList<GoalTile>> = mutableListOf()
