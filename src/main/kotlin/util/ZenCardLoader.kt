@@ -14,7 +14,7 @@ class ZenCardLoader {
     val csvLoader = CSVLoader()
 
     private fun readAllGrowthCards(playerAmount: Int) : List<GrowthCard> {
-        return csvLoader.readCsvFile<CSVGrowthCardEntry>("/zengrowth.csv").map {
+        return csvLoader.readCsvFile<CSVGrowthCardEntry>("/zengrowth.csv").mapNotNull {
             val type = when(it.type) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
@@ -22,11 +22,12 @@ class ZenCardLoader {
                 else -> TileType.FRUIT
             }
 
-            var id = it.id
-            if (playerAmount < it.minPlayerAmount) {
-                id = -1
+            val result = if (playerAmount < it.minPlayerAmount) {
+                null
+            } else{
+                GrowthCard(type, it.id)
             }
-            GrowthCard(type, id)
+            result
         }
     }
 
@@ -43,7 +44,7 @@ class ZenCardLoader {
     }
 
     private fun readAllMasterCards(playerAmount: Int) : List<MasterCard> {
-        return csvLoader.readCsvFile<CSVMasterCardEntry>("/zenmaster.csv").map {
+        return csvLoader.readCsvFile<CSVMasterCardEntry>("/zenmaster.csv").mapNotNull {
 
             val type1 = when(it.type1) {
                 "log" -> TileType.WOOD
@@ -70,17 +71,13 @@ class ZenCardLoader {
                 else -> TileType.EMPTY
             }
 
-            var id = it.id
             val tileTypes = mutableListOf(type1,type2,type3)
-            while (tileTypes.contains(TileType.EMPTY)){
-                tileTypes.remove(TileType.EMPTY)
+            val result = if (playerAmount < it.minPlayerAmount) {
+                null
+            } else{
+                MasterCard(tileTypes, it.id)
             }
-
-            if (playerAmount < it.minPlayerAmount) {
-                id = -1
-            }
-
-            MasterCard(tileTypes, id)
+            result
         }
     }
 
@@ -107,12 +104,13 @@ class ZenCardLoader {
     }
 
     private fun readAllToolCards(playerAmount: Int) : List<ToolCard> {
-        return csvLoader.readCsvFile<CSVToolCardEntry>("/zentool.csv").map {
-            var id = it.id
-            if (playerAmount < it.minPlayerAmount) {
-                id = -1
+        return csvLoader.readCsvFile<CSVToolCardEntry>("/zentool.csv").mapNotNull {
+            val result = if (playerAmount < it.minPlayerAmount) {
+                null
+            } else{
+                ToolCard(it.id)
             }
-            ToolCard(id)
+            result
         }
     }
 
@@ -122,16 +120,18 @@ class ZenCardLoader {
      * @param [playerAmount] of how many players are there in the game
      */
     fun readAllZenCards(playerAmount : Int) : List<Card> {
-        val fullZenDeck = readAllGrowthCards(playerAmount) +
+        return readAllGrowthCards(playerAmount) +
                 readAllHelperCards() +
                 readAllMasterCards(playerAmount)+
                 readAllParchmentCards() +
                 readAllToolCards(playerAmount)
+        /**
         val mutableZenDeck = fullZenDeck.toMutableList()
         mutableZenDeck.removeAll {
             it.id == -1
         }
         return mutableZenDeck
+        */
     }
 }
 
