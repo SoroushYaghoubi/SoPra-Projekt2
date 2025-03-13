@@ -183,7 +183,7 @@ class ClaimOrRenounceGoalTest {
         val rootService = setUpGame()
         val playerActionService = PlayerActionService(rootService)
         val player = getCurrentPlayer(rootService)
-        player.bonsaiTree[Pair(6, -3)] = Tile(6, -3, TileType.FLOWER)
+        player.bonsaiTree[Pair(5, -3)] = Tile(5, -3, TileType.FLOWER)
         playerActionService.claimOrRenounceGoal(true)
         assertTrue(player.claimedGoals.isNotEmpty())
         assertEquals(GoalTileType.BLUE, player.claimedGoals.first().goalTileType)
