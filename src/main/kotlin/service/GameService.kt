@@ -338,7 +338,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     /**
      *
      */
-    private fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
+    fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
             : MutableList<MutableList<GoalTile>> {
 
         val goalTiles: MutableList<MutableList<GoalTile>> = mutableListOf()
