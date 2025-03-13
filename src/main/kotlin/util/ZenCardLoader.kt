@@ -125,13 +125,6 @@ class ZenCardLoader {
                 readAllMasterCards(playerAmount)+
                 readAllParchmentCards() +
                 readAllToolCards(playerAmount)
-        /**
-        val mutableZenDeck = fullZenDeck.toMutableList()
-        mutableZenDeck.removeAll {
-            it.id == -1
-        }
-        return mutableZenDeck
-        */
     }
 }
 
