@@ -468,10 +468,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
          * return true if the [tier] of the blue goal tile is reached, otherwise false
          */
         private fun hasReachedBlueGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
-            val leftProtrude = bonsaiTree.keys.any { it.first <= -2 }
-            val rightProtrude = bonsaiTree.keys.any { it.first >= 4 || it.first ==3 && (it.second) % 2 ==0 }
-            val bellowLeftProtrude = bonsaiTree.keys.any { it.first <= -2 && it.second >= 2 }
-            val bellowRightProtrude = bonsaiTree.keys.any { it.first >= 4 && it.second >= 2 }
+
+            val leftProtrude = bonsaiTree.keys.any { it.second <= -2*(it.first+2) }
+            val rightProtrude = bonsaiTree.keys.any { it.second >= -2*(it.first-3) }
+
+            val bellowLeftProtrude = bonsaiTree.keys.any {leftProtrude && it.second >= 2}
+            val bellowRightProtrude = bonsaiTree.keys.any {rightProtrude && it.second >= 2  }
 
             return when (tier) {
                 0 -> rightProtrude

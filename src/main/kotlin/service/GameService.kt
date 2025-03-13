@@ -336,7 +336,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     *
+     * TODO needs to be checked by network, if tiers are correct
      */
     private fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
             : MutableList<MutableList<GoalTile>> {
@@ -344,29 +344,29 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         val goalTiles: MutableList<MutableList<GoalTile>> = mutableListOf()
 
         val brownGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.BROWN, 8, 5),
-            GoalTile(GoalTileType.BROWN, 10, 10),
-            GoalTile(GoalTileType.BROWN, 12, 15)
+            GoalTile(GoalTileType.BROWN, 0, 5),
+            GoalTile(GoalTileType.BROWN, 1, 10),
+            GoalTile(GoalTileType.BROWN, 2, 15)
         )
         val greenGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.GREEN, 5, 6),
-            GoalTile(GoalTileType.GREEN, 7, 9),
-            GoalTile(GoalTileType.GREEN, 9, 12)
+            GoalTile(GoalTileType.GREEN, 0, 6),
+            GoalTile(GoalTileType.GREEN, 1, 9),
+            GoalTile(GoalTileType.GREEN, 2, 12)
         )
         val pinkGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.PINK, 3, 8),
-            GoalTile(GoalTileType.PINK, 4, 12),
-            GoalTile(GoalTileType.PINK, 5, 16)
+            GoalTile(GoalTileType.PINK, 0, 8),
+            GoalTile(GoalTileType.PINK, 1, 12),
+            GoalTile(GoalTileType.PINK, 2, 16)
         )
         val orangeGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.ORANGE, 3, 9),
-            GoalTile(GoalTileType.ORANGE, 4, 11),
-            GoalTile(GoalTileType.ORANGE, 5, 13)
+            GoalTile(GoalTileType.ORANGE, 0, 9),
+            GoalTile(GoalTileType.ORANGE, 1, 11),
+            GoalTile(GoalTileType.ORANGE, 2, 13)
         )
         val blueGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.ORANGE, 0, 9),
-            GoalTile(GoalTileType.ORANGE, 0, 11),
-            GoalTile(GoalTileType.ORANGE, 0, 13)
+            GoalTile(GoalTileType.BLUE, 0, 9),
+            GoalTile(GoalTileType.BLUE, 1, 11),
+            GoalTile(GoalTileType.BLUE, 2, 13)
         )
 
         goalTilesTypesEntries.forEach { goalTileType ->
