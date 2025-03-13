@@ -2,7 +2,10 @@ package service
 
 
 import edu.udo.cs.sopra.ntf.*
+import entity.GoalTileType
 import gui.Refreshable
+import entity.*
+
 
 
 /**
@@ -82,29 +85,42 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * @throws IllegalStateException if [connectionState] != [ConnectionState.WAITING_FOR_GUEST]
      * @throws IllegalStateException if player size < 2 or player size > 4
      */
-    fun sendStartGameMessage() {
+    fun sendStartGameMessage(playerOrder : MutableList<Player>,goalTilesEntries: MutableList<GoalTileType>) {
         check(connectionState == ConnectionState.WAITING_FOR_GUEST)
         {"currently not prepared to start a new hosted game."}
 
-        val players = client?.otherPlayerNames
-        checkNotNull(players)
+        val playerNames = client?.otherPlayerNames
+        checkNotNull(playerNames)
 
-        //val colorMessage = message.orderedPlayerNames.first().second
-        //val color = colorMessage.toColor()
-
-        if(players.size < 2 || players.size > 4) {
+        if(playerNames.size < 2 || playerNames.size > 4) {
             throw IllegalStateException("there should be 2 to 4 players")
         }
 
-        //rootService.gameService.startNewGame()
+        rootService.gameService.startNewGame(playerOrder, true, goalTilesEntries)
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game) {"game should not be null right after starting it."}
 
-        //it depends on who's the first player
-        if(true) {
-            //do something
+        val nameColorPair = playerOrder.map {
+            Pair(it.name, it.color.toColorMessage())
+        }
+
+        val chosenGoalTiles = goalTilesEntries.map{it ->
+            it.toColor()
+        }
+
+        val zenDeckMessage = game.zenDeck.map {
+            Pair(it.cardType.toCardTypeMessage(), it.id)
+        }
+
+        val message = StartGameMessage(nameColorPair, chosenGoalTiles, zenDeckMessage)
+        //TODO(still needs to be checked if it's correct)
+
+        if(myName == playerOrder.first().name) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
+            client?.sendGameActionMessage(message)
         } else {
-            //maybe do something
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
+            client?.sendGameActionMessage(message)
         }
     }
 
@@ -114,6 +130,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
 
     fun sendCultivateMessage(message : CultivateMessage) {
         //TODO
+
+        //get removedTilesPosition
     }
 
     /**
@@ -146,12 +164,22 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
     }
 
-    fun receiveMeditateMessage(message : MeditateMessage) {
+    fun receiveMeditateMessage(message: MeditateMessage, sender: String) {
         //TODO
     }
 
-    fun receiveCultivateMessage(message : CultivateMessage) {
-        //TODO
+    fun receiveCultivateMessage(message: CultivateMessage, sender: String) {
+        check(connectionState == ConnectionState.WAITING_FOR_OPPONENT)
+        {"currently not expecting an opponent's turn."}
+
+        // reproduce what the other player has done
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        val otherPlayer = game.currentPlayer
+
+        //TODO(how??)
+        //maybe
+        rootService.playerActionService.cultivate()
     }
 
     /**
