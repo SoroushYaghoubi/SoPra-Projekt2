@@ -1,9 +1,9 @@
 package gui
 
-import entity.Player
 import entity.Tile
 import entity.TileType
 import service.AbstractRefreshingService
+import service.ConnectionState
 
 /**
  * This interface provides a mechanism for the service layer classes to communicate
@@ -93,8 +93,7 @@ interface Refreshable {
     fun refreshAfterRedoOrUndo(){}
 
     /**
-     * perform refreshes that are necessary to show the final score
+     * perform refreshes that are necessary after the [ConnectionState] was changed
      */
-    fun refreshAfterShowWinner(players: List<Player>){}
-
+    fun refreshConnectionState(newState: ConnectionState) {}
 }
