@@ -53,10 +53,10 @@ class CalculateScoreTest {
             (2 to -4) to Tile(2, -4, TileType.FRUIT)
         )
 
-        //4woods
         //3flowers with 10 sides be untouched
         //5leaves x 3 = 15
         //1fruit x 7 = 7
+        //sum 32
 
         val playerCollectedCard = mutableListOf(
             MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
@@ -67,13 +67,14 @@ class CalculateScoreTest {
             ParchmentCard(null, CardType.MASTERCARD, 2, 38)
         )
         //parchmentCard fruit with 1 collected fruit tile = 2
-        //parchmentCard with 2 collected mastercards = 2
-
+        //parchmentCard with 2 collected mastercards = 2 x 2 = 4
+        //sum 6
         val playerClaimedGoal = mutableListOf(
             GoalTile(GoalTileType.GREEN, 5, 6),
             GoalTile(GoalTileType.PINK, 4, 12),
         )
         //points: 18
+        //total 32 + 6 + 18 = 56
         gameState.currentPlayer.collectedCards = playerCollectedCard
         gameState.currentPlayer.bonsaiTree = playerBonsaiTree
         gameState.currentPlayer.claimedGoals = playerClaimedGoal
@@ -100,7 +101,6 @@ class CalculateScoreTest {
         checkNotNull(gameState) { "No active game state." }
 
         assertEquals(56, rootService.gameService.calculateScore())
-
 
     }
 }
