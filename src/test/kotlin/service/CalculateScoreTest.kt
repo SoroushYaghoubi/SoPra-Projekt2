@@ -41,22 +41,22 @@ class CalculateScoreTest {
 
         val playerBonsaiTree = mutableMapOf(
             (0 to 0) to Tile(null, null, TileType.WOOD),
-            (-1 to -1) to Tile(-1, -1, TileType.LEAF), (0 to -1) to Tile(0, -1, TileType.WOOD),
+            (-1 to -1) to Tile(null, null, TileType.LEAF), (0 to -1) to Tile(null, null, TileType.WOOD),
 
-            (-1 to -2) to Tile(-1, -2, TileType.FLOWER), (0 to -2) to Tile(0, -2, TileType.WOOD),
-            (1 to -2) to Tile(1, -2, TileType.WOOD), (2 to -2) to Tile(2, -2, TileType.LEAF),
-            (3 to -2) to Tile(3, -2, TileType.FLOWER),
+            (-1 to -2) to Tile(null, null, TileType.FLOWER), (0 to -2) to Tile(null, null, TileType.WOOD),
+            (1 to -2) to Tile(null, null, TileType.WOOD), (2 to -2) to Tile(null, null, TileType.LEAF),
+            (3 to -2) to Tile(null, null, TileType.FLOWER),
 
-            (0 to -3) to Tile(0, -3, TileType.FLOWER), (1 to -3) to Tile(1, -3, TileType.LEAF),
-            (2 to -3) to Tile(2, -3, TileType.LEAF), (3 to -3) to Tile(3, -3, TileType.LEAF),
+            (0 to -3) to Tile(null, null, TileType.FLOWER), (1 to -3) to Tile(null, null, TileType.LEAF),
+            (2 to -3) to Tile(null, null, TileType.LEAF),
 
-            (2 to -4) to Tile(2, -4, TileType.FRUIT)
+            (2 to -4) to Tile(null, null, TileType.FRUIT)
         )
 
-        //3flowers with 10 sides be untouched
-        //5leaves x 3 = 15
+        //3flowers with 11 sides be untouched
+        //4leaves x 3 = 12
         //1fruit x 7 = 7
-        //sum 32
+        //sum 30
 
         val playerCollectedCard = mutableListOf(
             MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
@@ -100,7 +100,7 @@ class CalculateScoreTest {
 
         checkNotNull(gameState) { "No active game state." }
 
-        assertEquals(56, rootService.gameService.calculateScore())
+        assertEquals(54, rootService.gameService.calculateScore())
 
     }
 }
