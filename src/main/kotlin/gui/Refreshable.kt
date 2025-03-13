@@ -1,5 +1,6 @@
 package gui
 
+import entity.Player
 import entity.Tile
 import entity.TileType
 import service.AbstractRefreshingService
@@ -96,4 +97,9 @@ interface Refreshable {
      * perform refreshes that are necessary after the [ConnectionState] was changed
      */
     fun refreshConnectionState(newState: ConnectionState) {}
+
+    /**
+     * perform refreshes that are necessary to show the result scene
+     */
+    fun refreshAfterShowWinner(players: List<Player>){}
 }
