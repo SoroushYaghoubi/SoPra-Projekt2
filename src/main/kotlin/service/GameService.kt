@@ -278,7 +278,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * TODO needs to be checked by network, if tiers are correct
      */
     fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
-            : MutableList<MutableList<GoalTile>> {
+            : MutableList<GoalTile> {
 
         val goalTiles: MutableList<MutableList<GoalTile>> = mutableListOf()
 
@@ -329,7 +329,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         }
         println("Goal Tiles$goalTiles")
 
-        return goalTiles
-
+        return goalTiles.flatten().toMutableList()
     }
 }
