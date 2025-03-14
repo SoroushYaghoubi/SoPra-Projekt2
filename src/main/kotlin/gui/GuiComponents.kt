@@ -13,14 +13,14 @@ import tools.aqua.bgw.visual.ImageVisual
 import util.*
 
 class ButtonStyle1(
-    posX : Int = 0, posY: Int = 0, text: String = "Button"
+    posX : Int = 0, posY: Int = 0, text: String = "Button", width : Int = 450, height : Int = 100,
 ) : Button(
     posX = posX,
     posY = posY,
-    width = 450,
-    height = 100,
+    width = width,
+    height = height,
     text = text,
-    font = Font(24.0, Color(PRIMARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
+    font = Font(24.0, Color(TERTIARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
     visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
@@ -80,6 +80,21 @@ class TextFieldStyle1(
     prompt = prompt,
     font = Font(48.0, Color(PRIMARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
     visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
+        style.borderRadius = BorderRadius(20.0)
+    }
+)
+
+class TextFieldStyle2(
+    posX : Int = 0, posY : Int = 0, text : String = "Text Field", prompt : String = ""
+) : TextField(
+    posX = posX,
+    posY = posY,
+    width = 600,
+    height = 110,
+    text = text,
+    prompt = prompt,
+    font = Font(48.0, Color(TERTIARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
+    visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
 )
@@ -147,6 +162,41 @@ class CheckBoxButton(
         } else {
             visual = CompoundVisual(
                 ColorVisual(Color(TERTIARY_COLOUR)).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                },
+                ImageVisual("remove.png")
+            )
+            isChecked = true
+        }
+    }
+
+
+}
+
+class CheckBoxButton2(
+    posX: Int = 0 , posY: Int = 0, text : String = ""
+) : Button(
+    posX = posX,
+    posY = posY,
+    width = 110,
+    height = 110,
+    text = text,
+    font = Font(16.0, Color(0x000000), "Arial Black", Font.FontWeight.BOLD),
+    visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+        style.borderRadius = BorderRadius(20.0)
+    }
+){
+    var isChecked : Boolean = false
+
+    fun change() {
+        if (isChecked) {
+            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+            isChecked = false
+        } else {
+            visual = CompoundVisual(
+                ColorVisual(Color(SECONDARY_COLOUR)).apply {
                     style.borderRadius = BorderRadius(20.0)
                 },
                 ImageVisual("remove.png")

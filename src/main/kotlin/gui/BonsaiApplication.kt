@@ -11,7 +11,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920,1080) {
     private val mainMenuScene = MainMenuScene(this)
     private val gameScene = BonsaiGameScene()
     private val configureGameMenuScene = ConfigureGameMenuScene(this)
-    private val joinScene = JoinScene()
+    private val joinScene = JoinScene(this)
     private val hostScene = HostScene()
 
     init {
