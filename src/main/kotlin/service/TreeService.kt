@@ -1,6 +1,7 @@
 package service
 
 import entity.Player
+import entity.States
 import entity.Tile
 import entity.TileType
 
@@ -43,8 +44,9 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         // update message
         val net = rootService.networkService
-        if(net.connectionState != ConnectionState.DISCONNECTED &&
-            currentPlayer.isLocal){
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            currentPlayer.isLocal
+        ) {
             net.toBeSentCultivateMessage.playedTiles.add(
                 (tile.tileType to (tilePosition))
             )
@@ -67,17 +69,53 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no tile (bonsai tree is empty).
      */
     fun removeFromTree(tilePosition: Pair<Int, Int>) {
-        //TODO(to be completed)
 
         val currentPlayer = getCurrentPlayer()
 
         // update message
         val net = rootService.networkService
         // TODO(if it's allowed then...)
-        if(net.connectionState != ConnectionState.DISCONNECTED &&
-            currentPlayer.isLocal){
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            currentPlayer.isLocal
+        ) {
             net.toBeSentCultivateMessage.removedTilesAxialCoordinates.add(tilePosition)
         }
+    }
+
+    fun canPlaceWoodTile(): Boolean {
+        val currentPlayer = getCurrentPlayer()
+        val tree = currentPlayer.bonsaiTree
+
+        //Position of pot
+        val forbiddenPositions = setOf(
+            Pair(-2, 0), Pair(-1, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0),
+            Pair(-1, 1), Pair(0, 1)
+        )
+
+        // Check for other WOOD tiles in the tree
+        for ((position, tile) in tree) {
+            if (tile.tileType != TileType.WOOD) continue // Only check around existing WOOD tiles
+
+            val (q, r) = position
+
+            // All 6 neighbors
+            val neighborPositions = listOf(
+                Pair(q + 1, r),
+                Pair(q, r + 1),
+                Pair(q - 1, r + 1),
+                Pair(q - 1, r),
+                Pair(q, r - 1),
+                Pair(q + 1, r - 1)
+            )
+
+            for (neighborPos in neighborPositions) {
+                if (!tree.containsKey(neighborPos) && neighborPos !in forbiddenPositions)
+                    return true // Found empty neighbor to place WOOD
+            }
+        }
+
+        // No valid place found
+        return false
     }
 
     /**
