@@ -25,6 +25,11 @@ class CreateGoalTilesTest {
         return rootService
     }
 
+    /**
+     * Checks the goal tile list for a Bonsai game with two players.
+     *
+     * if two players then remove the middle goal Tile from each chosen goal Tile categories
+     */
     @Test
     fun testGoalTilesForTwoPlayers() {
         val rootService = setUpGame()
