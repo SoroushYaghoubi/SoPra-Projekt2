@@ -330,6 +330,17 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
     }
 
+    /**
+     * Checks if the given goal can be claimed
+     *
+     * preconditions:
+     * - the game must be active,
+     *
+     * post conditions:
+     * - returned true if the goal can be claimed
+     * - returned false otherwise
+     */
+
     fun canClaimOrRenounceGoal(goalTileType: GoalTileType, tier: Int): Boolean {
 
         val player = getCurrentPlayer()
