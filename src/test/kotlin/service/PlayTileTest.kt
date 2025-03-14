@@ -210,6 +210,33 @@ class PlayTileTest {
         assertFails { rootService.treeService.playTile(tile, Pair(-1, -1)) }
     }
 
+    @Test
+    fun `test PlayTile tile type Any`() {
+        val rootService = setUpGame()
+
+        val game = rootService.currentGame
+        checkNotNull(game)
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+
+        println(gameState.currentPlayer.playableTiles)
+        val tileToPlay = Tile(null, null, TileType.FLOWER)
+
+        gameState.currentPlayer.personalSupply.add(tileToPlay)
+        gameState.currentPlayer.playableTilesCopy = mutableListOf(TileType.ANY, TileType.WOOD, TileType.LEAF)
+
+        assertTrue(gameState.currentPlayer.personalSupply.contains(tileToPlay))
+        assertTrue(gameState.currentPlayer.playableTilesCopy.contains(TileType.ANY))
+
+        rootService.treeService.playTile(tileToPlay, Pair(3, -3))
+
+        assertEquals(tileToPlay, gameState.currentPlayer.bonsaiTree[Pair(3, -3)])
+        assertFalse(gameState.currentPlayer.playableTilesCopy.contains(TileType.ANY))
+        assertFalse(gameState.currentPlayer.personalSupply.contains(tileToPlay))
+
+    }
+
 }
 
 

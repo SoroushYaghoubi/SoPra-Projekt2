@@ -135,7 +135,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         if (!currentPlayer.personalSupply.contains(tile)) {
             throw IllegalArgumentException("Player does not have this bonsai tile in hand")
         }
-        return currentPlayer.playableTilesCopy.contains(tile.tileType)
+        return currentPlayer.playableTilesCopy.contains(tile.tileType) || currentPlayer.playableTilesCopy.contains(TileType.ANY)
     }
 
     /**
