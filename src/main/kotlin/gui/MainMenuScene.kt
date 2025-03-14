@@ -37,7 +37,7 @@ class MainMenuScene(private val bonsaiApplication: BonsaiApplication) : MenuScen
     private val hostGameButton  = ButtonStyle1(350,730, "HOST GAME").apply {
         onMouseClicked = {
             bonsaiApplication.hideMenuScene()
-            bonsaiApplication.showHostScene()
+            bonsaiApplication.showStartSessionScene()
         }
     }
 

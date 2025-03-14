@@ -181,7 +181,7 @@ class CheckBoxButton2(
     width = 110,
     height = 110,
     text = text,
-    font = Font(16.0, Color(0x000000), "Arial Black", Font.FontWeight.BOLD),
+    font = Font(16.0, Color(TERTIARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
     visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
