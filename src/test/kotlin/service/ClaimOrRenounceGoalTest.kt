@@ -220,7 +220,8 @@ class ClaimOrRenounceGoalTest {
 
 
     /**
-     * Tests the case if the tiers in [PlayerActionService.canClaimOrRenounceGoal] are not 0 to 2 so the function should return false.
+     * Tests the case if the tiers in [PlayerActionService.canClaimOrRenounceGoal] are not 0 to 2
+     * in this case the function should return false.
      */
     @Test
     fun testClaimTilesInvalid() {

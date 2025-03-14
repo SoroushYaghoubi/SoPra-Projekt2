@@ -28,7 +28,8 @@ class CreateGoalTilesTest {
     @Test
     fun testGoalTilesForTwoPlayers() {
         val rootService = setUpGame()
-        val goalTiles = rootService.gameService.createGoalTiles(mutableListOf(GoalTileType.BROWN, GoalTileType.ORANGE, GoalTileType.GREEN), 2)
+        val goalTiles = rootService.gameService.createGoalTiles(
+            mutableListOf(GoalTileType.BROWN, GoalTileType.ORANGE, GoalTileType.GREEN), 2)
 
         assertFalse(goalTiles.flatten().contains(GoalTile(GoalTileType.ORANGE, 4, 11)))
         assertFalse(goalTiles.flatten().contains(GoalTile(GoalTileType.BROWN, 10, 10)))

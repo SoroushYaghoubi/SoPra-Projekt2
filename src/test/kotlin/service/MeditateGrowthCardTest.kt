@@ -81,13 +81,19 @@ class MeditateGrowthCardTest {
         assertEquals(3, gameState.currentPlayer.playableTiles.size)
         assertEquals(1, gameState.currentPlayer.personalSupply.size)
         assertEquals(1, gameState.currentPlayer.collectedCards.size)
+        repeat(3) {
+            gameState.currentPlayer.personalSupply.add(Tile(null, null, TileType.WOOD))
+        }
+
         //println("personal supply:" + gameState.currentPlayer.personalSupply)
 
         rootService.playerActionService.meditate(3, null)
         //println("personal supply:" + gameState.currentPlayer.personalSupply)
         assertEquals(5, gameState.currentPlayer.tileCapacity)
         assertEquals(4, gameState.currentPlayer.playableTiles.size)
-        assertEquals(3, gameState.currentPlayer.personalSupply.size)
+        assertEquals(6, gameState.currentPlayer.personalSupply.size)
         assertEquals(2, gameState.currentPlayer.collectedCards.size)
+        assertEquals(States.DISCARDING , gameState.currentState)
+
     }
 }
