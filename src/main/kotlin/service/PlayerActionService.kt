@@ -321,14 +321,17 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val player = getCurrentPlayer()
         val net = rootService.networkService
 
+        require (canClaimOrRenounceGoal(goalTileType, tier))
+
 
         // if the goal tile requirement is reached, get goal tile based on the claim
         if (claim) {
             // remove the claimed goal tile from the list
-                gameState.goalTiles.forEach {
-                if(it.goalTileType == goalTileType && it.tier == tier) {
-                    player.claimedGoals.add(gameState.goalTiles.removeAt(gameState.goalTiles.indexOf(it)))
-                }
+            gameState.goalTiles.removeIf { tile ->
+                if (tile.goalTileType == goalTileType && tile.tier == tier) {
+                    player.claimedGoals.add(tile)
+                    true
+                }else false
             }
             // update message
             if (net.connectionState != ConnectionState.DISCONNECTED &&
@@ -336,10 +339,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
             }
         } else {
-            gameState.goalTiles.forEach {
-                if(it.goalTileType == goalTileType && it.tier == tier) {
-                    player.renouncedGoals.add(gameState.goalTiles[gameState.goalTiles.indexOf(it)])
-                }
+            gameState.goalTiles.removeIf { tile ->
+                if (tile.goalTileType == goalTileType && tile.tier == tier) {
+                    player.renouncedGoals.add(tile)
+                    true
+                }else false
             }
             // update message
             if (net.connectionState != ConnectionState.DISCONNECTED &&
@@ -412,6 +416,13 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val player = getCurrentPlayer()
         val playersBonsaiTree = player.bonsaiTree
+
+        if (player.claimedGoals.any { it.goalTileType == goalTileType }) {
+            return false
+        }
+        if(player.renouncedGoals.any{it.goalTileType == goalTileType && it.tier == tier }) {
+            return false
+        }
 
         return when (goalTileType) {
             GoalTileType.BROWN -> hasReachedBrownGoal(playersBonsaiTree, tier)
