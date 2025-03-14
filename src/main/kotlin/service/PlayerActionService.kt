@@ -1,6 +1,6 @@
 package service
 
-import edu.udo.cs.sopra.ntf.MeditateMessage
+
 import entity.*
 import kotlin.math.max
 
@@ -299,7 +299,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val gameState = checkNotNull(game.currentBonsaiGameState)
 
         val player = getCurrentPlayer()
-        val playersBonsaiTree = player.bonsaiTree
         val net = rootService.networkService
 
 
