@@ -219,4 +219,29 @@ class ClaimOrRenounceGoalTest {
     }
 
 
+    /**
+     * Tests the case if the tiers in [PlayerActionService.canClaimOrRenounceGoal] are not 0 to 2 so the function should return false.
+     */
+    @Test
+    fun testClaimTilesInvalid() {
+        val rootService = setUpGame()
+        val playerActionService = PlayerActionService(rootService)
+        val player = getCurrentPlayer(rootService)
+        val goalTilePink = GoalTile(GoalTileType.PINK, 0, 8)
+        val goalTileBrown = GoalTile(GoalTileType.BROWN, 0, 8)
+        val goalTileBlue = GoalTile(GoalTileType.BLUE, 0, 8)
+        val goalTileOrange = GoalTile(GoalTileType.ORANGE, 0, 8)
+        val pinkTest = playerActionService.canClaimOrRenounceGoal(goalTilePink.goalTileType, 4)
+        val brownTest = playerActionService.canClaimOrRenounceGoal(goalTileBrown.goalTileType, 4)
+        val blueTest = playerActionService.canClaimOrRenounceGoal(goalTileBlue.goalTileType, 4)
+        val orangeTest = playerActionService.canClaimOrRenounceGoal(goalTileOrange.goalTileType, 4)
+        assertEquals(false, pinkTest)
+        assertEquals(false, brownTest)
+        assertEquals(false, blueTest)
+        assertEquals(false, orangeTest)
+
+        assertTrue(player.claimedGoals.isEmpty())
+        assertTrue(player.renouncedGoals.isEmpty())
+    }
+
 }
