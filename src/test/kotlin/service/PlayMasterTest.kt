@@ -4,6 +4,9 @@ import entity.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import kotlin.test.Test
 
+/**
+ * Tests the [PlayerActionService.playMasterCard] function for a card with three tiles
+ */
 class PlayMasterTest {
     //The game state before meditate action
     private fun setUp() : RootService {
@@ -57,6 +60,13 @@ class PlayMasterTest {
         return rootService
     }
 
+    /**
+     * Tests if the card effects for a Master card with three Tiles are applied correctly
+     *
+     * increases the players personal supply ba Five tiles 3 for the card and 2 for board position
+     * sets the current state of the game to discarding because the player's tile capacity is reached
+     * after that the Master card is added to player's collected cards stack
+     */
     @Test
     fun testMasterEffektWithThreeTiles() {
         val rootService = setUp()

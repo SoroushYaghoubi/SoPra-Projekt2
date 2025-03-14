@@ -210,6 +210,12 @@ class PlayTileTest {
         assertFails { rootService.treeService.playTile(tile, Pair(-1, -1)) }
     }
 
+    /**
+     * Tests the playTile function if a player to lay a tile, that it not playable, on his tree.
+     *
+     * If the player has a tile type Any in his playable tile list
+     * If the tile is played remove the tile type Any from the personal playable tile copy.
+     */
     @Test
     fun `test PlayTile tile type Any`() {
         val rootService = setUpGame()
