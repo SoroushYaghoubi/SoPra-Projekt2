@@ -219,4 +219,18 @@ class ClaimOrRenounceGoalTest {
     }
 
 
+    /**
+     * Tests the case if a player hasn't reached a goal tile yet, so his goal tile lists stay empty.
+     */
+    @Test
+    fun testClaimBrownTileInvalid() {
+        val rootService = setUpGame()
+        val playerActionService = PlayerActionService(rootService)
+        val player = getCurrentPlayer(rootService)
+
+        playerActionService.claimOrRenounceGoal(true)
+        assertTrue(player.claimedGoals.isEmpty())
+        assertTrue(player.renouncedGoals.isEmpty())
+    }
+
 }
