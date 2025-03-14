@@ -1,5 +1,6 @@
 package gui
 
+import entity.GoalTileType
 import entity.Player
 import entity.Tile
 import entity.TileType
@@ -28,7 +29,7 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player has played a tile
      */
-    fun refreshAfterPlayTile(){}
+    fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {}
 
     /**
      * perform refreshes that are necessary after a player has meditated
