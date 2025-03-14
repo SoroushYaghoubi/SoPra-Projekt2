@@ -157,10 +157,13 @@ class MeditateTest {
         assertEquals(TileType.WOOD , gameState.currentPlayer.personalSupply[0].tileType)
     }
 
-    // in this case: position 3 -> player receives a leaf tile and fruit tile in personal supply
-    // drawn card is growth card, player's playable tiles is increased
-    // in this situation GrowthCard(TileType.FLOWER, 9)
-    // and the drawn card is moved to the personal collected card stack
+
+    /**
+     * in this case: position 3 -> player receives a leaf tile and fruit tile in personal supply
+     * drawn card is growth card, player's playable tiles is increased
+     * in this situation GrowthCard(TileType.FLOWER, 9)
+     * and the drawn card is moved to the personal collected card stack
+     */
     @Test
     fun `test draw the card in position 3`() {
         val rootService = setUpGame()
