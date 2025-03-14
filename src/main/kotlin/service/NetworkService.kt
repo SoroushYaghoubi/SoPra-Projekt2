@@ -30,6 +30,13 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
     // our own name
     val myName = client?.playerName
 
+    var toBeSentMeditateMessage = MutableMeditateMessage(
+        mutableListOf(), 4, mutableListOf(),
+        mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
+    )
+    var toBeSentCultivateMessage = MutableCultivateMessage(
+        mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
+
 
     /**
      * Connects to server and creates a new game session.
@@ -103,7 +110,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
 
         val chosenGoalTiles = goalTilesEntries.map { it ->
-            it.toColor()
+            it.toGoalTileTypeMessage()
         }
 
         val zenDeckMessage = game.zenDeck.map {
@@ -123,13 +130,49 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
     }
 
     fun sendMeditateMessage(message: MeditateMessage) {
-        //TODO
+        // TODO(some of its code should be implemented in other service classes)
+        // TODO(for the example, please check playTile())
+
+        //
+        toBeSentMeditateMessage.removedTilesAxialCoordinates.clear()
+        toBeSentCultivateMessage.removedTilesAxialCoordinates.clear()
+        toBeSentMeditateMessage.playedTiles.clear()
+        toBeSentMeditateMessage.claimedGoals.clear()
+        toBeSentMeditateMessage.renouncedGoals.clear()
+        toBeSentMeditateMessage.drawnTiles.clear()
+        toBeSentMeditateMessage.discardedTiles.clear()
+        toBeSentMeditateMessage.chosenCardPosition = 4
     }
 
-    fun sendCultivateMessage(message: CultivateMessage) {
-        //TODO
+    fun sendCultivateMessage() {
+        check(connectionState == ConnectionState.PLAYING_MY_TURN)
+        { "currently not expecting your turn." }
 
-        //get removedTilesPosition
+        val message = CultivateMessage(
+            toBeSentCultivateMessage.removedTilesAxialCoordinates.map{it},
+            toBeSentCultivateMessage.playedTiles.map{
+                (it.first.toTileTypeMessage() to it.second)
+            },
+            toBeSentCultivateMessage.claimedGoals.map{
+                (it.first.toGoalTileTypeMessage() to it.second)
+            },
+            toBeSentCultivateMessage.renouncedGoals.map{
+                (it.first.toGoalTileTypeMessage() to it.second)
+            }
+        )
+
+        // at the end clear the toBeSentMessage
+        toBeSentMeditateMessage.removedTilesAxialCoordinates.clear()
+        toBeSentCultivateMessage.removedTilesAxialCoordinates.clear()
+        toBeSentCultivateMessage.playedTiles.clear()
+        toBeSentCultivateMessage.claimedGoals.clear()
+        toBeSentCultivateMessage.renouncedGoals.clear()
+
+        updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
+        client?.sendGameActionMessage(message)
+
+        // TODO(this method should be called somewhere and at the moment
+        //  the game or the state should know that we cultivated instead of meditate)
     }
 
     /**
@@ -173,11 +216,33 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         // reproduce what the other player has done
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        val otherPlayer = game.currentPlayer
+        //val otherPlayer = game.currentPlayer
 
-        //TODO(how??)
-        //maybe
-        rootService.playerActionService.cultivate()
+
+        message.removedTilesAxialCoordinates.forEach {
+            rootService.treeService.removeFromTree(it)
+        }
+        message.playedTiles.forEach {
+            //TODO(not right)
+            val tile = Tile(it.second.first, it.second.second, it.first.toTileType())
+            rootService.treeService.playTile(tile, it.second)
+        }
+        message.claimedGoals.forEach {
+            //TODO(it needs some work when there's canCorRGoals)
+        }
+        message.renouncedGoals.forEach {
+            //TODO(it needs some work when there's canCorRGoals)
+        }
+
+        val currentIndex = game.players.indexOf(game.currentPlayer)
+
+        // get next player in the list, looping back to the first player at end of the list
+        val nextIndex = (currentIndex + 1) % game.players.size
+
+        if (game.players[nextIndex].name == myName) {
+            updateConnectionState(ConnectionState.PLAYING_MY_TURN)
+        }
+        rootService.playerActionService.endTurn()
     }
 
     /**
