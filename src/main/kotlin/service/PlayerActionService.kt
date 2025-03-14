@@ -296,7 +296,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
     fun claimOrRenounceGoal(claim: Boolean) {
         val game = checkNotNull(rootService.currentGame) { "No game was started." }
 
-        val gameState = checkNotNull(game.currentBonsaiGameState)
+        val gameState = checkNotNull(game.currentBonsaiGameState) { "No active game state." }
 
         val player = getCurrentPlayer()
         val net = rootService.networkService
@@ -318,8 +318,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 if (claim) {
                     player.claimedGoals.add(goalTile)
                     // update message
-                    if(net.connectionState != ConnectionState.DISCONNECTED &&
-                        player.isLocal){
+                    if (net.connectionState != ConnectionState.DISCONNECTED &&
+                        player.isLocal
+                    ) {
                         net.toBeSentCultivateMessage.claimedGoals.add((goalTile.goalTileType to goalTile.tier))
                     }
                     // remove the claimed goal tile from the list
@@ -332,8 +333,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 } else {
                     player.renouncedGoals.add(goalTile)
                     // update message
-                    if(net.connectionState != ConnectionState.DISCONNECTED &&
-                        player.isLocal){
+                    if (net.connectionState != ConnectionState.DISCONNECTED &&
+                        player.isLocal
+                    ) {
                         net.toBeSentCultivateMessage.renouncedGoals.add((goalTile.goalTileType to goalTile.tier))
                     }
                     break

@@ -29,9 +29,7 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
      * @throws IllegalStateException if there isn't a next game state.
      */
     fun redo() {
-        if (!canRedo()) {
-            return
-        }
+        require(canRedo())
         val game = checkNotNull(rootService.currentGame)
         val history = checkNotNull(rootService.currentGame?.history)
         history.currentPosition += 1
@@ -51,9 +49,7 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
      * @throws IllegalStateException if no previous action exists (game has just started).
      */
     fun undo() {
-        if (!canUndo()) {
-            return
-        }
+        require(canUndo())
         val game = checkNotNull(rootService.currentGame)
         val history = checkNotNull(rootService.currentGame?.history)
         history.currentPosition -= 1
@@ -75,9 +71,9 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
     fun saveGame() {
         val game = checkNotNull(rootService.currentGame)
         val currentPlayer = getCurrentPlayer()
-        if (!currentPlayer.isLocal) {
-            throw IllegalStateException("Can only be saved if played local")
-        }
+
+        require(currentPlayer.isLocal) { "Can only be saved if played local" }
+
         val json = Json.encodeToString(game)
         File("./savedGameState.json").writeText(json)
     }
@@ -121,9 +117,9 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
      */
     fun continueGame() {
         val savedGameState = File("./savedGameState.json")
-        if (!savedGameState.exists()) {
-            throw IllegalStateException("There is no saved gameState")
-        }
+
+        check(savedGameState.exists()) { "There is no saved gameState" }
+
         val jsonString = savedGameState.readText()
         val game = Json.decodeFromString<BonsaiGame>(jsonString)
         rootService.currentGame = game

@@ -28,9 +28,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      */
     fun playTile(tile: Tile, tilePosition: Pair<Int, Int>) {
 
-        if (!canPlayTile(tile, tilePosition)) {
-            throw IllegalArgumentException("Tile can not be played")
-        }
+        require(canPlayTile(tile, tilePosition)) { "Tile can not be played" }
 
         val currentPlayer = getCurrentPlayer()
         currentPlayer.bonsaiTree[tilePosition] = tile
@@ -69,8 +67,20 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no tile (bonsai tree is empty).
      */
     fun removeFromTree(tilePosition: Pair<Int, Int>) {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+
+        gameState.currentState = States.DISCARDING
 
         val currentPlayer = getCurrentPlayer()
+
+        // Remove the selected tile
+        currentPlayer.bonsaiTree.remove(tilePosition)
+        // Refresh GUI to reflect the updated tree
+        onAllRefreshables { refreshAfterRemoveFromTree(tilePosition) }
 
         // update message
         val net = rootService.networkService
@@ -132,10 +142,10 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      */
     fun canPlayTile(tile: Tile): Boolean {
         val currentPlayer = getCurrentPlayer()
-        if (!currentPlayer.personalSupply.contains(tile)) {
-            throw IllegalArgumentException("Player does not have this bonsai tile in hand")
-        }
-        return currentPlayer.playableTilesCopy.contains(tile.tileType) || currentPlayer.playableTilesCopy.contains(TileType.ANY)
+        require(currentPlayer.personalSupply.contains(tile)) { "Player does not have this bonsai tile in hand" }
+
+        return currentPlayer.playableTilesCopy.contains(tile.tileType)
+                || currentPlayer.playableTilesCopy.contains(TileType.ANY)
     }
 
     /**
@@ -154,13 +164,12 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalArgumentException if bonsai tile is played in invalid position.
      */
     fun canPlayTile(tile: Tile, tilePosition: Pair<Int, Int>): Boolean {
-        if (!canPlayTile(tile)) {
-            return false
-        }
+        if (!canPlayTile(tile)) return false
+
         val currentPlayer = getCurrentPlayer()
-        if (currentPlayer.bonsaiTree.containsKey(tilePosition)) {
-            throw IllegalArgumentException("Position is already occupied")
-        }
+
+        require(currentPlayer.bonsaiTree.containsKey(tilePosition)) { "Position is already occupied" }
+
         val tree = currentPlayer.bonsaiTree
         val q = tilePosition.first
         val r = tilePosition.second
@@ -172,9 +181,9 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             tree.getOrDefault(Pair(q, r - 1), null)?.tileType,
             tree.getOrDefault(Pair(q + 1, r - 1), null)?.tileType,
         ).filterNotNull()
-        if (neighbourTiles.isEmpty()) {
-            throw IllegalArgumentException("There are no adjacent cards")
-        }
+
+        require(neighbourTiles.isEmpty()) { "There are no adjacent cards" }
+
         if (tile.tileType == TileType.WOOD) {
             return neighbourTiles.contains(TileType.WOOD)
         }
