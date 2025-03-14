@@ -28,16 +28,11 @@ private val SIDE_VECTORS = listOf(
     // root
 val ROOT = (0 to 0)
 
-    // pot tiles (todo: make sure the values are correct)
+    // pot tiles
 val POT = setOf(
-         ROOT,
-        -2 to 1,
-        -1 to 1,
-         0 to 1,
-         1 to 1,
-        -2 to 2,
-        -1 to 2,
-         0 to 2,
+        -2 to 0, -1 to 0, ROOT, 1 to 0, 2 to 0, 3 to 0,
+        -2 to 1, -1 to 1, 0 to 1, 1 to 1, 2 to 1,
+        -2 to 2, -1 to 2, 0 to 2, 1 to 2
     )
 
 // ------------------------------------------------
