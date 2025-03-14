@@ -4,6 +4,7 @@ import entity.Player
 import entity.Tile
 import entity.TileType
 
+
 /**
  * The service layer class which contains all actions related to the bonsai tree
  */
@@ -39,6 +40,15 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         } else if (TileType.ANY in currentPlayer.playableTilesCopy) {
             currentPlayer.playableTilesCopy.remove(TileType.ANY)
         }
+
+        // update message
+        val net = rootService.networkService
+        if(net.connectionState != ConnectionState.DISCONNECTED &&
+            currentPlayer.isLocal){
+            net.toBeSentCultivateMessage.playedTiles.add(
+                (tile.tileType to (tilePosition))
+            )
+        }
         // TODO: check if player has achieved a goal tile
         onAllRefreshables { refreshAfterPlayTile() }
     }
@@ -57,7 +67,19 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @param tilePosition The position of the bonsai tile to be removed from.
      * @throws IllegalStateException if there is no tile (bonsai tree is empty).
      */
-    fun removeFromTree(tile: Tile, tilePosition: Pair<Int, Int>) {}
+    fun removeFromTree(tilePosition: Pair<Int, Int>) {
+        //TODO(to be completed)
+
+        val currentPlayer = getCurrentPlayer()
+
+        // update message
+        val net = rootService.networkService
+        // TODO(if it's allowed then...)
+        if(net.connectionState != ConnectionState.DISCONNECTED &&
+            currentPlayer.isLocal){
+            net.toBeSentCultivateMessage.removedTilesAxialCoordinates.add(tilePosition)
+        }
+    }
 
     /**
      * Checks if a bonsai tile can be played based on the symbols shown on

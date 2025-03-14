@@ -300,6 +300,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val player = getCurrentPlayer()
         val playersBonsaiTree = player.bonsaiTree
+        val net = rootService.networkService
+
 
         // checks if a player has already claimed a goal tile from a specific tile type
         for (goalTile in gameState.goalTiles.flatten()) {
@@ -316,6 +318,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 // if the goal tile requirement is reached, get goal tile based on the claim
                 if (claim) {
                     player.claimedGoals.add(goalTile)
+                    // update message
+                    if(net.connectionState != ConnectionState.DISCONNECTED &&
+                        player.isLocal){
+                        net.toBeSentCultivateMessage.claimedGoals.add((goalTile.goalTileType to goalTile.tier))
+                    }
+                    // remove the claimed goal tile from the list
                     for (goalTileList in gameState.goalTiles) {
                         if (goalTileList.contains(goalTile)) {
                             goalTileList.remove(goalTile)
@@ -324,6 +332,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                     }
                 } else {
                     player.renouncedGoals.add(goalTile)
+                    // update message
+                    if(net.connectionState != ConnectionState.DISCONNECTED &&
+                        player.isLocal){
+                        net.toBeSentCultivateMessage.renouncedGoals.add((goalTile.goalTileType to goalTile.tier))
+                    }
                     break
                 }
             }
