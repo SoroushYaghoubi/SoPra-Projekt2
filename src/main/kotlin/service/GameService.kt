@@ -37,14 +37,17 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         check(rootService.currentGame == null) { "There is already a game running." }
         require(playerOrder.size >= 2) { "at least 2 Players" }
 
-        // create the zenDeck depending on the number of players
-        val zenDeck = ZenCardLoader().readAllZenCards(playerOrder.size).shuffled().toMutableList()
-
-        // put the first 4 cards face up
+        var zenDeck = mutableListOf<Card>()
         val faceUpCards = mutableListOf<Card>()
-        repeat(4) {
-            faceUpCards.add(zenDeck.removeAt(0))
+        if (!networkGame){
+            // create the zenDeck depending on the number of players
+            zenDeck = ZenCardLoader().readAllZenCards(playerOrder.size).shuffled().toMutableList()
+            // put the first 4 cards face up
+            repeat(4) {
+                faceUpCards.add(zenDeck.removeAt(0))
+            }
         }
+
 
         val gameState = BonsaiGameState(
             currentPlayer = playerOrder.first(),

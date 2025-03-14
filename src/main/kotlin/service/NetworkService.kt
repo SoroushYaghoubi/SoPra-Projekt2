@@ -4,6 +4,7 @@ import edu.udo.cs.sopra.ntf.*
 import entity.GoalTileType
 import gui.Refreshable
 import entity.*
+import util.ZenCardLoader
 
 /**
  * Service layer class that realizes the necessary logic for sending and receiving messages
@@ -189,20 +190,39 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         check(connectionState == ConnectionState.WAITING_FOR_INIT)
         { "not waiting for game init message" }
 
-        val orderedPair = message.orderedPlayerNames
         //decode message
+        val orderedPair = message.orderedPlayerNames
+        val goalTileTypes = message.chosenGoalTiles.map{
+            it.toGoalTileType()
+        }
+        val players = mutableListOf<Player>()
+        orderedPair.forEach {
+            val isLocal = myName == it.first
+            // TODO(we need to decide if we use bot or not)
+            players.add(Player(it.first, PlayerType.HUMAN, isLocal, it.second.toColor()))
+        }
 
-        //construct game
 
         //initialise game
-        val colorType = message.orderedPlayerNames.first().second.toColor()
+        rootService.gameService.startNewGame(players, true, goalTileTypes.toMutableList())
+
+        //construct game
+        val zenCardLoader = ZenCardLoader()
+        val standardZenDeck =
+            when (message.orderedCards.size) {
+                32 -> zenCardLoader.readAllZenCards(2)
+                43 -> zenCardLoader.readAllZenCards(3)
+                else -> zenCardLoader.readAllZenCards(4)
+            }
+        rootService.currentGame?.currentBonsaiGameState?.zenDeck =
+            message.orderedCards.map{
+                standardZenDeck[it.second]
+            }.toMutableList()
 
 
         if (myName == orderedPair.first().first) {
-            //do something
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
         } else {
-            //maybe do something
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
         }
     }
