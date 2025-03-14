@@ -220,7 +220,7 @@ class ClaimOrRenounceGoalTest {
 
 
     /**
-     * Tests the case if a player hasn't reached a goal tile yet, so his goal tile lists stay empty.
+     * Tests the case if the tiers in [PlayerActionService.canClaimOrRenounceGoal] are not 0 to 2 so the function should return false.
      */
     @Test
     fun testClaimTilesInvalid() {
