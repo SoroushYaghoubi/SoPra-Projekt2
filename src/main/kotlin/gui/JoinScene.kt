@@ -87,6 +87,8 @@ class JoinScene(bonsaiApplication: BonsaiApplication) : MenuScene(
         ).apply {
             onMouseClicked = {
                 // TODO
+                bonsaiApplication.hideMenuScene()
+                bonsaiApplication.showWaitingScene()
             }
         }
 
