@@ -4,11 +4,7 @@ import entity.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import kotlin.test.Test
 
-/**
- * Test class for [PlayerActionService.meditate] for a growth card.
- */
-class MeditateGrowthCardTest {
-
+class PlayMasterTest {
     //The game state before meditate action
     private fun setUp() : RootService {
         val rootService = RootService()
@@ -61,14 +57,8 @@ class MeditateGrowthCardTest {
         return rootService
     }
 
-    /**
-     * card position 3 -> player receives a leaf tile and fruit tile in personal supply
-     * a GrowthCard(TileType.WOOD, 1) is drawn
-     * the player's playable tiles is increased by a Wood Tile
-     * and the drawn card is moved to the personal collected card stack
-     */
     @Test
-    fun testMeditateGrowthCardPosition3() {
+    fun testMasterEffektWithThreeTiles() {
         val rootService = setUp()
 
         val game = rootService.currentGame
@@ -87,14 +77,12 @@ class MeditateGrowthCardTest {
 
         //println("personal supply:" + gameState.currentPlayer.personalSupply)
 
-        rootService.playerActionService.meditate(3, null)
+        rootService.playerActionService.meditate(2, null)
         //println("personal supply:" + gameState.currentPlayer.personalSupply)
         assertEquals(5, gameState.currentPlayer.tileCapacity)
-        assertEquals(4, gameState.currentPlayer.playableTiles.size)
-        assertEquals(6, gameState.currentPlayer.personalSupply.size)
+        assertEquals(3, gameState.currentPlayer.playableTiles.size)
+        assertEquals(9, gameState.currentPlayer.personalSupply.size)
         assertEquals(2, gameState.currentPlayer.collectedCards.size)
         assertEquals(States.DISCARDING , gameState.currentState)
-
     }
-
 }

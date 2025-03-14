@@ -191,6 +191,7 @@ class MeditateTest {
         gameState.currentPlayer.personalSupply.addAll( listOf( Tile(null, null, TileType.WOOD )
             , Tile(null, null, TileType.WOOD )))
         rootService.playerActionService.choseTile(TileType.FRUIT)
+        assertEquals(true, gameState.currentPlayer.hasPlayed)
         assertEquals(States.DISCARDING , gameState.currentState)
         assertEquals(6, gameState.currentPlayer.personalSupply.size)
         gameState.currentPlayer.personalSupply.removeAll( listOf( Tile(null, null, TileType.WOOD )
@@ -199,5 +200,4 @@ class MeditateTest {
         assertEquals(TileType.FRUIT , gameState.currentPlayer.personalSupply.last().tileType)
 
     }
-
 }
