@@ -234,6 +234,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // change game state to CULTIVATE
         gameState.currentState = States.CULTIVATE
 
+        // let the game know at endTurn() that it should send cultivateMessage
+        if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
+            currentPlayer.isLocal) {
+            rootService.networkService.hasCultivated = true
+        }
+
         onAllRefreshables { refreshAfterCultivateStart() }
 
     }
@@ -272,6 +278,20 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         gameState.currentState = States.START_TURN
+
+        val net = rootService.networkService
+        // if it's online and we're the local player
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            getCurrentPlayer().isLocal) {
+            // if we cultivated then send cultivateMessage
+            if (net.hasCultivated) {
+                net.sendCultivateMessage()
+                net.hasCultivated = false
+            } else {
+                net.sendMeditateMessage()
+                net.hasCultivated = false
+            }
+        }
         onAllRefreshables { refreshAfterEndTurn() }
 
         // TODO: Update history -> later
