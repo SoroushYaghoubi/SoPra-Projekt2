@@ -2,7 +2,6 @@ package util
 
 import entity.*
 
-
 /**
  * this class is to create the zenDeck
  * usage sees [readAllZenCards]
@@ -13,26 +12,27 @@ import entity.*
 class ZenCardLoader {
     val csvLoader = CSVLoader()
 
-    private fun readAllGrowthCards(playerAmount: Int) : List<GrowthCard> {
-        return csvLoader.readCsvFile<CSVGrowthCardEntry>("/zengrowth.csv").map {
-            val type = when(it.type) {
+    private fun readAllGrowthCards(playerAmount: Int): List<GrowthCard> {
+        return csvLoader.readCsvFile<CSVGrowthCardEntry>("/zengrowth.csv").mapNotNull {
+            val type = when (it.type) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
                 else -> TileType.FRUIT
             }
 
-            var id = it.id
-            if (playerAmount < it.minPlayerAmount) {
-                id = -1
+            val result = if (playerAmount < it.minPlayerAmount) {
+                null
+            } else {
+                GrowthCard(type, it.id)
             }
-            GrowthCard(type, id)
+            result
         }
     }
 
-    private fun readAllHelperCards() : List<HelperCard> {
+    private fun readAllHelperCards(): List<HelperCard> {
         return csvLoader.readCsvFile<CSVHelperCardEntry>("/zenhelper.csv").map {
-            val type = when(it.type2) {
+            val type = when (it.type2) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
@@ -42,10 +42,10 @@ class ZenCardLoader {
         }
     }
 
-    private fun readAllMasterCards(playerAmount: Int) : List<MasterCard> {
-        return csvLoader.readCsvFile<CSVMasterCardEntry>("/zenmaster.csv").map {
+    private fun readAllMasterCards(playerAmount: Int): List<MasterCard> {
+        return csvLoader.readCsvFile<CSVMasterCardEntry>("/zenmaster.csv").mapNotNull {
 
-            val type1 = when(it.type1) {
+            val type1 = when (it.type1) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
@@ -53,7 +53,7 @@ class ZenCardLoader {
                 "all" -> TileType.ANY
                 else -> TileType.EMPTY
             }
-            val type2 = when(it.type2) {
+            val type2 = when (it.type2) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
@@ -61,7 +61,7 @@ class ZenCardLoader {
                 "all" -> TileType.ANY
                 else -> TileType.EMPTY
             }
-            val type3 = when(it.type3) {
+            val type3 = when (it.type3) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
@@ -70,31 +70,26 @@ class ZenCardLoader {
                 else -> TileType.EMPTY
             }
 
-            var id = it.id
-            val tileTypes = mutableListOf(type1,type2,type3)
-            while (tileTypes.contains(TileType.EMPTY)){
-                tileTypes.remove(TileType.EMPTY)
+            val tileTypes = mutableListOf(type1, type2, type3)
+            val result = if (playerAmount < it.minPlayerAmount) {
+                null
+            } else {
+                MasterCard(tileTypes, it.id)
             }
-
-            if (playerAmount < it.minPlayerAmount) {
-                id = -1
-            }
-
-            MasterCard(tileTypes, id)
+            result
         }
     }
 
-
-    private fun readAllParchmentCards() : List<ParchmentCard> {
+    private fun readAllParchmentCards(): List<ParchmentCard> {
         return csvLoader.readCsvFile<CSVParchmentCardEntry>("/zenparchment.csv").map {
-            val cardType = when(it.targetType) {
+            val cardType = when (it.targetType) {
                 "master" -> CardType.MASTERCARD
                 "growth" -> CardType.GROWTHCARD
                 "helper" -> CardType.HELPERCARD
                 else -> null
             }
 
-            val tileType = when(it.targetType) {
+            val tileType = when (it.targetType) {
                 "blossom" -> TileType.FLOWER
                 "fruit" -> TileType.FRUIT
                 "leaf" -> TileType.LEAF
@@ -106,13 +101,14 @@ class ZenCardLoader {
         }
     }
 
-    private fun readAllToolCards(playerAmount: Int) : List<ToolCard> {
-        return csvLoader.readCsvFile<CSVToolCardEntry>("/zentool.csv").map {
-            var id = it.id
-            if (playerAmount < it.minPlayerAmount) {
-                id = -1
+    private fun readAllToolCards(playerAmount: Int): List<ToolCard> {
+        return csvLoader.readCsvFile<CSVToolCardEntry>("/zentool.csv").mapNotNull {
+            val result = if (playerAmount < it.minPlayerAmount) {
+                null
+            } else {
+                ToolCard(it.id)
             }
-            ToolCard(id)
+            result
         }
     }
 
@@ -121,37 +117,47 @@ class ZenCardLoader {
      *
      * @param [playerAmount] of how many players are there in the game
      */
-    fun readAllZenCards(playerAmount : Int) : List<Card> {
-        val fullZenDeck = readAllGrowthCards(playerAmount) +
+    fun readAllZenCards(playerAmount: Int): List<Card> {
+        return readAllGrowthCards(playerAmount) +
                 readAllHelperCards() +
-                readAllMasterCards(playerAmount)+
+                readAllMasterCards(playerAmount) +
                 readAllParchmentCards() +
                 readAllToolCards(playerAmount)
-        val mutableZenDeck = fullZenDeck.toMutableList()
-        mutableZenDeck.removeAll {
-            it.id == -1
-        }
-        return mutableZenDeck
     }
 }
 
+/**
+ * Represents a CSV entry for a Growth Card.
+ */
 data class CSVGrowthCardEntry(
     val id: Int, val minPlayerAmount: Int, val type: String
 )
 
+/**
+ * Represents a CSV entry for a Helper Card.
+ */
 data class CSVHelperCardEntry(
     val id: Int, val type1: String, val type2: String
 )
 
+/**
+ * Represents a CSV entry for a Master Card.
+ */
 data class CSVMasterCardEntry(
     val id: Int, val minPlayerAmount: Int,
     val type1: String, val type2: String, val type3: String
 )
 
+/**
+ * Represents a CSV entry for a Parchment Card.
+ */
 data class CSVParchmentCardEntry(
     val id: Int, val points: Int, val targetType: String
 )
 
+/**
+ * Represents a CSV entry for a Tool Card.
+ */
 data class CSVToolCardEntry(
     val id: Int, val minPlayerAmount: Int
 )

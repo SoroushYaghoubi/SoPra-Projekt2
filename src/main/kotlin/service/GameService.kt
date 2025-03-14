@@ -1,8 +1,8 @@
 package service
 
-import edu.udo.cs.sopra.ntf.*
+//import edu.udo.cs.sopra.ntf.*
 
-import edu.udo.cs.sopra.ntf.StartGameMessage
+//import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 import util.ZenCardLoader
 
@@ -28,7 +28,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
      * @param playerOrder A list of Players deciding the player order.
      * @param networkGame true if game is played online otherwise false.
      */
-    fun startNewGame( // playersEntries: MutableMap<String, PlayerType>,
+    fun startNewGame(
         playerOrder: MutableList<Player>,
         networkGame: Boolean,
         goalTilesEntries: MutableList<GoalTileType>
@@ -84,20 +84,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
             currentBonsaiGameState = gameState
         }
 
-
         rootService.currentGame = game
-
-        if (networkGame) {
-
-            val message = StartGameMessage(
-                orderedPlayerNames = playerOrder.map { player -> Pair(player.name, ColorTypeMessage.valueOf(player.color.name))},
-                chosenGoalTiles = goalTilesEntries.map { GoalTileTypeMessage.valueOf(it.name) },
-                orderedCards = zenDeck.mapIndexed { index, card ->
-                    Pair(CardTypeMessage.valueOf(card.cardType.name), index)
-                }
-            )
-            rootService.networkService.sendStartGameMessage(message)
-        }
 
         onAllRefreshables { refreshAfterGameStart() }
     }
@@ -129,83 +116,131 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     * Shows the winner of the game.
+     * refreshes with a list of the best placed players in order
      *
      * preconditions:
      * - Zen deck is empty and all players played their last action.
-     * NOTE by Giang: this is already checked in endTurn of PlayerActionService
+     *
      * post conditions:
      * - a refresh with the player order was used, where the winning player is at index 0,
-     * second place is at index 2 etc.
+     * second place is at index 1 etc.
      *
      * @throws IllegalStateException if game isn't over yet.
      */
-    fun showWinner() : String {
+    fun showWinner() {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
-        // Get the winner's name using the index
-       return gameState.players[getWinnerIndex()].name
-    }
-
-    // Dennis implemented showWinner with a return value to test it
-    /*
-    fun showWinner(): String {
-        val game = rootService.currentGame
-        checkNotNull(game) { "No game was started." }
-
-        val gameState = game.bonsaiGameState.lastOrNull()
-        checkNotNull(gameState) { "No active game state." }
-
-        // Get the winner's name using the index and return it
-        return gameState.players[getWinnerIndex()].name
-    }
-    */
-
-    /**
-     * Help function to get the index of the winner
-     */
-    private fun getWinnerIndex(): Int {
-        val game = rootService.currentGame
-        checkNotNull(game) { "No game was started." }
-        val gameState = game.currentBonsaiGameState
-        checkNotNull(gameState) { "No active game state." }
-
-        val maxScore = gameState.players.maxOf { it.score }
-
-        //val playerOrder: MutableList<Player> = mutableListOf()
-        val playerOrder = gameState.players
-
-        // List of players as candidate for winner: those with highest score
-        val candidates = gameState.players.filter { it.score == maxScore }
-
-        // If only one has the highest score
-        if (candidates.size == 1) {
-            return gameState.players.indexOf(candidates[0])
+        if (gameState.endGameCounter != gameState.players.size) {
+            throw IllegalStateException("Game is not over yet.")
         }
 
-        // In case of a tie, find the candidate who is farthest from the starting player in the playOrder list
-        var farthestIndex = 0
-        var maxDistance = 0
+        // Get the order of players by score with tiebreak included
+        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+            .thenByDescending { gameState.players.indexOf(it) })
 
-        // Checking the position of candidates in playerOrder, the player with the highest index is then the farthest
-        for (candidate in candidates) {
-            val candidateIndexInOrder = playerOrder.indexOf(candidate)
-            if (candidateIndexInOrder > maxDistance) {
-                maxDistance = candidateIndexInOrder
-                farthestIndex = gameState.players.indexOf(candidate)
-            }
-        }
-        return farthestIndex
+        onAllRefreshables { refreshAfterShowWinner(winnerOrder) }
     }
+
 
     /**
      * Calculates the score of the current player.
      */
-    fun calculateScore() {}
+    fun calculateScore(): Int {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+
+        val actPlayer = gameState.currentPlayer
+        val playersBonsaiTree = actPlayer.bonsaiTree
+        val playersCollectedCards = actPlayer.collectedCards
+        val claimGoals = actPlayer.claimedGoals
+
+        // Calculate score for each tile
+        val leaf = countTilesType(playersBonsaiTree, TileType.LEAF)
+        val flower = countTilesType(playersBonsaiTree, TileType.FLOWER)
+        val fruit = countTilesType(playersBonsaiTree, TileType.FRUIT)
+        val wood = countTilesType(playersBonsaiTree, TileType.WOOD)
+
+        val scoreOfLeaf = leaf * 3
+        val scoreOfFlower = calculateFlowerPoints(playersBonsaiTree)
+        val scoreOfFruit = fruit * 7
+
+        val scoreTiles = scoreOfLeaf + scoreOfFlower + scoreOfFruit
+
+        // Calculate score for parchment
+        var scoreParchment = 0
+
+        // Filter all parchment cards
+        val parchmentCards = playersCollectedCards.filterIsInstance<ParchmentCard>()
+
+        for (parchment in parchmentCards) {
+            val basePoints = parchment.basePoints
+
+            // If parchment is based on TileType
+            parchment.parchmentTileType?.let { tileType ->
+                val tileCount = countTilesType(playersBonsaiTree, tileType) ?: 0
+                val points = tileCount * basePoints
+                scoreParchment += points
+            }
+
+            // If parchment is based on CardType
+            parchment.parchmentCardType?.let { cardType ->
+                val cardCount = countZenCardType(playersCollectedCards, cardType)
+                val points = cardCount * basePoints
+                scoreParchment += points
+            }
+        }
+
+        // Calculate score for Goal
+        val scoreOfGoal = claimGoals.sumOf { it.score }
+
+        // Total
+        return scoreTiles + scoreParchment + scoreOfGoal
+    }
+
+    // Help functions for calculating score
+
+    private fun countTilesType(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, type: TileType): Int {
+        return bonsaiTree.values.count { it.tileType == type }
+    }
+
+    private fun countZenCardType(collectedZenCard: MutableList<Card>, type: CardType): Int {
+        return collectedZenCard.count { it.cardType == type }
+    }
+
+    private fun calculateFlowerPoints(bonsaiTree: Map<Pair<Int, Int>, Tile>): Int {
+        var totalPoints = 0
+
+        for ((position, tile) in bonsaiTree) {
+            if (tile.tileType == TileType.FLOWER) {
+                val (q, r) = position
+
+                // Define neighbor positions
+                val neighbors = listOf(
+                    Pair(q + 1, r),
+                    Pair(q, r + 1),
+                    Pair(q - 1, r + 1),
+                    Pair(q - 1, r),
+                    Pair(q, r - 1),
+                    Pair(q + 1, r - 1)
+                )
+
+                // Count sides that are NOT touching other tiles
+                val emptySides = neighbors.count { neighborPos -> !bonsaiTree.containsKey(neighborPos) }
+
+                // Add points (1 point per empty side)
+                totalPoints += emptySides
+            }
+        }
+
+        return totalPoints
+    }
+
 
     /**
      * Refills the board after a player has meditated.
@@ -240,37 +275,37 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     *
+     * TODO needs to be checked by network, if tiers are correct
      */
-    private fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
+    fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
             : MutableList<MutableList<GoalTile>> {
 
         val goalTiles: MutableList<MutableList<GoalTile>> = mutableListOf()
 
         val brownGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.BROWN, 8, 5),
-            GoalTile(GoalTileType.BROWN, 10, 10),
-            GoalTile(GoalTileType.BROWN, 12, 15)
+            GoalTile(GoalTileType.BROWN, 0, 5),
+            GoalTile(GoalTileType.BROWN, 1, 10),
+            GoalTile(GoalTileType.BROWN, 2, 15)
         )
         val greenGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.GREEN, 5, 6),
-            GoalTile(GoalTileType.GREEN, 7, 9),
-            GoalTile(GoalTileType.GREEN, 9, 12)
+            GoalTile(GoalTileType.GREEN, 0, 6),
+            GoalTile(GoalTileType.GREEN, 1, 9),
+            GoalTile(GoalTileType.GREEN, 2, 12)
         )
         val pinkGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.PINK, 3, 8),
-            GoalTile(GoalTileType.PINK, 4, 12),
-            GoalTile(GoalTileType.PINK, 5, 16)
+            GoalTile(GoalTileType.PINK, 0, 8),
+            GoalTile(GoalTileType.PINK, 1, 12),
+            GoalTile(GoalTileType.PINK, 2, 16)
         )
         val orangeGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.ORANGE, 3, 9),
-            GoalTile(GoalTileType.ORANGE, 4, 11),
-            GoalTile(GoalTileType.ORANGE, 5, 13)
+            GoalTile(GoalTileType.ORANGE, 0, 9),
+            GoalTile(GoalTileType.ORANGE, 1, 11),
+            GoalTile(GoalTileType.ORANGE, 2, 13)
         )
         val blueGoalTiles = mutableListOf(
-            GoalTile(GoalTileType.ORANGE, 0, 9),
-            GoalTile(GoalTileType.ORANGE, 0, 11),
-            GoalTile(GoalTileType.ORANGE, 0, 13)
+            GoalTile(GoalTileType.BLUE, 0, 9),
+            GoalTile(GoalTileType.BLUE, 1, 11),
+            GoalTile(GoalTileType.BLUE, 2, 13)
         )
 
         goalTilesTypesEntries.forEach { goalTileType ->

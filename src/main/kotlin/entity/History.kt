@@ -1,6 +1,7 @@
 package entity
 
 import kotlinx.serialization.Serializable
+
 /**
  * Represents the history of game states in a Bonsai game.
  *

@@ -29,7 +29,7 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
      * @throws IllegalStateException if there isn't a next game state.
      */
     fun redo() {
-        if (!canRedo()){
+        if (!canRedo()) {
             return
         }
         val game = checkNotNull(rootService.currentGame)
@@ -51,7 +51,7 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
      * @throws IllegalStateException if no previous action exists (game has just started).
      */
     fun undo() {
-        if (!canUndo()){
+        if (!canUndo()) {
             return
         }
         val game = checkNotNull(rootService.currentGame)

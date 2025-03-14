@@ -10,8 +10,9 @@ package entity
  * @param id is ID for the card
  */
 
-class ParchmentCard(val parchmentTileType: TileType?,
-                    val parchmentCardType: CardType?,
-                    val basePoints : Int,
-                    id : Int) : Card(id, CardType.PARCHMENTCARD) {
-}
+class ParchmentCard(
+    val parchmentTileType: TileType?,
+    val parchmentCardType: CardType?,
+    val basePoints: Int,
+    id: Int
+) : Card(id, CardType.PARCHMENTCARD)

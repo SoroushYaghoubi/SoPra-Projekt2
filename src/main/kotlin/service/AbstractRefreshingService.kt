@@ -17,8 +17,7 @@ abstract class AbstractRefreshingService {
      * adds a [Refreshable] to the list that gets called
      * whenever [onAllRefreshables] is used.
      */
-    fun addRefreshable(newRefreshable : Refreshable) {
-
+    fun addRefreshable(newRefreshable: Refreshable) {
         refreshables += newRefreshable
     }
 

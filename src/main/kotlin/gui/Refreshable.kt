@@ -1,8 +1,10 @@
 package gui
 
+import entity.Player
 import entity.Tile
 import entity.TileType
 import service.AbstractRefreshingService
+import service.ConnectionState
 
 /**
  * This interface provides a mechanism for the service layer classes to communicate
@@ -58,6 +60,10 @@ interface Refreshable {
     fun refreshAfterReceivedTile(discard : Boolean){}
 
     /**
+     *  perform refreshes that are necessary after apply card effects
+     */
+    fun refreshAfterApplyCardEffects(){}
+    /**
      * perform refreshes that are necessary after a player has received tiles
      */
     fun refreshAfterChooseTileToPlay(tile: Tile) {}
@@ -87,4 +93,13 @@ interface Refreshable {
      */
     fun refreshAfterRedoOrUndo(){}
 
+    /**
+     * perform refreshes that are necessary after the [ConnectionState] was changed
+     */
+    fun refreshConnectionState(newState: ConnectionState) {}
+
+    /**
+     * perform refreshes that are necessary to show the result scene
+     */
+    fun refreshAfterShowWinner(players: List<Player>){}
 }

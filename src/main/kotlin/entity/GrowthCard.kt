@@ -8,4 +8,4 @@ package entity
  * @throws IllegalArgumentException If [id] is not a non-negative int
  */
 
-class GrowthCard(val tileType: TileType, id : Int) : Card(id, CardType.GROWTHCARD)
+class GrowthCard(val tileType: TileType, id: Int) : Card(id, CardType.GROWTHCARD)
