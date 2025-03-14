@@ -234,6 +234,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // change game state to CULTIVATE
         gameState.currentState = States.CULTIVATE
 
+        // let the game know at endTurn() that it should send cultivateMessage
+        if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
+            currentPlayer.isLocal) {
+            rootService.networkService.hasCultivated = true
+        }
+
         onAllRefreshables { refreshAfterCultivateStart() }
 
     }
@@ -272,6 +278,20 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         gameState.currentState = States.START_TURN
+
+        val net = rootService.networkService
+        // if it's online and we're the local player
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            getCurrentPlayer().isLocal) {
+            // if we cultivated then send cultivateMessage
+            if (net.hasCultivated) {
+                net.sendCultivateMessage()
+                net.hasCultivated = false
+            } else {
+                net.sendMeditateMessage()
+                net.hasCultivated = false
+            }
+        }
         onAllRefreshables { refreshAfterEndTurn() }
 
         // TODO: Update history -> later
@@ -293,7 +313,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * TODO: this class claims or renounces two goals at the same time if possible. this might be bad
      *
      */
-    fun claimOrRenounceGoal(claim: Boolean) {
+    fun claimOrRenounceGoal(claim: Boolean, goalTileType: GoalTileType, tier: Int) {
         val game = checkNotNull(rootService.currentGame) { "No game was started." }
 
         val gameState = checkNotNull(game.currentBonsaiGameState) { "No active game state." }
@@ -302,6 +322,36 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val net = rootService.networkService
 
 
+        // if the goal tile requirement is reached, get goal tile based on the claim
+        if (claim) {
+            // remove the claimed goal tile from the list
+                gameState.goalTiles.forEach {
+                if(it.goalTileType == goalTileType && it.tier == tier) {
+                    player.claimedGoals.add(gameState.goalTiles.removeAt(gameState.goalTiles.indexOf(it)))
+                }
+            }
+            // update message
+            if (net.connectionState != ConnectionState.DISCONNECTED &&
+                player.isLocal) {
+                net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier))
+            }
+        } else {
+            gameState.goalTiles.forEach {
+                if(it.goalTileType == goalTileType && it.tier == tier) {
+                    player.renouncedGoals.add(gameState.goalTiles[gameState.goalTiles.indexOf(it)])
+                }
+            }
+            // update message
+            if (net.connectionState != ConnectionState.DISCONNECTED &&
+                player.isLocal
+            ) {
+                net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier))
+            }
+        }
+
+        onAllRefreshables { refreshAfterClaimGoal() }
+
+        /**
         // checks if a player has already claimed a goal tile from a specific tile type
         for (goalTile in gameState.goalTiles.flatten()) {
             if (player.claimedGoals.any { it.goalTileType == goalTile.goalTileType }) {
@@ -342,7 +392,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 }
             }
         }
+        */
+
     }
+
 
     /**
      * Checks if the given goal can be claimed

@@ -43,14 +43,23 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         // update message
         val net = rootService.networkService
         if (net.connectionState != ConnectionState.DISCONNECTED &&
-            currentPlayer.isLocal
-        ) {
+            currentPlayer.isLocal) {
             net.toBeSentCultivateMessage.playedTiles.add(
                 (tile.tileType to (tilePosition))
             )
         }
         // TODO: check if player has achieved a goal tile
-        onAllRefreshables { refreshAfterPlayTile() }
+
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        game.goalTiles.forEach {
+            if (rootService.playerActionService.canClaimOrRenounceGoal(it.goalTileType, it.tier) && currentPlayer.isLocal){
+                // call claimOrRenounceGoal() in the gui layer
+                onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier) }
+            }
+        }
+        // do other stuff in gui
+        onAllRefreshables { refreshAfterPlayTile(null, 0) }
     }
 
     /**
