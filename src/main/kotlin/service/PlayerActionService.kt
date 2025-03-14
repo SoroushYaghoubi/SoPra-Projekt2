@@ -333,7 +333,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             // update message
             if (net.connectionState != ConnectionState.DISCONNECTED &&
                 player.isLocal) {
-                net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier))
+                net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
             }
         } else {
             gameState.goalTiles.forEach {
@@ -345,7 +345,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             if (net.connectionState != ConnectionState.DISCONNECTED &&
                 player.isLocal
             ) {
-                net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier))
+                net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
             }
         }
 

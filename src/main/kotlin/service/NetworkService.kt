@@ -160,10 +160,10 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                 (it.first.toTileTypeMessage() to it.second)
             },
             toBeSentCultivateMessage.claimedGoals.map{
-                (it.first.toGoalTileTypeMessage() to it.second)
+                (it.first.toGoalTileTypeMessage() to it.second + 1)
             },
             toBeSentCultivateMessage.renouncedGoals.map{
-                (it.first.toGoalTileTypeMessage() to it.second)
+                (it.first.toGoalTileTypeMessage() to it.second + 1)
             }
         )
 
@@ -197,7 +197,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
         val players = mutableListOf<Player>()
         orderedPair.forEach {
-            val isLocal = myName == it.first
+            val isLocal = (myName == it.first)
             // TODO(we need to decide if we use bot or not)
             players.add(Player(it.first, PlayerType.HUMAN, isLocal, it.second.toColor()))
         }
@@ -207,13 +207,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         rootService.gameService.startNewGame(players, true, goalTileTypes.toMutableList())
 
         //construct game
-        val zenCardLoader = ZenCardLoader()
-        val standardZenDeck =
-            when (message.orderedCards.size) {
-                32 -> zenCardLoader.readAllZenCards(2)
-                43 -> zenCardLoader.readAllZenCards(3)
-                else -> zenCardLoader.readAllZenCards(4)
-            }
+        val standardZenDeck = ZenCardLoader().readAllZenCards(message.orderedPlayerNames.size)
         rootService.currentGame?.currentBonsaiGameState?.zenDeck =
             message.orderedCards.map{
                 standardZenDeck[it.second]
