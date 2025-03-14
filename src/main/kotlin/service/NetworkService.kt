@@ -37,6 +37,9 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
     var toBeSentCultivateMessage = MutableCultivateMessage(
         mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
 
+    var hasCultivated = false
+    var hasMeditated = false
+
 
     /**
      * Connects to server and creates a new game session.
@@ -118,7 +121,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
 
         val message = StartGameMessage(nameColorPair, chosenGoalTiles, zenDeckMessage)
-        //TODO(still needs to be checked if it's correct)
 
         if (myName == playerOrder.first().name) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
@@ -129,11 +131,11 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
     }
 
-    fun sendMeditateMessage(message: MeditateMessage) {
+    fun sendMeditateMessage() {
         // TODO(some of its code should be implemented in other service classes)
         // TODO(for the example, please check playTile())
 
-        //
+
         toBeSentMeditateMessage.removedTilesAxialCoordinates.clear()
         toBeSentCultivateMessage.removedTilesAxialCoordinates.clear()
         toBeSentMeditateMessage.playedTiles.clear()
@@ -144,6 +146,9 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         toBeSentMeditateMessage.chosenCardPosition = 4
     }
 
+    /**
+     * it needs doc
+     */
     fun sendCultivateMessage() {
         check(connectionState == ConnectionState.PLAYING_MY_TURN)
         { "currently not expecting your turn." }
@@ -170,9 +175,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
 
         updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
         client?.sendGameActionMessage(message)
-
-        // TODO(this method should be called somewhere and at the moment
-        //  the game or the state should know that we cultivated instead of meditate)
     }
 
     /**
@@ -223,19 +225,17 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             rootService.treeService.removeFromTree(it)
         }
         message.playedTiles.forEach {
-            //TODO(not right)
-            val tile = Tile(it.second.first, it.second.second, it.first.toTileType())
+            val tile = Tile(null, null, it.first.toTileType())
             rootService.treeService.playTile(tile, it.second)
         }
         message.claimedGoals.forEach {
-            //TODO(it needs some work when there's canCorRGoals)
+            rootService.playerActionService.claimOrRenounceGoal(true, it.first.toGoalTileType(), it.second)
         }
         message.renouncedGoals.forEach {
-            //TODO(it needs some work when there's canCorRGoals)
+            rootService.playerActionService.claimOrRenounceGoal(false, it.first.toGoalTileType(), it.second)
         }
 
         val currentIndex = game.players.indexOf(game.currentPlayer)
-
         // get next player in the list, looping back to the first player at end of the list
         val nextIndex = (currentIndex + 1) % game.players.size
 
@@ -291,5 +291,9 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
         client = null
         updateConnectionState(ConnectionState.DISCONNECTED)
+    }
+
+    fun redoReceivedGoalTile() {
+
     }
 }
