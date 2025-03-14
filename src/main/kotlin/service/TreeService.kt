@@ -110,7 +110,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         //Position of pot
         val forbiddenPositions = setOf(
             Pair(-2, 0), Pair(-1, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0),
-            Pair(-1, 1), Pair(0, 1)
+            Pair(-2,1), Pair(-1, 1), Pair(0, 1), Pair(1, 1), Pair(2, 1)
         )
 
         // Check for other WOOD tiles in the tree
@@ -179,7 +179,14 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         val currentPlayer = getCurrentPlayer()
 
-        require(!currentPlayer.bonsaiTree.containsKey(tilePosition)) { "Position is already occupied" }
+        // Position of pot
+        val forbiddenPositions = setOf(
+            Pair(-2, 0), Pair(-1, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0),
+            Pair(-2,1), Pair(-1, 1), Pair(0, 1), Pair(1, 1), Pair(2, 1)
+        )
+
+        require(!currentPlayer.bonsaiTree.containsKey(tilePosition)
+                && tilePosition !in forbiddenPositions) { "Position is already occupied or is pot" }
 
         val tree = currentPlayer.bonsaiTree
         val q = tilePosition.first

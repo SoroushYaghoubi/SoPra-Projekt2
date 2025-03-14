@@ -72,7 +72,10 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
         val game = checkNotNull(rootService.currentGame)
         val currentPlayer = getCurrentPlayer()
 
-        require(currentPlayer.isLocal) { "Can only be saved if played local" }
+        //require(currentPlayer.isLocal) { "Can only be saved if played local" }
+        if (!currentPlayer.isLocal) {
+            throw IllegalStateException("Can only be saved if played local")
+        }
 
         val json = Json.encodeToString(game)
         File("./savedGameState.json").writeText(json)
