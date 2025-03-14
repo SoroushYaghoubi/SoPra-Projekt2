@@ -8,6 +8,8 @@ import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.visual.ColorVisual
 import tools.aqua.bgw.style.BorderRadius
+import tools.aqua.bgw.visual.CompoundVisual
+import tools.aqua.bgw.visual.ImageVisual
 import util.*
 
 class ButtonStyle1(
@@ -29,11 +31,11 @@ class ButtonStyle2(
 ) : Button(
     posX = posX,
     posY = posY,
-    width = 450,
+    width = 250,
     height = 100,
     text = text,
-    font = Font(24.0, Color(TERTIARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
-    visual = ColorVisual(Color(QUATERNARY_COLOUR)).apply {
+    font = Font(24.0, Color(PRIMARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
+    visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
 )
@@ -49,6 +51,20 @@ class LabelStyle1(
     text = text,
     font = Font(24.0, Color(PRIMARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
     visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+        style.borderRadius = BorderRadius(20.0)
+    }
+)
+
+class LabelStyle2(
+    posX : Int = 0, posY : Int = 0, text : String = "Label"
+) : Label(
+    posX = posX,
+    posY = posY,
+    width = 330,
+    height = 110,
+    text = text,
+    font = Font(24.0, Color(PRIMARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
+    visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
 )
@@ -108,6 +124,39 @@ class SquareButton(
         style.borderRadius = BorderRadius(20.0)
     }
 )
+
+class CheckBoxButton(
+    posX: Int = 0 , posY: Int = 0,
+) : Button(
+    posX = posX,
+    posY = posY,
+    width = 110,
+    height = 110,
+    visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
+        style.borderRadius = BorderRadius(20.0)
+    }
+){
+    var isChecked : Boolean = false
+
+    fun change() {
+        if (isChecked) {
+            visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+            isChecked = false
+        } else {
+            visual = CompoundVisual(
+                ColorVisual(Color(TERTIARY_COLOUR)).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                },
+                ImageVisual("remove.png")
+            )
+            isChecked = true
+        }
+    }
+
+
+}
 
 class ColourButton(
     posX : Int = 0, posY : Int = 0,

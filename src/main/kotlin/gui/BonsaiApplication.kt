@@ -10,7 +10,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920,1080) {
 
     private val mainMenuScene = MainMenuScene(this)
     private val gameScene = BonsaiGameScene()
-    private val configureGameMenuScene = ConfigureGameMenuScene()
+    private val configureGameMenuScene = ConfigureGameMenuScene(this)
     private val joinScene = JoinScene()
     private val hostScene = HostScene()
 
@@ -20,6 +20,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920,1080) {
         this.showMenuScene(mainMenuScene)
     }
 
+    fun showMainMenuScene() = this.showMenuScene(mainMenuScene)
     fun showConfigScene() = this.showMenuScene(configureGameMenuScene)
     fun showJoinScene() = this.showMenuScene(joinScene)
     fun showHostScene() = this.showMenuScene(hostScene)
