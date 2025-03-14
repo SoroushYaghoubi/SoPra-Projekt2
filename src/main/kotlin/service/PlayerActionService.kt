@@ -311,17 +311,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 continue
             }
 
-            // checks if one of the goal tiles is reached
-            val conditionValid = when (goalTile.goalTileType) {
-                GoalTileType.BROWN -> hasReachedBrownGoal(playersBonsaiTree, goalTile.tier)
-                GoalTileType.GREEN -> hasReachedGreenGoal(playersBonsaiTree, goalTile.tier)
-                GoalTileType.PINK -> hasReachedPinkGoal(playersBonsaiTree, goalTile.tier)
-                GoalTileType.ORANGE -> hasReachedOrangeGoal(playersBonsaiTree, goalTile.tier)
-                GoalTileType.BLUE -> hasReachedBlueGoal(playersBonsaiTree, goalTile.tier)
-            }
-
-            // if goal tile requirement is reached then take actions based on claim
-            if (conditionValid) {
+            // checks if one of the goal tile requirements is reached
+            if (canClaimOrRenounceGoal(goalTile.goalTileType, goalTile.tier)) {
+                // if the goal tile requirement is reached, get goal tile based on the claim
                 if (claim) {
                     player.claimedGoals.add(goalTile)
                     for (goalTileList in gameState.goalTiles) {
@@ -335,6 +327,20 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                     break
                 }
             }
+        }
+    }
+
+    fun canClaimOrRenounceGoal(goalTileType: GoalTileType, tier: Int): Boolean {
+
+        val player = getCurrentPlayer()
+        val playersBonsaiTree = player.bonsaiTree
+
+        return when (goalTileType) {
+            GoalTileType.BROWN -> hasReachedBrownGoal(playersBonsaiTree, tier)
+            GoalTileType.GREEN -> hasReachedGreenGoal(playersBonsaiTree, tier)
+            GoalTileType.PINK -> hasReachedPinkGoal(playersBonsaiTree, tier)
+            GoalTileType.ORANGE -> hasReachedOrangeGoal(playersBonsaiTree, tier)
+            GoalTileType.BLUE -> hasReachedBlueGoal(playersBonsaiTree, tier)
         }
     }
 
