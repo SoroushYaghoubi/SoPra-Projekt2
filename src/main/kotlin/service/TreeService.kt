@@ -63,7 +63,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * post conditions:
      * - The bonsai tile is removed from the bonsai tree.
      *
-     * @param tile The bonsai tile(s) to be removed.
      * @param tilePosition The position of the bonsai tile to be removed from.
      * @throws IllegalStateException if there is no tile (bonsai tree is empty).
      */
