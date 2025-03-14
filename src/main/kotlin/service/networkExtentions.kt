@@ -59,7 +59,7 @@ fun CardType.toCardTypeMessage() : CardTypeMessage {
     }
 }
 
-fun GoalTileTypeMessage.toColor() : GoalTileType {
+fun GoalTileTypeMessage.toGoalTileType() : GoalTileType {
     return when (this) {
         GoalTileTypeMessage.BLUE -> GoalTileType.BLUE
         GoalTileTypeMessage.GREEN -> GoalTileType.GREEN
@@ -69,7 +69,7 @@ fun GoalTileTypeMessage.toColor() : GoalTileType {
     }
 }
 
-fun GoalTileType.toColor() : GoalTileTypeMessage {
+fun GoalTileType.toGoalTileTypeMessage() : GoalTileTypeMessage {
     return when (this) {
         GoalTileType.BLUE -> GoalTileTypeMessage.BLUE
         GoalTileType.BROWN -> GoalTileTypeMessage.BROWN
@@ -78,3 +78,22 @@ fun GoalTileType.toColor() : GoalTileTypeMessage {
         GoalTileType.ORANGE -> GoalTileTypeMessage.ORANGE
     }
 }
+
+data class MutableMeditateMessage(
+    val removedTilesAxialCoordinates: MutableList<Pair<Int, Int>>,
+    var chosenCardPosition: Int,
+    val playedTiles: MutableList<Pair<TileType, Pair<Int, Int>>>,
+    val drawnTiles: MutableList<TileType>,
+    val claimedGoals: MutableList<Pair<GoalTileType, Int>>,
+    val renouncedGoals: MutableList<Pair<GoalTileType, Int>>,
+    val discardedTiles: MutableList<TileType>
+)
+
+data class MutableCultivateMessage(
+    val removedTilesAxialCoordinates: MutableList<Pair<Int, Int>>,
+    val playedTiles: MutableList<Pair<TileType, Pair<Int, Int>>>,
+    val claimedGoals: MutableList<Pair<GoalTileType, Int>>,
+    val renouncedGoals: MutableList<Pair<GoalTileType, Int>>
+)
+
+
