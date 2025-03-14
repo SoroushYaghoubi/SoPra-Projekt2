@@ -186,7 +186,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
             // If parchment is based on TileType
             parchment.parchmentTileType?.let { tileType ->
-                val tileCount = countTilesType(playersBonsaiTree, tileType) ?: 0
+                val tileCount = countTilesType(playersBonsaiTree, tileType)
                 val points = tileCount * basePoints
                 scoreParchment += points
             }

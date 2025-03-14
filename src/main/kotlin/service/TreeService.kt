@@ -179,7 +179,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         val currentPlayer = getCurrentPlayer()
 
-        require(currentPlayer.bonsaiTree.containsKey(tilePosition)) { "Position is already occupied" }
+        require(!currentPlayer.bonsaiTree.containsKey(tilePosition)) { "Position is already occupied" }
 
         val tree = currentPlayer.bonsaiTree
         val q = tilePosition.first
@@ -193,7 +193,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             tree.getOrDefault(Pair(q + 1, r - 1), null)?.tileType,
         ).filterNotNull()
 
-        require(neighbourTiles.isEmpty()) { "There are no adjacent cards" }
+        require(neighbourTiles.isNotEmpty()) { "There are no adjacent cards" }
 
         if (tile.tileType == TileType.WOOD) {
             return neighbourTiles.contains(TileType.WOOD)
