@@ -46,9 +46,9 @@ val POT = setOf(
  *
  * @param bfsRoot is where the traversal starts
  *
- * @return tiles as a lazy sequence
+ * @return tile position as a lazy sequence
  */
-infix fun MutableMap<Pair<Int, Int>, Tile?>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Tile?> = sequence {
+infix fun MutableMap<Pair<Int, Int>, Tile?>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
     // args check
     require(this@traverseFrom[bfsRoot] != null) { "Cannot start from non-existing tile." }
 
@@ -64,7 +64,7 @@ infix fun MutableMap<Pair<Int, Int>, Tile?>.traverseFrom(bfsRoot: Pair<Int, Int>
         val currentNode = queue.removeFirst()
 
         // process current node
-        yield(this@traverseFrom[currentNode])
+        yield(currentNode)
 
         // add neighbour nodes to queue
         for (neighbour in (circleAround(currentNode))) {
@@ -79,7 +79,6 @@ infix fun MutableMap<Pair<Int, Int>, Tile?>.traverseFrom(bfsRoot: Pair<Int, Int>
         }
     }
 }
-
 
 /**
  * Takes an axial coordinate as a parameter and acts like an iterator. It returns a generator that yields a tile around
@@ -148,4 +147,27 @@ operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> {
  */
 operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
     return Pair(this.first + other.first, this.second + other.second)
+}
+
+// --------------- sus feature (rethink later) ---------------
+
+/**
+ * for gui, read empty tiles to show in game scene.
+ *
+ * @return a list of playable positions
+ */
+fun MutableMap<Pair<Int, Int>, Tile?>.getEmptyTiles(): Set<Pair<Int, Int>>{
+    val emptyTiles = mutableSetOf<Pair<Int, Int>>()
+
+    for (tileIndex in (this@getEmptyTiles traverseFrom ROOT)) {
+        for (neighbourIndex in circleAround(tileIndex)) {
+            if (this@getEmptyTiles[neighbourIndex] == null &&
+                neighbourIndex !in POT)
+            {
+                emptyTiles += neighbourIndex
+            }
+        }
+    }
+
+    return emptyTiles
 }
