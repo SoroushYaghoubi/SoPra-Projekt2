@@ -5,7 +5,7 @@ import entity.TileType
 
 fun main() {
     // --------------- safe append ---------------
-    val tree = mutableMapOf<Pair<Int, Int>, Tile?>()
+    val tree = mutableMapOf<Pair<Int, Int>, Tile>()
     // (some of these will be ignored on traverse because they will be on pot)
     // radius 1
     tree.safelyAppendTile(Tile(0, 0, TileType.WOOD), 0 to 0)

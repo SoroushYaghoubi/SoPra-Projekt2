@@ -1,6 +1,6 @@
 package gui
 
-import entity.Tile
+import entity.*
 import service.RootService
 import tools.aqua.bgw.components.ComponentView
 import tools.aqua.bgw.components.container.CardStack
@@ -312,42 +312,38 @@ class BonsaiGameScene(private val rootService: RootService) :
             treeHexagonGrid[it.first, it.second] = hexagon
         }
 
-        treeHexagonGrid[0, -1] = HexagonView(
-            visual = CompoundVisual(
-                ColorVisual(Color.WHITE),
-                TextVisual(
-                    text = "0, -1",
-                    font = Font(10.0, Color(0x000000))
-                )
-            ),
-            size = 30
-        )
-        treeHexagonGrid[1, -1] = HexagonView(
-            visual = CompoundVisual(
-                ColorVisual(Color.WHITE),
-                TextVisual(
-                    text = "1, -1",
-                    font = Font(10.0, Color(0x000000))
-                )
-            ),
-            size = 30
-        )
         //map the tiles to hexagon
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         treeTileMap.add((game.currentPlayer.bonsaiTree[0 to 0] to treeHexagonGrid[0,0]) as Pair<Tile, HexagonView>)
+
+        // get the empty tiles
+        game.currentPlayer.bonsaiTree.getEmptyTiles().forEach{
+            val hexagon = HexagonView(
+                visual = CompoundVisual(
+                    ColorVisual(Color.WHITE),
+                    TextVisual(
+                        text = "${it.first}, ${it.second}",
+                        font = Font(10.0, Color(0x000000))
+                    )
+                ),
+                size = 30
+            )
+            treeHexagonGrid[it.first, it.second] = hexagon
+        }
     }
 
-    fun initZenBoard() {
+    private fun initZenBoard() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         game.zenDeck.forEach {
             val cardView = CardView(
                 height = 160,
                 width = 110,
-                front = ColorVisual.WHITE,
+                front = CompoundVisual(ColorVisual.WHITE),
                 back = ColorVisual.BLACK,
             )
+            cardFrontSetter(it, cardView)
             cardView.showBack()
             zenDeckView.add(cardView)
             zenCardMap.add(it to cardView)
@@ -356,15 +352,14 @@ class BonsaiGameScene(private val rootService: RootService) :
             val cardView = CardView(
                 height = 160,
                 width = 110,
-                front = ColorVisual.WHITE,
+                front  = ColorVisual.WHITE,
                 back = ColorVisual.BLACK,
             )
+            cardFrontSetter(it, cardView)
             cardView.showFront()
             faceUpCards.add(cardView)
             zenCardMap.add(it to cardView)
         }
-        println(game.zenDeck.size)
-        println(game.faceUpCards.size)
     }
 
     //refresher do something
@@ -379,5 +374,63 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     override fun refreshAfterCultivateStart() {
         // refresh information telling the player to pick a tile
+    }
+
+    private fun cardFrontSetter(generalCard : Card, cardView : CardView) {
+        when (generalCard.cardType){
+            CardType.TOOLCARD -> {
+                val card = generalCard as ToolCard
+                CompoundVisual(ColorVisual.WHITE,
+                    TextVisual("${card.cardType}\n" + "___2___"))
+            }
+            CardType.GROWTHCARD -> {
+                val card = generalCard as GrowthCard
+                cardView.apply {
+                    card.apply {
+                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n" +"___${card.tileType}___"))
+                    }
+                }
+            }
+            CardType.HELPERCARD -> {
+                val card = generalCard as HelperCard
+                cardView.apply {
+                    card.apply {
+                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___",
+                                font = Font(15)))
+                    }
+                }
+            }
+            CardType.MASTERCARD -> {
+                val card = generalCard as MasterCard
+                cardView.apply {
+                    if (card.tileTypes.size == 3) {
+                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___\n___${card.tileTypes[2]}___"))
+                    } else if (card.tileTypes.size == 2) {
+                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___",
+                                font = Font(15)))
+                    } else {
+                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___"))
+
+                    }
+                }
+            }
+            CardType.PARCHMENTCARD -> {
+                val card = generalCard as ParchmentCard
+                cardView.apply {
+                    if (card.parchmentCardType != null) {
+                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.parchmentCardType}___\n___${card.basePoints}___"))
+                    } else {
+                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.parchmentTileType}___\n___${card.basePoints}___"))
+                    }
+                }
+            }
+        }
     }
 }
