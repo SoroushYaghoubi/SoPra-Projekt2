@@ -43,9 +43,9 @@ class ZenCardLoader {
     }
 
     private fun readAllMasterCards(playerAmount: Int): List<MasterCard> {
-        return csvLoader.readCsvFile<CSVMasterCardEntry>("/zenmaster.csv").mapNotNull {
+        return csvLoader.readCsvFile<CSVMasterCardEntry>("/zenmaster.csv").mapNotNull { cardEntry ->
 
-            val type1 = when (it.type1) {
+            val type1 = when (cardEntry.type1) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
@@ -53,7 +53,7 @@ class ZenCardLoader {
                 "all" -> TileType.ANY
                 else -> TileType.EMPTY
             }
-            val type2 = when (it.type2) {
+            val type2 = when (cardEntry.type2) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
@@ -61,7 +61,7 @@ class ZenCardLoader {
                 "all" -> TileType.ANY
                 else -> TileType.EMPTY
             }
-            val type3 = when (it.type3) {
+            val type3 = when (cardEntry.type3) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
@@ -71,10 +71,13 @@ class ZenCardLoader {
             }
 
             val tileTypes = mutableListOf(type1, type2, type3)
-            val result = if (playerAmount < it.minPlayerAmount) {
+            tileTypes.removeAll {
+                it == TileType.EMPTY
+            }
+            val result = if (playerAmount < cardEntry.minPlayerAmount) {
                 null
             } else {
-                MasterCard(tileTypes, it.id)
+                MasterCard(tileTypes, cardEntry.id)
             }
             result
         }
