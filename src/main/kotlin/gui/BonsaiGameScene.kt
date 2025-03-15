@@ -33,7 +33,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     BoardGameScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
 
     private val treeTileMap: BidirectionalMap<entity.Tile, HexagonView> = BidirectionalMap()
+    private val supplyTileMap: BidirectionalMap<entity.Tile, HexagonView> = BidirectionalMap()
     private val zenCardMap: BidirectionalMap<entity.Card, CardView> = BidirectionalMap()
+    private val clickedSupply : HexagonView? = null
 
     // button for cultivate
     private val cultivateButton =
@@ -47,7 +49,11 @@ class BonsaiGameScene(private val rootService: RootService) :
             },
             text = "cultivate",
             font = Font(36)
-        )
+        ).apply {
+            onMouseClicked= {
+                rootService.playerActionService.cultivate()
+            }
+        }
 
     // button for meditate
     private val meditateButton =
@@ -199,7 +205,9 @@ class BonsaiGameScene(private val rootService: RootService) :
             )
         ),
         size = 60
-    )
+    ).apply {
+        // TODO()
+    }
 
     val flowerSupply = HexagonView(
         posX = 60,
@@ -229,16 +237,16 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     //zenDeck
     private val zenDeckView = CardStack<CardView>(
-        posX = 55, posY = 40,
-        width = 120, height = 170)
+        posX = 60, posY = 40,
+        width = 110, height = 160)
 
     //faceup cards
     private val faceUpCards = LinearLayout<CardView>(
-        posX = 195,
+        posX = 205,
         posY = 40,
-        width = 600,
-        height = 170,
-        spacing = 5
+        width = 500,
+        height = 160,
+        spacing = 13
     )
 
 
@@ -303,6 +311,27 @@ class BonsaiGameScene(private val rootService: RootService) :
             )
             treeHexagonGrid[it.first, it.second] = hexagon
         }
+
+        treeHexagonGrid[0, -1] = HexagonView(
+            visual = CompoundVisual(
+                ColorVisual(Color.WHITE),
+                TextVisual(
+                    text = "0, -1",
+                    font = Font(10.0, Color(0x000000))
+                )
+            ),
+            size = 30
+        )
+        treeHexagonGrid[1, -1] = HexagonView(
+            visual = CompoundVisual(
+                ColorVisual(Color.WHITE),
+                TextVisual(
+                    text = "1, -1",
+                    font = Font(10.0, Color(0x000000))
+                )
+            ),
+            size = 30
+        )
         //map the tiles to hexagon
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
@@ -314,8 +343,8 @@ class BonsaiGameScene(private val rootService: RootService) :
         checkNotNull(game)
         game.zenDeck.forEach {
             val cardView = CardView(
-                height = 170,
-                width = 120,
+                height = 160,
+                width = 110,
                 front = ColorVisual.WHITE,
                 back = ColorVisual.BLACK,
             )
@@ -325,8 +354,8 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
         game.faceUpCards.forEach {
             val cardView = CardView(
-                height = 170,
-                width = 120,
+                height = 160,
+                width = 110,
                 front = ColorVisual.WHITE,
                 back = ColorVisual.BLACK,
             )
@@ -346,5 +375,9 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
         addComponents(treePane)
         initZenBoard()
+    }
+
+    override fun refreshAfterCultivateStart() {
+        // refresh information telling the player to pick a tile
     }
 }
