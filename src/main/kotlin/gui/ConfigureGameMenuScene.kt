@@ -1,5 +1,8 @@
 package gui
 
+import entity.GoalTileType
+import entity.PlayerType
+import service.RootService
 import tools.aqua.bgw.components.layoutviews.Pane
 import tools.aqua.bgw.components.uicomponents.*
 import tools.aqua.bgw.core.Color
@@ -12,14 +15,17 @@ import tools.aqua.bgw.visual.ImageVisual
 import util.PRIMARY_COLOUR
 import util.SECONDARY_COLOUR
 import util.TERTIARY_COLOUR
+import javax.swing.plaf.synth.ColorType
 
 
 /**
  * The [ConfigureGameMenuScene] is a [MenuScene] to configure the starting parameters
  * of a game of bonsai in hot seat mode
  */
-class ConfigureGameMenuScene(bonsaiApplication: BonsaiApplication) : MenuScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
+class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
+    private val rootService: RootService) : MenuScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
 
+        //private val orderedPlayer
     private val contentPlayerPane =
         Pane<UIComponent>(
             posX = 80,
@@ -172,7 +178,7 @@ class ConfigureGameMenuScene(bonsaiApplication: BonsaiApplication) : MenuScene(1
             }
         }
 
-    private val startButton = ButtonStyle2(
+    val startButton = ButtonStyle2(
         posX = 715,
         posY = 830,
         text = "START"
@@ -184,8 +190,9 @@ class ConfigureGameMenuScene(bonsaiApplication: BonsaiApplication) : MenuScene(1
         text = "BACK"
     ).apply {
         onMouseClicked = {
-            bonsaiApplication.hideMenuScene()
-            bonsaiApplication.showMainMenuScene()
+            //TODO()
+            //bonsaiApplication.hideMenuScene()
+            //bonsaiApplication.showMainMenuScene()
         }
     }
 
@@ -258,7 +265,19 @@ class ConfigureGameMenuScene(bonsaiApplication: BonsaiApplication) : MenuScene(1
             addPlayerButton,
             backButton,
             playerOrderButton,
-            startButton,
+            startButton.apply {
+                onMouseClicked = {
+                    val guiPlayer = playerInputs.mapIndexed() { index, it->
+                        val color = entity.ColorType.entries[index]
+                        entity.Player(it.text.trim(), PlayerType.HUMAN, true, color)
+                    }.toMutableList()
+
+                    rootService.gameService.startNewGame(guiPlayer, false,
+                        mutableListOf(GoalTileType.BLUE, GoalTileType.GREEN, GoalTileType.ORANGE))
+                    bonsaiApplication.hideMenuScene()
+                    bonsaiApplication.showGameScene()
+                }
+            },
             playerTurn,
             playerInput ,
             playerRemove,
