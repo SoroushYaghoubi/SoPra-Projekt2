@@ -4,6 +4,7 @@ import entity.Player
 import entity.States
 import entity.Tile
 import entity.TileType
+import util.POT
 
 
 /**
@@ -103,41 +104,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         }
     }
 
-    fun canPlaceWoodTile(): Boolean {
-        val currentPlayer = getCurrentPlayer()
-        val tree = currentPlayer.bonsaiTree
-
-        //Position of pot
-        val forbiddenPositions = setOf(
-            Pair(-2, 0), Pair(-1, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0),
-            Pair(-2,1), Pair(-1, 1), Pair(0, 1), Pair(1, 1), Pair(2, 1)
-        )
-
-        // Check for other WOOD tiles in the tree
-        for ((position, tile) in tree) {
-            if (tile.tileType != TileType.WOOD) continue // Only check around existing WOOD tiles
-
-            val (q, r) = position
-
-            // All 6 neighbors
-            val neighborPositions = listOf(
-                Pair(q + 1, r),
-                Pair(q, r + 1),
-                Pair(q - 1, r + 1),
-                Pair(q - 1, r),
-                Pair(q, r - 1),
-                Pair(q + 1, r - 1)
-            )
-
-            for (neighborPos in neighborPositions) {
-                if (!tree.containsKey(neighborPos) && neighborPos !in forbiddenPositions)
-                    return true // Found empty neighbor to place WOOD
-            }
-        }
-
-        // No valid place found
-        return false
-    }
 
     /**
      * Checks if a bonsai tile can be played based on the symbols shown on
@@ -157,6 +123,34 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         return currentPlayer.playableTilesCopy.contains(tile.tileType)
                 || currentPlayer.playableTilesCopy.contains(TileType.ANY)
+    }
+
+    /**
+     * check if a [WOOD] can be placed in the tree .
+     */
+    fun canPlayWood() :Boolean{
+        val tree = getCurrentPlayer().bonsaiTree
+        tree.filter { it.value.tileType == TileType.WOOD }
+            .forEach { (position, tile) ->
+                val q = position.first
+                val r = position.second
+                println("Tile at ($q, $r) -> Type: ${tile.tileType}")
+
+                val neighbourTiles = listOf(
+                    Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
+                    Pair(Pair(q, r + 1), tree.getOrDefault(Pair(q, r + 1), null)),
+                    Pair(Pair(q - 1, r + 1), tree.getOrDefault(Pair(q - 1, r + 1), null)),
+                    Pair(Pair(q - 1, r), tree.getOrDefault(Pair(q - 1, r), null)),
+                    Pair(Pair(q, r - 1), tree.getOrDefault(Pair(q, r - 1), null)),
+                    Pair(Pair(q + 1, r - 1), tree.getOrDefault(Pair(q + 1, r - 1), null))
+                ).filter { it.first !in POT }
+                val nullPositions = neighbourTiles.filter { it.second == null }.map { it.first }
+
+                if (nullPositions.isNotEmpty()) {
+                    return true
+                }
+            }
+        return false
     }
 
     /**
@@ -180,6 +174,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val currentPlayer = getCurrentPlayer()
 
         // Position of pot
+        //  TODO: you can import the POT from util
         val forbiddenPositions = setOf(
             Pair(-2, 0), Pair(-1, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0),
             Pair(-2,1), Pair(-1, 1), Pair(0, 1), Pair(1, 1), Pair(2, 1)

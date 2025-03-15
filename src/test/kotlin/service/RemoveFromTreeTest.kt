@@ -63,7 +63,7 @@ class RemoveFromTreeTest {
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
 
-        assertTrue(rootService.treeService.canPlaceWoodTile())
+        assertTrue(rootService.treeService.canPlayWood())
     }
 
     @Test
@@ -118,7 +118,7 @@ class RemoveFromTreeTest {
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
 
-        assertFalse(rootService.treeService.canPlaceWoodTile())
+        assertFalse(rootService.treeService.canPlayWood())
     }
 
 }
