@@ -38,6 +38,9 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         require(playerOrder.size >= 2) { "at least 2 Players" }
         require(goalTilesEntries.size == 3) { "Exactly 3 goal tiles must be selected." }
 
+        val playerColors = playerOrder.map { it.color }
+        require(playerColors.distinct().size == playerColors.size) { "All players must have unique colors." }
+
         var zenDeck = mutableListOf<Card>()
         val faceUpCards = mutableListOf<Card>()
         if (!networkGame){

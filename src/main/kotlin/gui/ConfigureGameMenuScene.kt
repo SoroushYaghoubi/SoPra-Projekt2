@@ -1,5 +1,6 @@
 package gui
 
+import entity.ColorType
 import entity.GoalTileType
 import entity.PlayerType
 import service.RootService
@@ -15,7 +16,8 @@ import tools.aqua.bgw.visual.ImageVisual
 import util.PRIMARY_COLOUR
 import util.SECONDARY_COLOUR
 import util.TERTIARY_COLOUR
-import javax.swing.plaf.synth.ColorType
+import util.*
+
 
 
 /**
@@ -24,6 +26,50 @@ import javax.swing.plaf.synth.ColorType
  */
 class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
                              private val rootService: RootService) : MenuScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
+
+    private val playerColors = mutableListOf(
+        ColorType.RED,
+        ColorType.PURPLE,
+        ColorType.BLACK,
+        ColorType.BLUE
+    )
+
+    private val availableColors = mutableListOf(
+        ColorType.RED,
+        ColorType.PURPLE,
+        ColorType.BLACK,
+        ColorType.BLUE
+    )
+
+    private val colorMapping = mapOf(
+        ColorType.RED to COLOUR_RED,
+        ColorType.PURPLE to COLOUR_PURPLE,
+        ColorType.BLACK to COLOUR_BLACK,
+        ColorType.BLUE to COLOUR_BLUE
+    )
+
+    private fun nextColor(currentColor: ColorType): ColorType {
+        val currentIndex = availableColors.indexOf(currentColor)
+        return if (currentIndex == -1 || currentIndex == availableColors.lastIndex)
+            availableColors.first()
+        else
+            availableColors[currentIndex + 1]
+    }
+
+    private fun assignColorButtonFunctionality() {
+        playerColours.forEachIndexed { index, button ->
+            button.onMouseClicked = {
+                val currentColor = playerColors[index]
+                val newColor = nextColor(currentColor)
+                playerColors[index] = newColor
+
+                // Update the button visual and ensure it stays rounded
+                button.visual = ColorVisual(Color(colorMapping[newColor] ?: COLOUR_BLACK)).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                }
+            }
+        }
+    }
 
     private val selectedGoalTiles = mutableListOf<GoalTileType>()
     //private val orderedPlayer
@@ -168,8 +214,22 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
 
     private fun toggleGoalTile(goalTileType: GoalTileType, button: CheckBoxButton) {
         if (button.isChecked) {
+            if (selectedGoalTiles.size >= 3) {
+                // If 3 goal tiles are already selected, we deselect the first one
+                val firstSelected = selectedGoalTiles.first()
+                val firstButton = when (firstSelected) {
+                    GoalTileType.BROWN -> woodGoalTileButton
+                    GoalTileType.GREEN -> leafGoalTileButton
+                    GoalTileType.ORANGE -> fruitGoalTileButton
+                    GoalTileType.PINK -> flowerGoalTileButton
+                    GoalTileType.BLUE -> positionGoalTileButton
+                }
+                firstButton.change()
+                selectedGoalTiles.remove(firstSelected)
+            }
             selectedGoalTiles.add(goalTileType)
         } else {
+            // If the button is being unchecked, remove the goal tile from the selected list
             selectedGoalTiles.remove(goalTileType)
         }
     }
@@ -249,6 +309,11 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         posY = 270
     ).apply {
         onMouseClicked = {
+            if (!isChecked) {
+                if (playerHardBots[0].isChecked) {
+                    playerHardBots[0].change()
+                }
+            }
             change()
         }
     }
@@ -258,7 +323,16 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         posY = 270
     ).apply {
         onMouseClicked = {
+            println("Player 1 HardBot clicked. Current state: $isChecked")
+            if (!isChecked) {
+                println("Checking Player 1 HardBot. Unchecking Player 1 EasyBot if it is checked.")
+                if (playerEasyBots[0].isChecked) {
+                    playerEasyBots[0].change()
+                    println("Player 1 EasyBot unchecked.")
+                }
+            }
             change()
+            println("New Player 1 HardBot state: $isChecked")
         }
     }
 
@@ -282,7 +356,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             startButton.apply {
                 onMouseClicked = {
                     val guiPlayer = playerInputs.mapIndexed() { index, it->
-                        val color = entity.ColorType.entries[index]
+                        val color = playerColors[index]
                         val playerType = when {
                             playerEasyBots[index].isChecked -> PlayerType.EASYBOT
                             playerHardBots[index].isChecked -> PlayerType.HARDBOT
@@ -320,37 +394,52 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         )
         addComponents(contentPlayerPane,contentGoalTilePane)
 
+        assignColorButtonFunctionality()
+
     }
 
     private fun addPlayer() {
-
         val currentIndex = playerInputs.size
-
         if (currentIndex >= 4) return
 
         val newPlayerTurn = TurnLabel(
             posX = 40,
-            posY = 270 + 140 * currentIndex ,
+            posY = 270 + 140 * currentIndex,
         ).apply {
-            text = "${currentIndex+1}"
+            text = "${currentIndex + 1}"
         }
 
         val newPlayerInput = TextFieldStyle1(
-            posX = 190 ,
-            posY = 270 + 140 * currentIndex ,
+            posX = 190,
+            posY = 270 + 140 * currentIndex,
             prompt = "INPUT NAME"
         )
 
         val newPlayerColour = ColourButton(
             posX = 600,
-            posY = 280 + 140 * currentIndex ,
-        )
+            posY = 280 + 140 * currentIndex,
+        ).apply {
+            onMouseClicked = {
+                val currentColor = playerColors[currentIndex]
+                val newColor = nextColor(currentColor)
+                playerColors[currentIndex] = newColor
+
+                // Apply the new color AND ensure the button stays rounded
+                this.visual = ColorVisual(Color(colorMapping[newColor] ?: COLOUR_BLACK)).apply {
+                    style.borderRadius = BorderRadius(20.0)  // Keep corners rounded
+                }
+            }
+
+            // Ensure the initial state is also rounded
+            visual = ColorVisual(Color(colorMapping[playerColors[currentIndex]] ?: COLOUR_BLACK)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        }
 
         val newPlayerRemove = SquareButton(
             posX = 680,
-            posY = 270 + 140 * currentIndex ,
+            posY = 270 + 140 * currentIndex,
         ).apply {
-            // When the button is clicked, the first player is removed
             onMouseClicked = {
                 removePlayer(currentIndex)
             }
@@ -361,6 +450,12 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             posY = 270 + 140 * currentIndex,
         ).apply {
             onMouseClicked = {
+                if (!isChecked) {
+                    // If hardBot is checked, uncheck it
+                    if (playerHardBots[currentIndex].isChecked) {
+                        playerHardBots[currentIndex].change()
+                    }
+                }
                 change()
             }
         }
@@ -370,10 +465,17 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             posY = 270 + 140 * currentIndex,
         ).apply {
             onMouseClicked = {
+                if (!isChecked) {
+                    // If easyBot is checked, uncheck it
+                    if (playerEasyBots[currentIndex].isChecked) {
+                        playerEasyBots[currentIndex].change()
+                    }
+                }
                 change()
             }
         }
 
+        // Add components to the pane
         contentPlayerPane.addAll(
             newPlayerInput,
             newPlayerTurn,
@@ -383,14 +485,15 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             newPlayerHardBot,
         )
 
+        // Add to respective lists
         playerTurns.add(newPlayerTurn)
         playerInputs.add(newPlayerInput)
-        playerRemoves.add(newPlayerRemove)
         playerColours.add(newPlayerColour)
+        playerRemoves.add(newPlayerRemove)
         playerEasyBots.add(newPlayerEasyBot)
         playerHardBots.add(newPlayerHardBot)
 
-        if (currentIndex == 3){
+        if (currentIndex == 3) {
             addPlayerButton.isDisabled = true
             addPlayerButton.isVisible = false
         }
