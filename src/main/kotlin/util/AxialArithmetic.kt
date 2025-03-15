@@ -49,6 +49,9 @@ val POT = setOf(
  * @return tiles as a lazy sequence
  */
 infix fun MutableMap<Pair<Int, Int>, Tile?>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Tile?> = sequence {
+    // args check
+    require(this@traverseFrom[bfsRoot] != null) { "Cannot start from non-existing tile." }
+
     // init
     val visited = mutableSetOf<Pair<Int, Int>>()
     val queue   =   ArrayDeque<Pair<Int, Int>>()
