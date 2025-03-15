@@ -48,7 +48,7 @@ val POT = setOf(
  *
  * @return tile position as a lazy sequence
  */
-infix fun MutableMap<Pair<Int, Int>, Tile?>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
+infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
     // args check
     require(this@traverseFrom[bfsRoot] != null) { "Cannot start from non-existing tile." }
 
@@ -156,7 +156,7 @@ operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
  *
  * @return a list of playable positions
  */
-fun MutableMap<Pair<Int, Int>, Tile?>.getEmptyTiles(): Set<Pair<Int, Int>>{
+fun MutableMap<Pair<Int, Int>, Tile>.getEmptyTiles(): Set<Pair<Int, Int>>{
     val emptyTiles = mutableSetOf<Pair<Int, Int>>()
 
     for (tileIndex in (this@getEmptyTiles traverseFrom ROOT)) {
