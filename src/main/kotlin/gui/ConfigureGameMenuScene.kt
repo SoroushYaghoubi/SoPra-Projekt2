@@ -23,9 +23,10 @@ import javax.swing.plaf.synth.ColorType
  * of a game of bonsai in hot seat mode
  */
 class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
-    private val rootService: RootService) : MenuScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
+                             private val rootService: RootService) : MenuScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
 
-        //private val orderedPlayer
+    private val selectedGoalTiles = mutableListOf<GoalTileType>()
+    //private val orderedPlayer
     private val contentPlayerPane =
         Pane<UIComponent>(
             posX = 80,
@@ -35,7 +36,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
-    )
+        )
 
     private val contentGoalTilePane =
         Pane<UIComponent>(
@@ -93,6 +94,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
     ).apply {
         onMouseClicked = {
             change()
+            toggleGoalTile(GoalTileType.BROWN, this)
         }
     }
 
@@ -109,6 +111,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
     ).apply {
         onMouseClicked = {
             change()
+            toggleGoalTile(GoalTileType.GREEN, this)
         }
     }
 
@@ -125,6 +128,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
     ).apply {
         onMouseClicked = {
             change()
+            toggleGoalTile(GoalTileType.ORANGE, this)
         }
     }
 
@@ -141,10 +145,11 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
     ).apply {
         onMouseClicked = {
             change()
+            toggleGoalTile(GoalTileType.PINK, this)
         }
     }
 
-    private val postionGoalTileLabel =
+    private val positionGoalTileLabel =
         LabelStyle2(
             posX = 20,
             posY = 830,
@@ -157,6 +162,15 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
     ).apply {
         onMouseClicked = {
             change()
+            toggleGoalTile(GoalTileType.BLUE, this)
+        }
+    }
+
+    private fun toggleGoalTile(goalTileType: GoalTileType, button: CheckBoxButton) {
+        if (button.isChecked) {
+            selectedGoalTiles.add(goalTileType)
+        } else {
+            selectedGoalTiles.remove(goalTileType)
         }
     }
 
@@ -269,11 +283,16 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
                 onMouseClicked = {
                     val guiPlayer = playerInputs.mapIndexed() { index, it->
                         val color = entity.ColorType.entries[index]
-                        entity.Player(it.text.trim(), PlayerType.HUMAN, true, color)
+                        val playerType = when {
+                            playerEasyBots[index].isChecked -> PlayerType.EASYBOT
+                            playerHardBots[index].isChecked -> PlayerType.HARDBOT
+                            else -> PlayerType.HUMAN
+                        }
+                        entity.Player(it.text.trim(), playerType, true, color)
                     }.toMutableList()
 
                     rootService.gameService.startNewGame(guiPlayer, false,
-                        mutableListOf(GoalTileType.BLUE, GoalTileType.GREEN, GoalTileType.ORANGE))
+                        selectedGoalTiles)
                     bonsaiApplication.hideMenuScene()
                     bonsaiApplication.showGameScene()
                 }
@@ -296,7 +315,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             fruitGoalTileButton,
             flowerGoalTileLabel,
             flowerGoalTileButton,
-            postionGoalTileLabel,
+            positionGoalTileLabel,
             positionGoalTileButton,
         )
         addComponents(contentPlayerPane,contentGoalTilePane)
