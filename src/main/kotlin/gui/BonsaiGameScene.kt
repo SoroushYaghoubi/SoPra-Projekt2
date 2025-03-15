@@ -32,9 +32,9 @@ import util.*
 class BonsaiGameScene(private val rootService: RootService) :
     BoardGameScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
 
-    private val treeTileMap: BidirectionalMap<entity.Tile, HexagonView> = BidirectionalMap()
-    private val supplyTileMap: BidirectionalMap<entity.Tile, HexagonView> = BidirectionalMap()
-    private val zenCardMap: BidirectionalMap<entity.Card, CardView> = BidirectionalMap()
+    private val treeTileMap: BidirectionalMap<Tile, HexagonView> = BidirectionalMap()
+    private val supplyTileMap: BidirectionalMap<Tile, HexagonView> = BidirectionalMap()
+    private val zenCardMap: BidirectionalMap<Card, CardView> = BidirectionalMap()
     private val clickedSupply : HexagonView? = null
 
     // button for cultivate
@@ -142,7 +142,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     //camera pane
 
-    val panLabel = Label(
+    private val panLabel = Label(
         posX = 300,
         posY = 410,
         width = 400,
@@ -152,7 +152,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         font = Font(20.0, Color.WHITE)
     )
 
-    val targetLayout = Pane<ComponentView>(
+    private val targetLayout = Pane<ComponentView>(
         width = 2000,
         height = 2000,
         visual = ColorVisual(Color(SECONDARY_COLOUR))
@@ -163,13 +163,13 @@ class BonsaiGameScene(private val rootService: RootService) :
 
 
     // components for the tree
-    val treeHexagonGrid = HexagonGrid<HexagonView>(
+    private val treeHexagonGrid = HexagonGrid<HexagonView>(
         posX = 1000,
         posY = 1000,
         coordinateSystem = HexagonGrid.CoordinateSystem.AXIAL
     )
 
-    val treePane = CameraPane(
+    private val treePane = CameraPane(
         posX = 240,
         posY = 380,
         width = 1320,
@@ -181,7 +181,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     }
 
     //components for the supplies
-    val woodSupply = HexagonView(
+    private val woodSupply = HexagonView(
         posX = 60,
         posY = 410,
         visual = CompoundVisual(
@@ -194,7 +194,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         size = 60
     )
 
-    val leafSupply = HexagonView(
+    private val leafSupply = HexagonView(
         posX = 60,
         posY = 560,
         visual = CompoundVisual(
@@ -209,7 +209,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         // TODO()
     }
 
-    val flowerSupply = HexagonView(
+    private val flowerSupply = HexagonView(
         posX = 60,
         posY = 710,
         visual = CompoundVisual(
@@ -222,7 +222,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         size = 60
     )
 
-    val fruitSupply = HexagonView(
+    private val fruitSupply = HexagonView(
         posX = 60,
         posY = 860,
         visual = CompoundVisual(
@@ -268,6 +268,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     //components for the tree boards
     //initialize board
+    /**
     //create hexagon
     fun initHexagon() {
         for (row in -8..8) {
@@ -289,8 +290,9 @@ class BonsaiGameScene(private val rootService: RootService) :
             }
         }
     }
+    */
 
-    fun initPot() {
+    private fun initPot() {
         POT.forEach{
             var color = COLOUR_RED
             if (it.second == 0) {
@@ -405,16 +407,24 @@ class BonsaiGameScene(private val rootService: RootService) :
             CardType.MASTERCARD -> {
                 val card = generalCard as MasterCard
                 cardView.apply {
-                    if (card.tileTypes.size == 3) {
-                        frontVisual = CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___\n___${card.tileTypes[2]}___"))
-                    } else if (card.tileTypes.size == 2) {
-                        frontVisual = CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___",
-                                font = Font(15)))
-                    } else {
-                        frontVisual = CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___"))
+                    frontVisual = when (card.tileTypes.size) {
+                        3 -> CompoundVisual(
+                            ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___\n___${card.tileTypes[2]}___")
+                        )
+
+                        2 -> CompoundVisual(
+                            ColorVisual.WHITE,
+                            TextVisual(
+                                "${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___",
+                                font = Font(15)
+                            )
+                        )
+
+                        else -> CompoundVisual(
+                            ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___")
+                        )
 
                     }
                 }
@@ -422,11 +432,11 @@ class BonsaiGameScene(private val rootService: RootService) :
             CardType.PARCHMENTCARD -> {
                 val card = generalCard as ParchmentCard
                 cardView.apply {
-                    if (card.parchmentCardType != null) {
-                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                    frontVisual = if (card.parchmentCardType != null) {
+                        CompoundVisual(ColorVisual.WHITE,
                             TextVisual("${card.cardType}\n___${card.parchmentCardType}___\n___${card.basePoints}___"))
                     } else {
-                        frontVisual = CompoundVisual(ColorVisual.WHITE,
+                        CompoundVisual(ColorVisual.WHITE,
                             TextVisual("${card.cardType}\n___${card.parchmentTileType}___\n___${card.basePoints}___"))
                     }
                 }
