@@ -124,10 +124,7 @@ class CalculateScoreTest {
         val players = mutableListOf(
             Player("Alice", PlayerType.HUMAN, true, ColorType.RED),
             Player("Bob", PlayerType.HUMAN, true, ColorType.BLUE),
-            Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
         )
-
-        ///val zenDeck = mutableListOf()
 
         val faceUpCards = mutableListOf(
             MasterCard(mutableListOf(TileType.LEAF, TileType.LEAF), 26),
@@ -135,58 +132,38 @@ class CalculateScoreTest {
         )
 
         val gameState = BonsaiGameState(
-            currentPlayer = players.first(),
-            players = players,
-            botSpeed = 1,
-            currentState = States.END_TURN
+            currentPlayer = players.first(), players = players,
+            botSpeed = 1, currentState = States.END_TURN
         )
 
         gameState.zenDeck.isEmpty()
         gameState.faceUpCards.addAll(faceUpCards)
 
         //SETUP for player
-
         val playerBonsaiTree = mutableMapOf(
-            (0 to 0) to Tile(null, null, TileType.WOOD),
-            (-2 to -1) to Tile(null, null, TileType.FLOWER),
-            (-1 to -1) to Tile(null, null, TileType.LEAF),
-            (0 to -1) to Tile(null, null, TileType.WOOD),
+            (0 to 0) to Tile(null, null, TileType.WOOD), (-2 to -1) to Tile(null, null, TileType.FLOWER),
+            (-1 to -1) to Tile(null, null, TileType.LEAF), (0 to -1) to Tile(null, null, TileType.WOOD),
 
-            (-2 to -2) to Tile(null, null, TileType.FRUIT),
-            (-1 to -2) to Tile(null, null, TileType.LEAF),
-            (0 to -2) to Tile(null, null, TileType.LEAF),
-            (1 to -2) to Tile(null, null, TileType.WOOD),
+            (-2 to -2) to Tile(null, null, TileType.FRUIT), (-1 to -2) to Tile(null, null, TileType.LEAF),
+            (0 to -2) to Tile(null, null, TileType.LEAF), (1 to -2) to Tile(null, null, TileType.WOOD),
             (2 to -2) to Tile(null, null, TileType.LEAF),
 
-            (-1 to -3) to Tile(null, null, TileType.LEAF),
-            (0 to -3) to Tile(null, null, TileType.WOOD),
-            (1 to -3) to Tile(null, null, TileType.WOOD),
-            (2 to -3) to Tile(null, null, TileType.WOOD),
-            (3 to -3) to Tile(null, null, TileType.LEAF),
-            (4 to -3) to Tile(null, null, TileType.FLOWER),
+            (-1 to -3) to Tile(null, null, TileType.LEAF), (0 to -3) to Tile(null, null, TileType.WOOD),
+            (1 to -3) to Tile(null, null, TileType.WOOD), (2 to -3) to Tile(null, null, TileType.WOOD),
+            (3 to -3) to Tile(null, null, TileType.LEAF), (4 to -3) to Tile(null, null, TileType.FLOWER),
 
-            (0 to -4) to Tile(null, null, TileType.LEAF),
-            (1 to -4) to Tile(null, null, TileType.WOOD),
-            (2 to -4) to Tile(null, null, TileType.LEAF),
-            (3 to -4) to Tile(null, null, TileType.WOOD),
+            (0 to -4) to Tile(null, null, TileType.LEAF), (1 to -4) to Tile(null, null, TileType.WOOD),
+            (2 to -4) to Tile(null, null, TileType.LEAF), (3 to -4) to Tile(null, null, TileType.WOOD),
 
-            (0 to -5) to Tile(null, null, TileType.FLOWER),
-            (1 to -5) to Tile(null, null, TileType.WOOD),
-            (2 to -5) to Tile(null, null, TileType.LEAF),
-            (3 to -5) to Tile(null, null, TileType.LEAF),
-            (4 to -5) to Tile(null, null, TileType.LEAF),
-            (5 to -5) to Tile(null, null, TileType.FLOWER),
+            (0 to -5) to Tile(null, null, TileType.FLOWER), (1 to -5) to Tile(null, null, TileType.WOOD),
+            (2 to -5) to Tile(null, null, TileType.LEAF), (3 to -5) to Tile(null, null, TileType.LEAF),
+            (4 to -5) to Tile(null, null, TileType.LEAF), (5 to -5) to Tile(null, null, TileType.FLOWER),
 
-            (1 to -6) to Tile(null, null, TileType.LEAF),
-            (2 to -6) to Tile(null, null, TileType.LEAF),
-            (3 to -6) to Tile(null, null, TileType.FLOWER),
-
-            (2 to -7) to Tile(null, null, TileType.FRUIT)
+            (1 to -6) to Tile(null, null, TileType.LEAF), (2 to -6) to Tile(null, null, TileType.LEAF),
+            (3 to -6) to Tile(null, null, TileType.FLOWER), (2 to -7) to Tile(null, null, TileType.FRUIT)
         )
 
         val playerCollectedCard = mutableListOf(
-            // MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
-            // HelperCard(TileType.LEAF, 35),
             GrowthCard(TileType.LEAF, 3),
             MasterCard(mutableListOf(TileType.ANY), 24),
             ParchmentCard(TileType.LEAF, null, 1, 39),
@@ -212,7 +189,6 @@ class CalculateScoreTest {
     /**
      * Test for calculate score
      */
-
     @Test
     fun `test calculate score `() {
         val rootService = setUpGame()
@@ -222,7 +198,10 @@ class CalculateScoreTest {
 
         checkNotNull(gameState) { "No active game state." }
 
-        assertEquals(intArrayOf(39, 14, 19, 5, 23, 100).toList(), rootService.gameService.calculateScore(player = gameState.currentPlayer))
-
+        assertEquals(
+            intArrayOf(39, 14, 19, 5, 23, 100).toList(),
+            rootService.gameService.calculateScore(player = gameState.currentPlayer)
+        )
     }
+
 }
