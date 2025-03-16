@@ -96,13 +96,26 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             throw IllegalArgumentException("No need to remove")
         }
 
-        if (!isMinimalRemoval(tilePosition)) {
-            throw IllegalArgumentException("Not minimal choice")
-        }
 
-        // Remove the selected tile
-        currentPlayer.bonsaiTree.remove(tilePosition)
-        // Refresh GUI to reflect the updated tree
+
+        require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF){"not a valid move"}
+
+
+        require(isMinimalAndCorrect(tilePosition))
+
+            if(getNeighbourTiles(tilePosition).any{ it.second?.tileType == TileType.FRUIT })
+            {
+                getNeighbourTiles(tilePosition)
+                    .filter { it.second?.tileType == TileType.FRUIT }
+                    .forEach { currentPlayer.bonsaiTree.remove(it.first) }
+                currentPlayer.bonsaiTree.remove(tilePosition)
+                // TODO : check it another time !!!!!!
+                  }
+
+            else{
+                currentPlayer.bonsaiTree.remove(tilePosition)
+            }
+                // Refresh GUI to reflect the updated tree
         onAllRefreshables { refreshAfterRemoveFromTree(tilePosition) }
 
         // update message
@@ -115,6 +128,67 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         }
     }
 
+    /**
+     *
+     */
+    fun isMinimalAndCorrect(tilePosition: Pair<Int, Int>) : Boolean{
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+        val tree = gameState.currentPlayer.bonsaiTree
+        val leafTilesPositions = tree
+            .filter { it.value.tileType == TileType.LEAF }.keys.toMutableList()
+        println(leafTilesPositions)
+        val removableLeafs1: MutableList<Pair<Int, Int>> = mutableListOf()
+        val removableLeafs2: MutableList<Pair<Int, Int>> = mutableListOf()
+        leafTilesPositions.forEach { position ->
+            val neighbourTiles = getNeighbourTiles(position)
+            println("neighbours $position : $neighbourTiles ")
+            if(neighbourTiles.any { it.second == null }) {
+                if (neighbourTiles.all {
+                        it.second == null ||
+                                it.second?.tileType == TileType.WOOD ||
+                                it.second?.tileType == TileType.LEAF ||
+                                (it.second?.tileType == TileType.FLOWER &&
+                                        getNeighbourTiles(it.first)
+                                            .filter { neighbor -> neighbor.first != position }
+                                            .any { neighbor -> neighbor.second?.tileType == TileType.LEAF })
+                    }) {
+                    removableLeafs1.add(position)
+                } else {
+                    removableLeafs2.add(position)
+                }
+            }
+        }
+        println("first $removableLeafs1")
+        println("second $removableLeafs2")
+        if (removableLeafs1.isNotEmpty()) return removableLeafs1.contains(tilePosition)
+        return removableLeafs2.contains(tilePosition)
+    }
+
+    /**
+     *
+     */
+    private fun getNeighbourTiles(position : Pair<Int, Int>) : List<Pair<Pair<Int, Int>, Tile?>>{
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+        val tree = gameState.currentPlayer.bonsaiTree
+        val q = position.first
+        val r = position.second
+        return listOf(
+            Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
+            Pair(Pair(q, r + 1), tree.getOrDefault(Pair(q, r + 1), null)),
+            Pair(Pair(q - 1, r + 1), tree.getOrDefault(Pair(q - 1, r + 1), null)),
+            Pair(Pair(q - 1, r), tree.getOrDefault(Pair(q - 1, r), null)),
+            Pair(Pair(q, r - 1), tree.getOrDefault(Pair(q, r - 1), null)),
+            Pair(Pair(q + 1, r - 1), tree.getOrDefault(Pair(q + 1, r - 1), null))
+        )
+    }
 
     /**
      * Checks if a bonsai tile can be played based on the symbols shown on
@@ -165,41 +239,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         return false
     }
 
-    fun isMinimalRemoval(positionToRemove: Pair<Int, Int>): Boolean {
-        val tree = getCurrentPlayer().bonsaiTree
 
-        // Get all WOOD tiles
-        val woodPositions = tree.filter { it.value.tileType == TileType.WOOD }.keys
-
-        // For each WOOD tile in the tree
-        for (woodPos in woodPositions) {
-            val (q, r) = woodPos
-
-            // All 6 axial neighbors around the WOOD tile
-            val neighborPositions = listOf(
-                Pair(q + 1, r),
-                Pair(q, r + 1),
-                Pair(q - 1, r + 1),
-                Pair(q - 1, r),
-                Pair(q, r - 1),
-                Pair(q + 1, r - 1)
-            )
-
-            // Check if positionToRemove is adjacent to this WOOD tile
-            if (positionToRemove in neighborPositions) {
-                // Now check if this WOOD tile has any other free neighbors (excluding the one we want to remove)
-                val otherFreeNeighbors = neighborPositions.filter { it != positionToRemove && it !in tree }
-
-                // If there are NO other free neighbors, then this removal is minimal to free space
-                if (otherFreeNeighbors.isEmpty()) {
-                    return true // Minimal removal: will create a necessary free neighbor
-                }
-            }
-        }
-
-        // If no WOOD tile would benefit from this removal, return false
-        return false
-    }
 
 
     /**
