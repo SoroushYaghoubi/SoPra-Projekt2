@@ -68,17 +68,21 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     * Removes bonsai tile from players bonsai tree.
+     * Removes a tile from the current player's bonsai tree and updates the game state accordingly.
      *
-     * preconditions:
-     * - The game has started and is currently running.
-     * - Bonsai tree has tiles to be removed from (bonsai tree is not empty).
+     * This function ensures that the game is in a valid state before removing the tile. It verifies that:
+     * - A game is currently active.
+     * - The game state is properly initialized.
+     * - The tile to be removed is a **LEAF** tile.
+     * - The removal is **minimal and correct** according to game rules.
+     * - If the removed tile is adjacent to any **FRUIT** tiles, those adjacent **FRUIT** tiles are also removed.
      *
-     * post conditions:
-     * - The bonsai tile is removed from the bonsai tree.
+     * After removing the tile(s), the function refreshes the game UI and, if applicable, updates the network message
+     * for multiplayer synchronization.
      *
-     * @param tilePosition The position of the bonsai tile to be removed from.
-     * @throws IllegalStateException if there is no tile (bonsai tree is empty).
+     * @param tilePosition The axial coordinates of the tile to be removed.
+     * @throws IllegalStateException if no game is active.
+     * @throws IllegalArgumentException if the move is not valid.
      */
     fun removeFromTree(tilePosition: Pair<Int, Int>) {
 
@@ -88,16 +92,10 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
 
-        gameState.currentState = States.DISCARDING
 
         val currentPlayer = getCurrentPlayer()
 
-        if (canPlayWood()) {
-            throw IllegalArgumentException("No need to remove")
-        }
-
-
-
+        require(!canPlayWood())
         require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF){"not a valid move"}
 
 
@@ -115,6 +113,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             else{
                 currentPlayer.bonsaiTree.remove(tilePosition)
             }
+        gameState.currentState = States.CHOOSE_ACTION
                 // Refresh GUI to reflect the updated tree
         onAllRefreshables { refreshAfterRemoveFromTree(tilePosition) }
 
@@ -129,23 +128,37 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
+     * Determines whether a given **LEAF** tile can be **minimally and correctly** removed from the bonsai tree.
      *
+     * A **LEAF** tile is considered removable if:
+     * - It has at least one empty neighboring tile.
+     * - It does not violate game constraints regarding WOOD, LEAF, and FLOWER tiles.
+     * - If multiple LEAF tiles are removable, priority is given to the ones in `removableLeafs1`,
+     *   which are the most minimal and correct removals.
+     *
+     * The function first classifies all removable **LEAF** tiles into two groups:
+     * 1. **`removableLeafs1`** - The highest-priority LEAF tiles that can be removed.
+     * 2. **`removableLeafs2`** - Other LEAF tiles that are removable but the system should also remove connected tiles.
+     *
+     * The function returns `true` if the given `tilePosition` exists in either of these lists,
+     * with priority given to `removableLeafs1`.
+     *
+     * @param tilePosition The axial coordinates of the tile to check for removability.
+     * @return `true` if the tile is a **valid minimal removal**, otherwise `false`.
+     * @throws IllegalStateException if no game or game state is active.
      */
     fun isMinimalAndCorrect(tilePosition: Pair<Int, Int>) : Boolean{
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
-
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         val tree = gameState.currentPlayer.bonsaiTree
         val leafTilesPositions = tree
             .filter { it.value.tileType == TileType.LEAF }.keys.toMutableList()
-        println(leafTilesPositions)
         val removableLeafs1: MutableList<Pair<Int, Int>> = mutableListOf()
         val removableLeafs2: MutableList<Pair<Int, Int>> = mutableListOf()
         leafTilesPositions.forEach { position ->
             val neighbourTiles = getNeighbourTiles(position)
-            println("neighbours $position : $neighbourTiles ")
             if(neighbourTiles.any { it.second == null }) {
                 if (neighbourTiles.all {
                         it.second == null ||
@@ -162,14 +175,22 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 }
             }
         }
-        println("first $removableLeafs1")
-        println("second $removableLeafs2")
         if (removableLeafs1.isNotEmpty()) return removableLeafs1.contains(tilePosition)
         return removableLeafs2.contains(tilePosition)
     }
 
     /**
+     * Retrieves the six neighboring tiles of a given position in a hexagonal grid.
      *
+     * Each hexagonal tile has six neighbors, determined by axial coordinates `(q, r)`.
+     * This function returns a list of all neighboring positions along with their corresponding tiles.
+     * If a neighboring tile does not exist in the bonsai tree, `null` is returned for that position.
+     *
+     * @param position The axial coordinates `(q, r)` of the tile whose neighbors should be retrieved.
+     * @return a list of pairs where each pair consists of:
+     *         - The neighbor's coordinates as a `Pair<Int, Int>`.
+     *         - The corresponding `Tile?` (or `null` if there is no tile at that position).
+     * @throws IllegalStateException if no game or game state is active.
      */
     private fun getNeighbourTiles(position : Pair<Int, Int>) : List<Pair<Pair<Int, Int>, Tile?>>{
         val game = rootService.currentGame
@@ -211,9 +232,25 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     * check if a [WOOD] can be placed in the tree .
+     * Checks if a WOOD tile can be placed in the bonsai tree.
+     *
+     * The function iterates through all existing WOOD tiles in the tree and determines
+     * whether any of them have an available adjacent position
+     * A position is considered available if:
+     * - It is one of the six hexagonal neighbors of a WOOD tile.
+     * - It is **not** part of the predefined `POT` (restricted area).
+     * - It is currently unoccupied
+     *
+     * If at least one WOOD tile has an open space next to it, the function returns `true`; otherwise, it returns `false`.
+     *
+     * @return `true` if a WOOD tile can be placed, otherwise `false`.
      */
     fun canPlayWood(): Boolean {
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
         val tree = getCurrentPlayer().bonsaiTree
         tree.filter { it.value.tileType == TileType.WOOD }
             .forEach { (position, tile) ->
@@ -233,9 +270,11 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
                 println("Null:$nullPositions")
                 if (nullPositions.isNotEmpty()) {
+                    gameState.currentState = States.CHOOSE_ACTION
                     return true
                 }
             }
+        gameState.currentState = States.REMOVE_TILES
         return false
     }
 
@@ -312,6 +351,15 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         return false
     }
 
+    /**
+     * Retrieves the current player from the active bonsai game state.
+     *
+     * This function ensures that a game is active before attempting to access the current player.
+     * If no game or game state is found, an exception is thrown.
+     *
+     * @return The `Player` object representing the current player.
+     * @throws IllegalStateException if no active game or game state exists.
+     */
     private fun getCurrentPlayer(): Player {
         val currentGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
         return currentGameState.currentPlayer

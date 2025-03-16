@@ -190,13 +190,13 @@ class MeditateTest {
         assertEquals(2, gameState.currentPlayer.collectedCards.size)
         gameState.currentPlayer.personalSupply.addAll( listOf( Tile(null, null, TileType.WOOD )
             , Tile(null, null, TileType.WOOD )))
-        rootService.playerActionService.choseTile(TileType.FRUIT)
+        rootService.playerActionService.chooseTile(TileType.FRUIT)
         assertEquals(true, gameState.currentPlayer.hasPlayed)
         assertEquals(States.DISCARDING , gameState.currentState)
         assertEquals(6, gameState.currentPlayer.personalSupply.size)
         gameState.currentPlayer.personalSupply.removeAll( listOf( Tile(null, null, TileType.WOOD )
             , Tile(null, null, TileType.WOOD )))
-        assertFails { rootService.playerActionService.choseTile(TileType.FRUIT) }
+        assertFails { rootService.playerActionService.chooseTile(TileType.FRUIT) }
         assertEquals(TileType.FRUIT , gameState.currentPlayer.personalSupply.last().tileType)
 
     }

@@ -2,7 +2,6 @@ package service
 
 import entity.*
 import kotlin.test.Test
-import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

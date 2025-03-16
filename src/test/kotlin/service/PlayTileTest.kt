@@ -65,23 +65,8 @@ class PlayTileTest {
             HelperCard(TileType.LEAF, 35),
             GrowthCard(TileType.LEAF, 3),
             MasterCard(mutableListOf(TileType.ANY), 24),
-//            ParchmentCard(TileType.FRUIT, null, 2, 38),
-//            ParchmentCard(null, CardType.MASTERCARD, 2, 38)
         )
 
-        val playerPersonalSupply = mutableListOf(
-            Tile(null, null, TileType.FLOWER),
-            Tile(null, null, TileType.WOOD),
-            Tile(null, null, TileType.LEAF),
-//            Tile(null, null, TileType.FLOWER),
-//            Tile(null, null, TileType.FRUIT),
-//            Tile(null, null, TileType.WOOD),
-        )
-
-//        val playerClaimedGoal = mutableListOf(
-//            GoalTile(GoalTileType.GREEN, 5, 6),
-//            GoalTile(GoalTileType.PINK, 4, 12),
-//        )
 
         gameState.currentPlayer.collectedCards = playerCollectedCard
         gameState.currentPlayer.bonsaiTree = playerBonsaiTree

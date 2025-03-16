@@ -104,8 +104,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
 
-        onAllRefreshables { refreshAfterReceivedTile(true) }
+
         actPlayer.hasPlayed = true
+        onAllRefreshables{refreshAfterMeditate()}
     }
 
     /**
@@ -146,15 +147,15 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterReceivedTile(false) }
-
+        onAllRefreshables {refreshAfterMeditate() }
+        gameState.currentState =States.END_TURN
     }
 
     /**
      * chose ANY Type
      * @param tileType : the TileType that the player has chosen
      */
-    fun choseTile(tileType: TileType) {
+    fun chooseTile(tileType: TileType) {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -177,7 +178,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterReceivedTile(false) }
+        onAllRefreshables { refreshAfterMeditate() }
+        gameState.currentState =States.END_TURN
 
     }
 
@@ -606,6 +608,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         check(player.personalSupply.size > player.tileCapacity)
         { "The personal supply tiles hasn't reached the capacity." }
         player.personalSupply.removeAll(tilesToDiscard)
+        rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
     }
 
     // returns the current player
