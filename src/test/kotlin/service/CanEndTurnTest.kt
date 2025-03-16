@@ -52,7 +52,6 @@ class CanEndTurnTest {
         rootService.currentGame = game
         val playerActionService = PlayerActionService(rootService)
         assertFalse(playerActionService.canEndTurn())
-
     }
 
 }

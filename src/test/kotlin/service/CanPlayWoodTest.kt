@@ -5,9 +5,16 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+/**
+ * Test class for [TreeService.canPlayWood]
+ */
 class CanPlayWoodTest {
+
+    /**
+     * test canPlayWood return true
+     */
     @Test
-    fun `test canPlaceWoodTile returns true for valid play`() {
+    fun `test canPlayWood returns true for valid play`() {
         val rootService = RootService()
 
         //SETUP for game
@@ -61,6 +68,9 @@ class CanPlayWoodTest {
         assertTrue(rootService.treeService.canPlayWood())
     }
 
+    /**
+     * test canPlayWood return false
+     */
     @Test
     fun `test canPlaceWoodTile fails`() {
         val rootService = RootService()

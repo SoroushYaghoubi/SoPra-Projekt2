@@ -96,25 +96,22 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val currentPlayer = getCurrentPlayer()
 
         require(!canPlayWood())
-        require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF){"not a valid move"}
+        require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF) { "not a valid move" }
 
 
         require(isMinimalAndCorrect(tilePosition))
 
-            if(getNeighbourTiles(tilePosition).any{ it.second?.tileType == TileType.FRUIT })
-            {
-                getNeighbourTiles(tilePosition)
-                    .filter { it.second?.tileType == TileType.FRUIT }
-                    .forEach { currentPlayer.bonsaiTree.remove(it.first) }
-                currentPlayer.bonsaiTree.remove(tilePosition)
-                // TODO : check it another time !!!!!!
-                  }
-
-            else{
-                currentPlayer.bonsaiTree.remove(tilePosition)
-            }
+        if (getNeighbourTiles(tilePosition).any { it.second?.tileType == TileType.FRUIT }) {
+            getNeighbourTiles(tilePosition)
+                .filter { it.second?.tileType == TileType.FRUIT }
+                .forEach { currentPlayer.bonsaiTree.remove(it.first) }
+            currentPlayer.bonsaiTree.remove(tilePosition)
+            // TODO : check it another time !!!!!!
+        } else {
+            currentPlayer.bonsaiTree.remove(tilePosition)
+        }
         gameState.currentState = States.CHOOSE_ACTION
-                // Refresh GUI to reflect the updated tree
+        // Refresh GUI to reflect the updated tree
         onAllRefreshables { refreshAfterRemoveFromTree(tilePosition) }
 
         // update message
@@ -147,7 +144,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @return `true` if the tile is a **valid minimal removal**, otherwise `false`.
      * @throws IllegalStateException if no game or game state is active.
      */
-    fun isMinimalAndCorrect(tilePosition: Pair<Int, Int>) : Boolean{
+    fun isMinimalAndCorrect(tilePosition: Pair<Int, Int>): Boolean {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
         val gameState = game.currentBonsaiGameState
@@ -159,7 +156,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val removableLeafs2: MutableList<Pair<Int, Int>> = mutableListOf()
         leafTilesPositions.forEach { position ->
             val neighbourTiles = getNeighbourTiles(position)
-            if(neighbourTiles.any { it.second == null }) {
+            if (neighbourTiles.any { it.second == null }) {
                 if (neighbourTiles.all {
                         it.second == null ||
                                 it.second?.tileType == TileType.WOOD ||
@@ -192,7 +189,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      *         - The corresponding `Tile?` (or `null` if there is no tile at that position).
      * @throws IllegalStateException if no game or game state is active.
      */
-    private fun getNeighbourTiles(position : Pair<Int, Int>) : List<Pair<Pair<Int, Int>, Tile?>>{
+    private fun getNeighbourTiles(position: Pair<Int, Int>): List<Pair<Pair<Int, Int>, Tile?>> {
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -277,8 +274,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         gameState.currentState = States.REMOVE_TILES
         return false
     }
-
-
 
 
     /**

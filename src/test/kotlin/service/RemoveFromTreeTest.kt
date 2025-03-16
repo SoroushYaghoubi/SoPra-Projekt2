@@ -3,11 +3,17 @@ package service
 import entity.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 
+/**
+ * Test class for [TreeService.removeFromTree]
+ */
 class RemoveFromTreeTest {
+
+    /**
+     * test remove tiles from tree
+     */
     @Test
-    fun ` Remove only the chosen Tile test `(){
+    fun ` Remove only the chosen Tile test `() {
         val rootService = RootService()
 
         //SETUP for game
@@ -28,7 +34,7 @@ class RemoveFromTreeTest {
         val playerBonsaiTree = mutableMapOf(
             (0 to 0) to Tile(null, null, TileType.WOOD),
             (1 to -2) to Tile(null, null, TileType.LEAF),
-            (0 to -2) to Tile(null, null, TileType.LEAF) ,
+            (0 to -2) to Tile(null, null, TileType.LEAF),
             (-1 to -1) to Tile(null, null, TileType.LEAF),
             (0 to -1) to Tile(null, null, TileType.WOOD),
             (1 to -1) to Tile(null, null, TileType.LEAF),
@@ -48,14 +54,17 @@ class RemoveFromTreeTest {
         val game = BonsaiGame()
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
-        assert( rootService.treeService.isMinimalAndCorrect(Pair(1, -1)) )
+        assert(rootService.treeService.isMinimalAndCorrect(Pair(1, -1)))
         println(gameState.currentPlayer.bonsaiTree)
-        rootService.treeService.removeFromTree(Pair(1,-1))
+        rootService.treeService.removeFromTree(Pair(1, -1))
         println(gameState.currentPlayer.bonsaiTree)
     }
 
+    /**
+     * test remove tile from tree
+     */
     @Test
-    fun `Remove the chosen tile and the connected one`(){
+    fun `Remove the chosen tile and the connected one`() {
         val rootService = RootService()
 
         //SETUP for game
@@ -76,12 +85,12 @@ class RemoveFromTreeTest {
         val playerBonsaiTree = mutableMapOf(
             (0 to 0) to Tile(null, null, TileType.WOOD),
             (1 to -2) to Tile(null, null, TileType.LEAF),
-            (0 to -2) to Tile(null, null, TileType.LEAF) ,
+            (0 to -2) to Tile(null, null, TileType.LEAF),
             (-1 to -1) to Tile(null, null, TileType.LEAF),
             (0 to -1) to Tile(null, null, TileType.WOOD),
             (1 to -1) to Tile(null, null, TileType.LEAF),
             (-1 to -2) to Tile(null, null, TileType.FRUIT),
-            (1 to -3) to Tile(null, null, TileType.FRUIT) ,
+            (1 to -3) to Tile(null, null, TileType.FRUIT),
             (2 to -2) to Tile(null, null, TileType.FRUIT),
         )
 
@@ -100,17 +109,17 @@ class RemoveFromTreeTest {
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
         rootService.treeService.isMinimalAndCorrect(Pair(1, -1))
-        assertEquals(9 , gameState.currentPlayer.bonsaiTree.size)
+        assertEquals(9, gameState.currentPlayer.bonsaiTree.size)
         println(gameState.currentPlayer.bonsaiTree)
-        rootService.treeService.removeFromTree(Pair(1,-1))
+        rootService.treeService.removeFromTree(Pair(1, -1))
         println(gameState.currentPlayer.bonsaiTree)
-        assertEquals(7 , gameState.currentPlayer.bonsaiTree.size)
-        gameState.currentPlayer.bonsaiTree[Pair(1,-1)] = Tile(null, null ,TileType.LEAF)
-        gameState.currentPlayer.bonsaiTree[Pair(2,-2)] = Tile(null, null ,TileType.FLOWER)
+        assertEquals(7, gameState.currentPlayer.bonsaiTree.size)
+        gameState.currentPlayer.bonsaiTree[Pair(1, -1)] = Tile(null, null, TileType.LEAF)
+        gameState.currentPlayer.bonsaiTree[Pair(2, -2)] = Tile(null, null, TileType.FLOWER)
         rootService.treeService.isMinimalAndCorrect(Pair(1, -1))
-        rootService.treeService.removeFromTree(Pair(1,-1))
+        rootService.treeService.removeFromTree(Pair(1, -1))
         println(gameState.currentPlayer.bonsaiTree)
-        assertEquals(8  , gameState.currentPlayer.bonsaiTree.size)
+        assertEquals(8, gameState.currentPlayer.bonsaiTree.size)
     }
 
 }
