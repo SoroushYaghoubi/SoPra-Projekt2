@@ -278,6 +278,146 @@ class BonsaiGameScene(private val rootService: RootService) :
         spacing = 13
     )
 
+    private val undoButton =
+        Button(
+            posX = 20, // Adjusted to fit within the buttonPane
+            posY = 30, // Adjusted to fit within the buttonPane
+            width = 50,
+            height = 40,
+            visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
+            text = "⬅", // Thick left arrow Unicode symbol
+            font = Font(36) // Adjust font size as needed
+        )
+
+    private val redoButton =
+        Button(
+            posX = 230, // Adjusted to fit within the buttonPane
+            posY = 30, // Adjusted to fit within the buttonPane
+            width = 50,
+            height = 40,
+            visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
+            text = "➡", // Thick right arrow Unicode symbol
+            font = Font(36) // Adjust font size as needed
+        )
+
+    private val saveButton =
+        Button(
+            posX = 20, // Adjusted to fit within the buttonPane
+            posY = 100, // Adjusted to fit within the buttonPane
+            width = 260,
+            height = 35,
+            visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
+            text = "SAVE GAME",
+            font = Font(36)
+        )
+
+
+
+    private fun createRightSidePane() {
+        val gameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(gameState) { "Game state is not initialized." }
+
+        // sorted goal tiles in order: brown, green, orange, pink, blue
+        val sortedGoalTiles = gameState.goalTiles.sortedBy {
+            when (it.goalTileType) {
+                GoalTileType.BROWN -> 0
+                GoalTileType.GREEN -> 1
+                GoalTileType.ORANGE -> 2
+                GoalTileType.PINK -> 3
+                GoalTileType.BLUE -> 4
+            }
+        }.map { it.goalTileType }
+
+        // right side pane
+        val buttonPane = Pane<UIComponent>(
+            posX = 1600,
+            posY = 20,
+            width = 300,
+            height = 1040,
+            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        )
+
+        // undo, redo, and save buttons
+        buttonPane.add(undoButton)
+        buttonPane.add(redoButton)
+        buttonPane.add(saveButton)
+
+        // player buttons below the save button
+        val playerButtonsY = saveButton.posY + saveButton.height + 20
+        val playerButtonHeight = 35
+        val playerButtonSpacing = 20
+
+        // number of necessary player buttons
+        val numberOfPlayerButtons = gameState.players.size - 1
+
+        // created player buttons
+        for (i in 0 until numberOfPlayerButtons) {
+            // current player needs no buttons
+            val player = gameState.players[i + 1]
+            val playerButton = Button(
+                posX = saveButton.posX,
+                posY = playerButtonsY + (playerButtonHeight + playerButtonSpacing) * i,
+                width = saveButton.width,
+                height = playerButtonHeight,
+                visual = ColorVisual(Color(0xffffff)).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                },
+                text = player.name,
+                font = Font(20)
+            )
+
+            buttonPane.add(playerButton)
+        }
+
+        val buttonHeight = 45
+        val buttonSpacing = 30
+        var currentY = 370
+
+        // need 6 goal tiles for 2 players and 9 for 3
+        val numberOfButtons = if (gameState.players.size == 2) 6 else 9
+
+        // create goal tile buttons in correct order
+        for (i in 0 until numberOfButtons) {
+            val goalTileType = sortedGoalTiles[i % sortedGoalTiles.size]
+            val button = Button(
+                posX = 20,
+                posY = currentY,
+                width = 260,
+                height = buttonHeight,
+                visual = ColorVisual(Color(getColorForGoalTile(goalTileType))).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                },
+                text = goalTileType.name,
+                font = Font(20)
+            )
+
+            buttonPane.add(button)
+            currentY += buttonHeight + buttonSpacing
+        }
+
+        // add panel to the scene
+        addComponents(buttonPane)
+    }
+
+    private fun getColorForGoalTile(goalTileType: GoalTileType): Int {
+        return when (goalTileType) {
+            GoalTileType.BROWN -> COLOUR_WOOD
+            GoalTileType.GREEN -> COLOUR_LEAF
+            GoalTileType.ORANGE -> COLOUR_FRUIT
+            GoalTileType.PINK -> COLOUR_FLOWER
+            GoalTileType.BLUE -> COLOUR_BLUE
+        }
+    }
+
+
 
 
 
@@ -292,7 +432,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         addComponents(leafSupply, woodSupply, flowerSupply, fruitSupply,
             zenCardPane, infoPane, interactionPane, collectedCardPane,
             removeButton, meditateButton, cultivateButton, endTurnButton,
-            zenDeckView, faceUpCards)
+            zenDeckView, faceUpCards,)
     }
 
     //components for the tree boards
@@ -429,6 +569,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
         addComponents(treePane)
         initZenBoard()
+        createRightSidePane()
     }
 
     override fun refreshAfterCultivateStart() {
