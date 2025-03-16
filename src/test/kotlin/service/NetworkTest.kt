@@ -5,14 +5,14 @@ import kotlin.test.*
 /**
  * Test class for [NetworkService]
  */
-class NetworkScenarios {
+class NetworkTest {
 
     /**
      * Tests a whole network session with the server, including handshakes, game init and game messages. But only
      * things regarding network. For example if the messages are being interpreted correctly, is not being tested here.
      */
     @Test
-    fun `scenario total`(){
+    fun `scenario total`() {
         val hostNet = RootService().networkService
         val joinNet = RootService().networkService
 
@@ -37,7 +37,6 @@ class NetworkScenarios {
         // --------------- receive messages ---------------
 
 
-
         // ---------------------------------------------------------
         // --------------- operational bracket ]]]]] ---------------
         // ---------------------------------------------------------
@@ -45,4 +44,5 @@ class NetworkScenarios {
         hostNet.disconnect()
         assertEquals(hostNet.connectionState, ConnectionState.DISCONNECTED)
     }
+
 }
