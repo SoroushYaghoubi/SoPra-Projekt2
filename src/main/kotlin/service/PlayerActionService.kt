@@ -238,7 +238,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         // let the game know at endTurn() that it should send cultivateMessage
         if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
-            currentPlayer.isLocal) {
+            currentPlayer.isLocal
+        ) {
             rootService.networkService.hasCultivated = true
         }
 
@@ -273,9 +274,14 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         // When the counter = the number of players -> all players finish their last turn
         if (gameState.endGameCounter == gameState.players.size) {
+            // Calculate score for all players before showing the winner
+            gameState.players.forEach { player ->
+                player.score = rootService.gameService.calculateScore(player)[5]
+            }
             rootService.gameService.showWinner()
         } else {
-            rootService.gameService.calculateScore()
+            gameState.currentPlayer.score = rootService.gameService.calculateScore(gameState.currentPlayer)[5]
+
             rootService.gameService.switchPlayerTurn()
         }
 
@@ -284,7 +290,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val net = rootService.networkService
         // if it's online and we're the local player
         if (net.connectionState != ConnectionState.DISCONNECTED &&
-            getCurrentPlayer().isLocal) {
+            getCurrentPlayer().isLocal
+        ) {
             // if we cultivated then send cultivateMessage
             if (net.hasCultivated) {
                 net.sendCultivateMessage()
@@ -323,7 +330,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val player = getCurrentPlayer()
         val net = rootService.networkService
 
-        require (canClaimOrRenounceGoal(goalTileType, tier))
+        require(canClaimOrRenounceGoal(goalTileType, tier))
 
 
         // if the goal tile requirement is reached, get goal tile based on the claim
@@ -333,11 +340,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 if (tile.goalTileType == goalTileType && tile.tier == tier) {
                     player.claimedGoals.add(tile)
                     true
-                }else false
+                } else false
             }
             // update message
             if (net.connectionState != ConnectionState.DISCONNECTED &&
-                player.isLocal) {
+                player.isLocal
+            ) {
                 net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
             }
         } else {
@@ -345,7 +353,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 if (tile.goalTileType == goalTileType && tile.tier == tier) {
                     player.renouncedGoals.add(tile)
                     true
-                }else false
+                } else false
             }
             // update message
             if (net.connectionState != ConnectionState.DISCONNECTED &&
@@ -360,45 +368,45 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         /**
         // checks if a player has already claimed a goal tile from a specific tile type
         for (goalTile in gameState.goalTiles.flatten()) {
-            if (player.claimedGoals.any { it.goalTileType == goalTile.goalTileType }) {
-                continue
-            }
-            // checks if player has renounced the current goal tile
-            if (goalTile in player.renouncedGoals) {
-                continue
-            }
-
-            // checks if one of the goal tile requirements is reached
-            if (canClaimOrRenounceGoal(goalTile.goalTileType, goalTile.tier)) {
-                // if the goal tile requirement is reached, get goal tile based on the claim
-                if (claim) {
-                    player.claimedGoals.add(goalTile)
-                    // update message
-                    if (net.connectionState != ConnectionState.DISCONNECTED &&
-                        player.isLocal
-                    ) {
-                        net.toBeSentCultivateMessage.claimedGoals.add((goalTile.goalTileType to goalTile.tier))
-                    }
-                    // remove the claimed goal tile from the list
-                    for (goalTileList in gameState.goalTiles) {
-                        if (goalTileList.contains(goalTile)) {
-                            goalTileList.remove(goalTile)
-                            break
-                        }
-                    }
-                } else {
-                    player.renouncedGoals.add(goalTile)
-                    // update message
-                    if (net.connectionState != ConnectionState.DISCONNECTED &&
-                        player.isLocal
-                    ) {
-                        net.toBeSentCultivateMessage.renouncedGoals.add((goalTile.goalTileType to goalTile.tier))
-                    }
-                    break
-                }
-            }
+        if (player.claimedGoals.any { it.goalTileType == goalTile.goalTileType }) {
+        continue
         }
-        */
+        // checks if player has renounced the current goal tile
+        if (goalTile in player.renouncedGoals) {
+        continue
+        }
+
+        // checks if one of the goal tile requirements is reached
+        if (canClaimOrRenounceGoal(goalTile.goalTileType, goalTile.tier)) {
+        // if the goal tile requirement is reached, get goal tile based on the claim
+        if (claim) {
+        player.claimedGoals.add(goalTile)
+        // update message
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+        player.isLocal
+        ) {
+        net.toBeSentCultivateMessage.claimedGoals.add((goalTile.goalTileType to goalTile.tier))
+        }
+        // remove the claimed goal tile from the list
+        for (goalTileList in gameState.goalTiles) {
+        if (goalTileList.contains(goalTile)) {
+        goalTileList.remove(goalTile)
+        break
+        }
+        }
+        } else {
+        player.renouncedGoals.add(goalTile)
+        // update message
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+        player.isLocal
+        ) {
+        net.toBeSentCultivateMessage.renouncedGoals.add((goalTile.goalTileType to goalTile.tier))
+        }
+        break
+        }
+        }
+        }
+         */
 
     }
 
@@ -422,7 +430,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         if (player.claimedGoals.any { it.goalTileType == goalTileType }) {
             return false
         }
-        if(player.renouncedGoals.any{it.goalTileType == goalTileType && it.tier == tier }) {
+        if (player.renouncedGoals.any { it.goalTileType == goalTileType && it.tier == tier }) {
             return false
         }
 

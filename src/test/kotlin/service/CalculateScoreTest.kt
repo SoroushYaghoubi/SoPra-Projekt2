@@ -222,7 +222,7 @@ class CalculateScoreTest {
 
         checkNotNull(gameState) { "No active game state." }
 
-        assertEquals(100, rootService.gameService.calculateScore())
+        assertEquals(intArrayOf(39, 14, 19, 5, 23, 100).toList(), rootService.gameService.calculateScore(player = gameState.currentPlayer))
 
     }
 }

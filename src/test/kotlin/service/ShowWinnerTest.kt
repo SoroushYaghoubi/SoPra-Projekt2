@@ -72,35 +72,36 @@ class ShowWinnerTest {
 
         assertEquals(expectedWinnerNames, winnerNames)
     }
-     /**
+
+    /**
      * Tests if the winner order is correct in case of a two player tie
      */
 
     @Test
     fun testTieWithTwoPlayers() {
-         val rootService = setUpGame()
-         val gameService = rootService.gameService
-         val gameState = rootService.currentGame?.currentBonsaiGameState
-         checkNotNull(gameState) { "Game state is null." }
-         gameState.endGameCounter = gameState.players.size
+        val rootService = setUpGame()
+        val gameService = rootService.gameService
+        val gameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(gameState) { "Game state is null." }
+        gameState.endGameCounter = gameState.players.size
 
-         // Set scores
-         gameState.players[0].score = 10
-         gameState.players[1].score = 70
-         gameState.players[2].score = 70
-         gameState.players[3].score = 5
+        // Set scores
+        gameState.players[0].score = 10
+        gameState.players[1].score = 70
+        gameState.players[2].score = 70
+        gameState.players[3].score = 5
 
-         gameService.showWinner()
+        gameService.showWinner()
 
-         val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
-             .thenByDescending { gameState.players.indexOf(it) })
+        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+            .thenByDescending { gameState.players.indexOf(it) })
 
-         val winnerNames = winnerOrder.map { it.name }
+        val winnerNames = winnerOrder.map { it.name }
 
-         val expectedWinnerNames = listOf("Tom3", "Tom2", "Tom", "Tom4")
+        val expectedWinnerNames = listOf("Tom3", "Tom2", "Tom", "Tom4")
 
-         assertEquals(expectedWinnerNames, winnerNames)
-     }
+        assertEquals(expectedWinnerNames, winnerNames)
+    }
 
     /**
      * Tests if the winner order is correct in case of a three player tie
@@ -150,19 +151,20 @@ class ShowWinnerTest {
         gameState.players[2].score = 10
         gameState.players[3].score = 10
 
-        gameService.showWinner()
+        //gameService.showWinner()
 
-        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
-            .thenByDescending { gameState.players.indexOf(it) })
-
-        val winnerNames = winnerOrder.map { it.name }
-
+//        val winnerOrder = gameState.players.sortedWith(compareByDescending<Player> { it.score }
+//            .thenByDescending { gameState.players.indexOf(it) })
+//
+//        val winnerNames = winnerOrder.map { it.name }
+//
+//        println(winnerOrder)
         val expectedWinnerNames = listOf("Tom4", "Tom3", "Tom2", "Tom")
-
-        assertEquals(expectedWinnerNames, winnerNames)
+        println("Test: " + gameService.showWinner())
+        assertEquals(expectedWinnerNames, gameService.showWinner().map { it.name })
     }
 
-     /**
+    /**
      * Tests if show winner fails if no game was started
      */
 

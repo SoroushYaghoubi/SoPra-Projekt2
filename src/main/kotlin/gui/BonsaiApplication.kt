@@ -7,7 +7,7 @@ import tools.aqua.bgw.util.Font
 /**
  * The [BonsaiApplication] is a [BoardGameApplication] that is the main class of the application
  */
-class BonsaiApplication : BoardGameApplication("Bonsai", 1920,1080), Refreshable {
+class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshable {
 
     private val rootService = RootService()
     private val mainMenuScene = MainMenuScene(this)
@@ -17,6 +17,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920,1080), Refreshable
     private val hostScene = HostScene()
     private val waitingScene = WaitingScene()
     private val startSessionScene = StartSessionScene(this)
+    private val showResultScene = ResultScene(this, rootService)
 
     init {
         rootService.addRefreshables(
@@ -27,10 +28,11 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920,1080), Refreshable
             configureGameMenuScene,
             joinScene,
             hostScene,
-            startSessionScene
+            startSessionScene,
+            showResultScene
         )
 
-        loadFont("arial_black.ttf", "Arial Black" , Font.FontWeight.NORMAL)
+        loadFont("arial_black.ttf", "Arial Black", Font.FontWeight.NORMAL)
         //this.showGameScene(gameScene)
         this.showMenuScene(mainMenuScene)
     }
