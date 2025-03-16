@@ -54,27 +54,27 @@ class IsMinimalAndCorrectTest {
 
             (2 to -7) to Tile(null, null, TileType.FRUIT)
         )
-
+        gameState.currentPlayer.bonsaiTree = playerBonsaiTree
         val game = BonsaiGame()
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
-        assert(rootService.treeService.isMinimalAndCorrect(Pair(1, -1)))
-        assert(rootService.treeService.isMinimalAndCorrect(Pair(-1, -1)))
-        assert(rootService.treeService.isMinimalAndCorrect(Pair(2, -2)))
-        assert(rootService.treeService.isMinimalAndCorrect(Pair(0, -4)))
-        assert(rootService.treeService.isMinimalAndCorrect(Pair(4, -6)))
-        assertFalse(rootService.treeService.isMinimalAndCorrect(Pair(-1, -3)))
-        assertFalse(rootService.treeService.isMinimalAndCorrect(Pair(3, -3)))
-        assertFalse(rootService.treeService.isMinimalAndCorrect(Pair(4, -5)))
-        assertFalse(rootService.treeService.isMinimalAndCorrect(Pair(1, -6)))
-        assertFalse(rootService.treeService.isMinimalAndCorrect(Pair(2, -6)))
+         assert( rootService.treeService.isMinimalAndCorrect(Pair(1, -1)) )
+         assert( rootService.treeService.isMinimalAndCorrect(Pair(-1, -1)) )
+         assert( rootService.treeService.isMinimalAndCorrect(Pair(2, -2)) )
+         assert( rootService.treeService.isMinimalAndCorrect(Pair(0, -4)) )
+         assert( rootService.treeService.isMinimalAndCorrect(Pair(4, -6)) )
+         assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(-1, -3)) )
+         assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(3, -3)) )
+         assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(4, -5)) )
+         assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(1, -6)) )
+         assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(2, -6)) )
     }
 
     /**
      * other test case minimal removal
      */
     @Test
-    fun `test another time `() {
+    fun `test another time `(){
         val rootService = RootService()
 
         //SETUP for game
@@ -120,12 +120,12 @@ class IsMinimalAndCorrectTest {
         val game = BonsaiGame()
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
-        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(-1, -1)))
-        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(1, -1)))
-        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(-1, -3)))
-        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(4, -5)))
-        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(1, -6)))
-        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(2, -6)))
-        assertFalse(rootService.treeService.isMinimalAndCorrect(Pair(5, -5)))
+        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(-1, -1)) )
+        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(1, -1)) )
+        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(-1, -3)) )
+        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(4, -5)) )
+        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(1, -6)) )
+        assertEquals(true, rootService.treeService.isMinimalAndCorrect(Pair(2, -6)) )
+        assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(5, -5)))
     }
 }
