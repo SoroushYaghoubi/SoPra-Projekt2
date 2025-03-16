@@ -136,7 +136,31 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         // TODO(some of its code should be implemented in other service classes)
         // TODO(for the example, please check playTile())
 
+        // --------------- prologue: state check ---------------
+        check(connectionState == ConnectionState.PLAYING_MY_TURN)
+        { "currently not expecting your turn." }
 
+        // --------------- main functionality ---------------
+        client?.sendGameActionMessage(
+            MeditateMessage(
+                toBeSentMeditateMessage
+                    .removedTilesAxialCoordinates.map { it },
+                toBeSentMeditateMessage
+                    .chosenCardPosition,
+                toBeSentMeditateMessage
+                    .playedTiles    .map { (it.first.toTileTypeMessage() to it.second) },
+                toBeSentMeditateMessage
+                    .drawnTiles     .map { it.toTileTypeMessage() },
+                toBeSentMeditateMessage
+                    .claimedGoals   .map { (it.first.toGoalTileTypeMessage() to it.second + 1) },
+                toBeSentMeditateMessage
+                    .renouncedGoals .map { (it.first.toGoalTileTypeMessage() to it.second + 1) },
+                toBeSentMeditateMessage
+                    .discardedTiles .map { it.toTileTypeMessage() },
+            )
+        )
+
+        // --------------- epilogue: state update ---------------
         toBeSentMeditateMessage.removedTilesAxialCoordinates.clear()
         toBeSentCultivateMessage.removedTilesAxialCoordinates.clear()
         toBeSentMeditateMessage.playedTiles.clear()
@@ -145,6 +169,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         toBeSentMeditateMessage.drawnTiles.clear()
         toBeSentMeditateMessage.discardedTiles.clear()
         toBeSentMeditateMessage.chosenCardPosition = 4
+        updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
     }
 
     /**
