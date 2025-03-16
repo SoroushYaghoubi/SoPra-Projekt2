@@ -29,7 +29,7 @@ data class Player(
     val isLocal: Boolean,
     val color: ColorType
 ) {
-    var bonsaiTree: MutableMap<Pair<Int, Int>, Tile> = mutableMapOf((0 to 0) to Tile(null, null, TileType.WOOD))
+    var bonsaiTree: MutableMap<Pair<Int, Int>, Tile> = mutableMapOf((0 to 0) to Tile(0, 0, TileType.WOOD))
 
     var personalSupply: MutableList<Tile> = mutableListOf()
     var collectedCards: MutableList<Card> = mutableListOf()
