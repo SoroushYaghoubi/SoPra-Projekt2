@@ -3,6 +3,7 @@ package gui
 import entity.*
 import service.RootService
 import tools.aqua.bgw.components.ComponentView
+import tools.aqua.bgw.components.container.Area
 import tools.aqua.bgw.components.container.CardStack
 import tools.aqua.bgw.components.container.HexagonGrid
 import tools.aqua.bgw.components.container.LinearLayout
@@ -24,6 +25,7 @@ import tools.aqua.bgw.visual.CompoundVisual
 import tools.aqua.bgw.visual.ImageVisual
 import tools.aqua.bgw.visual.TextVisual
 import util.*
+import kotlin.math.E
 
 /**
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
@@ -40,9 +42,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     // button for cultivate
     private val cultivateButton =
         Button(
-            posX = 380,
+            posX = 360,
             posY = 270,
-            width = 160,
+            width = 150,
             height = 80,
             visual = ColorVisual(Color(0xffffff)).apply {
                 style.borderRadius = BorderRadius(20.0)
@@ -58,9 +60,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     // button for meditate
     private val meditateButton =
         Button(
-            posX = 200,
+            posX = 190,
             posY = 270,
-            width = 160,
+            width = 150,
             height = 80,
             visual = ColorVisual(Color(0xffffff)).apply {
                 style.borderRadius = BorderRadius(20.0)
@@ -74,12 +76,34 @@ class BonsaiGameScene(private val rootService: RootService) :
         Button(
             posX = 20,
             posY = 270,
-            width = 160,
+            width = 150,
             height = 80,
             visual = ColorVisual(Color(0xffffff)).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
             text = "remove",
+            font = Font(36)
+        ).apply {
+            // Testing to skip a player's turn
+            onMouseClicked = {
+                val game = rootService.currentGame?.currentBonsaiGameState
+                checkNotNull(game)
+                rootService.playerActionService.cultivate()
+                rootService.playerActionService.endTurn()
+            }
+        }
+
+    // button for end turn
+    private val endTurnButton =
+        Button(
+            posX = 1400,
+            posY = 270,
+            width = 150,
+            height = 80,
+            visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
+            text = "EndTurn",
             font = Font(36)
         )
 
@@ -122,9 +146,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     // pane for the interaction
     private val interactionPane =
         Pane<UIComponent>(
-            posX = 560,
+            posX = 540,
             posY = 260,
-            width = 1000,
+            width = 840,
             height = 100,
             visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
                 style.borderRadius = BorderRadius(20.0)
@@ -204,9 +228,14 @@ class BonsaiGameScene(private val rootService: RootService) :
                 font = Font(30.0, Color(0x000000))
             )
         ),
-        size = 60
+       size = 60
     ).apply {
-        // TODO()
+            this.isDraggable  = true
+            this.onDragGestureEnded = { _, success ->
+                if (success) {
+                    this.isDraggable = false
+                }
+            }
     }
 
     private val flowerSupply = HexagonView(
@@ -262,7 +291,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     init {
         addComponents(leafSupply, woodSupply, flowerSupply, fruitSupply,
             zenCardPane, infoPane, interactionPane, collectedCardPane,
-            removeButton, meditateButton, cultivateButton,
+            removeButton, meditateButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards)
     }
 
@@ -323,14 +352,40 @@ class BonsaiGameScene(private val rootService: RootService) :
         game.currentPlayer.bonsaiTree.getEmptyTiles().forEach{
             val hexagon = HexagonView(
                 visual = CompoundVisual(
-                    ColorVisual(Color.WHITE),
+                    ColorVisual(255,255,255, 0.3),
                     TextVisual(
                         text = "${it.first}, ${it.second}",
                         font = Font(10.0, Color(0x000000))
                     )
                 ),
                 size = 30
-            )
+            ).apply {
+                val emptyTile = Tile(it.first, it.second, TileType.EMPTY)
+                treeTileMap.add(emptyTile to this)
+                this.dropAcceptor = { dragEvent ->
+                    when (dragEvent.draggedComponent) {
+                        is HexagonView -> {
+                            val q = treeTileMap.backward(this).q
+                            val r = treeTileMap.backward(this).r
+                            val tile = Tile(q, r, TileType.LEAF)
+                            treeTileMap.remove(emptyTile to this)
+                            // TODO it needs to map to new hexagon
+                            treeTileMap.add(tile to this)
+                            // TODO temperory for the view
+                            visual = CompoundVisual(
+                                ColorVisual(255,255,255, 0.3),
+                                TextVisual(
+                                    text = "${it.first}, ${it.second}",
+                                    font = Font(10.0, Color(COLOUR_LEAF))
+                                ))
+                            rootService.treeService.playTile(tile,
+                                (q as Int to r as Int))
+                            dragEvent.draggedComponent == this
+                        }
+                        else -> false
+                    }
+                }
+            }
             treeHexagonGrid[it.first, it.second] = hexagon
         }
     }
@@ -362,6 +417,8 @@ class BonsaiGameScene(private val rootService: RootService) :
             faceUpCards.add(cardView)
             zenCardMap.add(it to cardView)
         }
+        println(game.zenDeck.size)
+        println(game.faceUpCards.size)
     }
 
     //refresher do something
@@ -390,7 +447,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                 cardView.apply {
                     card.apply {
                         frontVisual = CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n" +"___${card.tileType}___"))
+                            TextVisual("${card.cardType}\n" +"___${card.tileType}___",
+                            font = Font(15)))
                     }
                 }
             }
