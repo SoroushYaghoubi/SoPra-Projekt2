@@ -1,3 +1,110 @@
+//package service
+//
+//import entity.*
+//import org.junit.jupiter.api.Assertions.assertEquals
+//import kotlin.test.Test
+//
+///**
+// * Test class for [GameService.calculateScore]
+// */
+//class CalculateScoreTest {
+//
+//    //The game state
+//    private fun setUpGame(): RootService {
+//        val rootService = RootService()
+//
+//        //SETUP for game
+//        val players = mutableListOf(
+//            Player("Alice", PlayerType.HUMAN, true, ColorType.RED),
+//            Player("Bob", PlayerType.HUMAN, true, ColorType.BLUE),
+//            Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
+//        )
+//
+//        ///val zenDeck = mutableListOf()
+//
+//        val faceUpCards = mutableListOf(
+//            MasterCard(mutableListOf(TileType.LEAF, TileType.LEAF), 26),
+//            MasterCard(mutableListOf(TileType.ANY), 26)
+//        )
+//
+//        val gameState = BonsaiGameState(
+//            currentPlayer = players.first(),
+//            players = players,
+//            botSpeed = 1,
+//            currentState = States.END_TURN
+//        )
+//
+//        gameState.zenDeck.isEmpty()
+//        gameState.faceUpCards.addAll(faceUpCards)
+//
+//        //SETUP for player
+//
+//        val playerBonsaiTree = mutableMapOf(
+//            (0 to 0) to Tile(null, null, TileType.WOOD),
+//            (-1 to -1) to Tile(null, null, TileType.LEAF), (0 to -1) to Tile(null, null, TileType.WOOD),
+//
+//            (-1 to -2) to Tile(null, null, TileType.FLOWER), (0 to -2) to Tile(null, null, TileType.WOOD),
+//            (1 to -2) to Tile(null, null, TileType.WOOD), (2 to -2) to Tile(null, null, TileType.LEAF),
+//            (3 to -2) to Tile(null, null, TileType.FLOWER),
+//
+//            (0 to -3) to Tile(null, null, TileType.FLOWER), (1 to -3) to Tile(null, null, TileType.LEAF),
+//            (2 to -3) to Tile(null, null, TileType.LEAF),
+//
+//            (2 to -4) to Tile(null, null, TileType.FRUIT)
+//        )
+//
+//        //3flowers with 11 sides be untouched
+//        //4leaves x 3 = 12
+//        //1fruit x 7 = 7
+//        //sum 30
+//
+//        val playerCollectedCard = mutableListOf(
+//            MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
+//            HelperCard(TileType.LEAF, 35),
+//            GrowthCard(TileType.LEAF, 3),
+//            MasterCard(mutableListOf(TileType.ANY), 24),
+//            ParchmentCard(TileType.FRUIT, null, 2, 38),
+//            ParchmentCard(null, CardType.MASTERCARD, 2, 38)
+//        )
+//        //parchmentCard fruit with 1 collected fruit tile = 2
+//        //parchmentCard with 2 collected mastercards = 2 x 2 = 4
+//        //sum 6
+//        val playerClaimedGoal = mutableListOf(
+//            GoalTile(GoalTileType.GREEN, 5, 6),
+//            GoalTile(GoalTileType.PINK, 4, 12),
+//        )
+//        //points: 18
+//        //total 32 + 6 + 18 = 56
+//        gameState.currentPlayer.collectedCards = playerCollectedCard
+//        gameState.currentPlayer.bonsaiTree = playerBonsaiTree
+//        gameState.currentPlayer.claimedGoals = playerClaimedGoal
+//
+//        val game = BonsaiGame()
+//        game.currentBonsaiGameState = gameState
+//
+//        rootService.currentGame = game
+//
+//        return rootService
+//    }
+//
+//    /**
+//     *
+//     */
+//
+//    @Test
+//    fun `test calculate score `() {
+//        val rootService = setUpGame()
+//        val game = rootService.currentGame
+//        checkNotNull(game)
+//        val gameState = game.currentBonsaiGameState
+//
+//        checkNotNull(gameState) { "No active game state." }
+//
+//        assertEquals(54, rootService.gameService.calculateScore())
+//
+//    }
+//}
+
 package service
 
 import entity.*
@@ -41,40 +148,55 @@ class CalculateScoreTest {
 
         val playerBonsaiTree = mutableMapOf(
             (0 to 0) to Tile(null, null, TileType.WOOD),
-            (-1 to -1) to Tile(null, null, TileType.LEAF), (0 to -1) to Tile(null, null, TileType.WOOD),
+            (-2 to -1) to Tile(null, null, TileType.FLOWER),
+            (-1 to -1) to Tile(null, null, TileType.LEAF),
+            (0 to -1) to Tile(null, null, TileType.WOOD),
 
-            (-1 to -2) to Tile(null, null, TileType.FLOWER), (0 to -2) to Tile(null, null, TileType.WOOD),
-            (1 to -2) to Tile(null, null, TileType.WOOD), (2 to -2) to Tile(null, null, TileType.LEAF),
-            (3 to -2) to Tile(null, null, TileType.FLOWER),
+            (-2 to -2) to Tile(null, null, TileType.FRUIT),
+            (-1 to -2) to Tile(null, null, TileType.LEAF),
+            (0 to -2) to Tile(null, null, TileType.LEAF),
+            (1 to -2) to Tile(null, null, TileType.WOOD),
+            (2 to -2) to Tile(null, null, TileType.LEAF),
 
-            (0 to -3) to Tile(null, null, TileType.FLOWER), (1 to -3) to Tile(null, null, TileType.LEAF),
-            (2 to -3) to Tile(null, null, TileType.LEAF),
+            (-1 to -3) to Tile(null, null, TileType.LEAF),
+            (0 to -3) to Tile(null, null, TileType.WOOD),
+            (1 to -3) to Tile(null, null, TileType.WOOD),
+            (2 to -3) to Tile(null, null, TileType.WOOD),
+            (3 to -3) to Tile(null, null, TileType.LEAF),
+            (4 to -3) to Tile(null, null, TileType.FLOWER),
 
-            (2 to -4) to Tile(null, null, TileType.FRUIT)
+            (0 to -4) to Tile(null, null, TileType.LEAF),
+            (1 to -4) to Tile(null, null, TileType.WOOD),
+            (2 to -4) to Tile(null, null, TileType.LEAF),
+            (3 to -4) to Tile(null, null, TileType.WOOD),
+
+            (0 to -5) to Tile(null, null, TileType.FLOWER),
+            (1 to -5) to Tile(null, null, TileType.WOOD),
+            (2 to -5) to Tile(null, null, TileType.LEAF),
+            (3 to -5) to Tile(null, null, TileType.LEAF),
+            (4 to -5) to Tile(null, null, TileType.LEAF),
+            (5 to -5) to Tile(null, null, TileType.FLOWER),
+
+            (1 to -6) to Tile(null, null, TileType.LEAF),
+            (2 to -6) to Tile(null, null, TileType.LEAF),
+            (3 to -6) to Tile(null, null, TileType.FLOWER),
+
+            (2 to -7) to Tile(null, null, TileType.FRUIT)
         )
-
-        //3flowers with 11 sides be untouched
-        //4leaves x 3 = 12
-        //1fruit x 7 = 7
-        //sum 30
 
         val playerCollectedCard = mutableListOf(
-            MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
-            HelperCard(TileType.LEAF, 35),
+            // MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
+            // HelperCard(TileType.LEAF, 35),
             GrowthCard(TileType.LEAF, 3),
             MasterCard(mutableListOf(TileType.ANY), 24),
-            ParchmentCard(TileType.FRUIT, null, 2, 38),
-            ParchmentCard(null, CardType.MASTERCARD, 2, 38)
+            ParchmentCard(TileType.LEAF, null, 1, 39),
+            ParchmentCard(TileType.FLOWER, null, 2, 37)
         )
-        //parchmentCard fruit with 1 collected fruit tile = 2
-        //parchmentCard with 2 collected mastercards = 2 x 2 = 4
-        //sum 6
+
         val playerClaimedGoal = mutableListOf(
-            GoalTile(GoalTileType.GREEN, 5, 6),
-            GoalTile(GoalTileType.PINK, 4, 12),
+            GoalTile(GoalTileType.BROWN, 0, 5)
         )
-        //points: 18
-        //total 32 + 6 + 18 = 56
+
         gameState.currentPlayer.collectedCards = playerCollectedCard
         gameState.currentPlayer.bonsaiTree = playerBonsaiTree
         gameState.currentPlayer.claimedGoals = playerClaimedGoal
@@ -88,7 +210,7 @@ class CalculateScoreTest {
     }
 
     /**
-     *
+     * Test for calculate score
      */
 
     @Test
@@ -100,7 +222,7 @@ class CalculateScoreTest {
 
         checkNotNull(gameState) { "No active game state." }
 
-        assertEquals(54, rootService.gameService.calculateScore())
+        assertEquals(100, rootService.gameService.calculateScore())
 
     }
 }

@@ -44,7 +44,8 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         // update message
         val net = rootService.networkService
         if (net.connectionState != ConnectionState.DISCONNECTED &&
-            currentPlayer.isLocal) {
+            currentPlayer.isLocal
+        ) {
             net.toBeSentCultivateMessage.playedTiles.add(
                 (tile.tileType to (tilePosition))
             )
@@ -56,7 +57,8 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         game.goalTiles.forEach {
             if (rootService.playerActionService.canClaimOrRenounceGoal(it.goalTileType, it.tier) &&
                 currentPlayer.isLocal &&
-                !currentPlayer.renouncedGoals.contains(it)){
+                !currentPlayer.renouncedGoals.contains(it)
+            ) {
                 // call claimOrRenounceGoal() in the gui layer
                 onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier) }
             }
@@ -79,6 +81,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * @throws IllegalStateException if there is no tile (bonsai tree is empty).
      */
     fun removeFromTree(tilePosition: Pair<Int, Int>) {
+
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -88,6 +91,14 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         gameState.currentState = States.DISCARDING
 
         val currentPlayer = getCurrentPlayer()
+
+        if (canPlayWood()) {
+            throw IllegalArgumentException("No need to remove")
+        }
+
+        if (!isMinimalRemoval(tilePosition)) {
+            throw IllegalArgumentException("Not minimal choice")
+        }
 
         // Remove the selected tile
         currentPlayer.bonsaiTree.remove(tilePosition)
@@ -128,7 +139,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
     /**
      * check if a [WOOD] can be placed in the tree .
      */
-    fun canPlayWood() :Boolean{
+    fun canPlayWood(): Boolean {
         val tree = getCurrentPlayer().bonsaiTree
         tree.filter { it.value.tileType == TileType.WOOD }
             .forEach { (position, tile) ->
@@ -146,12 +157,50 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 ).filter { it.first !in POT }
                 val nullPositions = neighbourTiles.filter { it.second == null }.map { it.first }
 
+                println("Null:$nullPositions")
                 if (nullPositions.isNotEmpty()) {
                     return true
                 }
             }
         return false
     }
+
+    fun isMinimalRemoval(positionToRemove: Pair<Int, Int>): Boolean {
+        val tree = getCurrentPlayer().bonsaiTree
+
+        // Get all WOOD tiles
+        val woodPositions = tree.filter { it.value.tileType == TileType.WOOD }.keys
+
+        // For each WOOD tile in the tree
+        for (woodPos in woodPositions) {
+            val (q, r) = woodPos
+
+            // All 6 axial neighbors around the WOOD tile
+            val neighborPositions = listOf(
+                Pair(q + 1, r),
+                Pair(q, r + 1),
+                Pair(q - 1, r + 1),
+                Pair(q - 1, r),
+                Pair(q, r - 1),
+                Pair(q + 1, r - 1)
+            )
+
+            // Check if positionToRemove is adjacent to this WOOD tile
+            if (positionToRemove in neighborPositions) {
+                // Now check if this WOOD tile has any other free neighbors (excluding the one we want to remove)
+                val otherFreeNeighbors = neighborPositions.filter { it != positionToRemove && it !in tree }
+
+                // If there are NO other free neighbors, then this removal is minimal to free space
+                if (otherFreeNeighbors.isEmpty()) {
+                    return true // Minimal removal: will create a necessary free neighbor
+                }
+            }
+        }
+
+        // If no WOOD tile would benefit from this removal, return false
+        return false
+    }
+
 
     /**
      * Checks if a bonsai tile can be played based on the game rules.
@@ -177,11 +226,13 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         //  TODO: you can import the POT from util
         val forbiddenPositions = setOf(
             Pair(-2, 0), Pair(-1, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0),
-            Pair(-2,1), Pair(-1, 1), Pair(0, 1), Pair(1, 1), Pair(2, 1)
+            Pair(-2, 1), Pair(-1, 1), Pair(0, 1), Pair(1, 1), Pair(2, 1)
         )
 
-        require(!currentPlayer.bonsaiTree.containsKey(tilePosition)
-                && tilePosition !in forbiddenPositions) { "Position is already occupied or is pot" }
+        require(
+            !currentPlayer.bonsaiTree.containsKey(tilePosition)
+                    && tilePosition !in forbiddenPositions
+        ) { "Position is already occupied or is pot" }
 
         val tree = currentPlayer.bonsaiTree
         val q = tilePosition.first

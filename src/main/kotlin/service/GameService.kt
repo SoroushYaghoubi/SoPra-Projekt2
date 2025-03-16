@@ -43,7 +43,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         var zenDeck = mutableListOf<Card>()
         val faceUpCards = mutableListOf<Card>()
-        if (!networkGame){
+        if (!networkGame) {
             // create the zenDeck depending on the number of players
             zenDeck = ZenCardLoader().readAllZenCards(playerOrder.size).shuffled().toMutableList()
             // put the first 4 cards face up
@@ -169,9 +169,9 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         // Calculate score for each tile
         val leaf = countTilesType(playersBonsaiTree, TileType.LEAF)
-        val flower = countTilesType(playersBonsaiTree, TileType.FLOWER)
+        //val flower = countTilesType(playersBonsaiTree, TileType.FLOWER)
         val fruit = countTilesType(playersBonsaiTree, TileType.FRUIT)
-        val wood = countTilesType(playersBonsaiTree, TileType.WOOD)
+        //val wood = countTilesType(playersBonsaiTree, TileType.WOOD)
 
         val scoreOfLeaf = leaf * 3
         val scoreOfFlower = calculateFlowerPoints(playersBonsaiTree)
