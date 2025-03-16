@@ -5,7 +5,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
+/**
+ * Test class for [TreeService.removeFromTree]
+ */
 class RemoveFromTreeTest {
+
+    /**
+     * Tests if only the chosen tiles are getting removed
+     */
     @Test
     fun ` Remove only the chosen Tile test `(){
         val rootService = RootService()
@@ -54,6 +61,9 @@ class RemoveFromTreeTest {
         println(gameState.currentPlayer.bonsaiTree)
     }
 
+    /**
+     * Tests if the connected tiles get removed as well
+     */
     @Test
     fun `Remove the chosen tile and the connected one`(){
         val rootService = RootService()

@@ -3,13 +3,14 @@ package service
 import entity.*
 import kotlin.test.*
 
-
+/**
+ * Test class for [TreeService.isMinimalAndCorrect]
+ */
 class IsMinimalAndCorrectTest {
 
     /**
      * test canPlaceWoodTile returns true for valid placement of leaf, wood, flower, fruit
      */
-
     @Test
     fun `test isMinimal`() {
         val rootService = RootService()
@@ -100,6 +101,9 @@ class IsMinimalAndCorrectTest {
          assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(2, -6)) )
     }
 
+    /**
+     * Tests the method with a different game state
+     */
     @Test
     fun `test another time `(){
         val rootService = RootService()
