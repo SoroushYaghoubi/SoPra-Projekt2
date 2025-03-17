@@ -1,15 +1,18 @@
 package gui
 
+import service.RootService
 import tools.aqua.bgw.components.uicomponents.Label
 import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.core.MenuScene
 import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.ImageVisual
+import util.DEFAULT_NAME
+import util.SECRET_KEY
 
 /**
  * The [StartSessionScene] for network play
  */
-class StartSessionScene(bonsaiApplication: BonsaiApplication) : MenuScene(
+class StartSessionScene(bonsaiApplication: BonsaiApplication, rootService: RootService) : MenuScene(
     1920, 1080, ImageVisual("Backgrounds/Hintergrund2.png", 1920, 1080)
 ), Refreshable {
 
@@ -28,6 +31,14 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication) : MenuScene(
             posY = 275,
             text = "",
             prompt = "SESSION ID",
+        )
+
+    private val nameTextField =
+        TextFieldStyle2(
+            posX = 875,
+            posY = 150,
+            text = "",
+            prompt = "PLAYER NAME",
         )
 
 
@@ -54,15 +65,21 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication) : MenuScene(
             text = "START SESSION",
         ).apply {
             onMouseClicked = {
-                // TODO
                 bonsaiApplication.hideMenuScene()
-
+                rootService.networkService
+                    .createGame (
+                        SECRET_KEY,
+                        if (nameTextField.text!="") nameTextField.text else DEFAULT_NAME,
+                        sessionTextField.text
+                    )
+                bonsaiApplication.showHostScene()
             }
         }
 
     init {
         addComponents(
             titleLabel,
+            nameTextField,
             sessionTextField,
             startSessionButton,
             backButton,
