@@ -6,9 +6,12 @@ import tools.aqua.bgw.core.MenuScene
 import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.ImageVisual
 
+/**
+ * The [StartSessionScene] for network play
+ */
 class StartSessionScene(bonsaiApplication: BonsaiApplication) : MenuScene(
-    1920,1080, ImageVisual("Backgrounds/Hintergrund2.png",1920,1080)
-) , Refreshable {
+    1920, 1080, ImageVisual("Backgrounds/Hintergrund2.png", 1920, 1080)
+), Refreshable {
 
     private val titleLabel = Label(
         0,
@@ -16,7 +19,8 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication) : MenuScene(
         800,
         210,
         "BONSAI",
-        font = Font(164.0, Color(0x000000), "Arial Black", Font.FontWeight.BOLD),)
+        font = Font(164.0, Color(0x000000), "Arial Black", Font.FontWeight.BOLD),
+    )
 
     private val sessionTextField =
         TextFieldStyle2(

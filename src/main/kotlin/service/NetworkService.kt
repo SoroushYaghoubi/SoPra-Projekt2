@@ -12,11 +12,13 @@ import util.ZenCardLoader
  */
 class NetworkService(private val rootService: RootService) : AbstractRefreshingService() {
 
+    /** URL of the BGW net server hosted for SoPra participants
+     * Name of the game as registered with the server
+     * */
     companion object {
-        /** URL of the BGW net server hosted for SoPra participants */
+
         const val SERVER_ADDRESS = "sopra.cs.tu-dortmund.de:80/bgw-net/connect"
 
-        /** Name of the game as registered with the server */
         const val GAME_ID = "Bonsai"
     }
 
@@ -36,7 +38,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
     )
     var toBeSentCultivateMessage = MutableCultivateMessage(
-        mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
+        mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
+    )
 
     var hasCultivated = false
     var hasMeditated = false
@@ -132,6 +135,9 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
     }
 
+    /**
+     * Holds the message to be sent for a Meditate action.
+     */
     fun sendMeditateMessage() {
         // TODO(some of its code should be implemented in other service classes)
         // TODO(for the example, please check playTile())
@@ -148,15 +154,15 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                 toBeSentMeditateMessage
                     .chosenCardPosition,
                 toBeSentMeditateMessage
-                    .playedTiles    .map { (it.first.toTileTypeMessage() to it.second) },
+                    .playedTiles.map { (it.first.toTileTypeMessage() to it.second) },
                 toBeSentMeditateMessage
-                    .drawnTiles     .map { it.toTileTypeMessage() },
+                    .drawnTiles.map { it.toTileTypeMessage() },
                 toBeSentMeditateMessage
-                    .claimedGoals   .map { (it.first.toGoalTileTypeMessage() to it.second + 1) },
+                    .claimedGoals.map { (it.first.toGoalTileTypeMessage() to it.second + 1) },
                 toBeSentMeditateMessage
-                    .renouncedGoals .map { (it.first.toGoalTileTypeMessage() to it.second + 1) },
+                    .renouncedGoals.map { (it.first.toGoalTileTypeMessage() to it.second + 1) },
                 toBeSentMeditateMessage
-                    .discardedTiles .map { it.toTileTypeMessage() },
+                    .discardedTiles.map { it.toTileTypeMessage() },
             )
         )
 
@@ -173,21 +179,21 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
     }
 
     /**
-     * it needs doc
+     * Holds the message to be sent for a Cultivate action.
      */
     fun sendCultivateMessage() {
         check(connectionState == ConnectionState.PLAYING_MY_TURN)
         { "currently not expecting your turn." }
 
         val message = CultivateMessage(
-            toBeSentCultivateMessage.removedTilesAxialCoordinates.map{it},
-            toBeSentCultivateMessage.playedTiles.map{
+            toBeSentCultivateMessage.removedTilesAxialCoordinates.map { it },
+            toBeSentCultivateMessage.playedTiles.map {
                 (it.first.toTileTypeMessage() to it.second)
             },
-            toBeSentCultivateMessage.claimedGoals.map{
+            toBeSentCultivateMessage.claimedGoals.map {
                 (it.first.toGoalTileTypeMessage() to it.second + 1)
             },
-            toBeSentCultivateMessage.renouncedGoals.map{
+            toBeSentCultivateMessage.renouncedGoals.map {
                 (it.first.toGoalTileTypeMessage() to it.second + 1)
             }
         )
@@ -217,7 +223,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
 
         //decode message
         val orderedPair = message.orderedPlayerNames
-        val goalTileTypes = message.chosenGoalTiles.map{
+        val goalTileTypes = message.chosenGoalTiles.map {
             it.toGoalTileType()
         }
         val players = mutableListOf<Player>()
@@ -234,7 +240,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         //construct game
         val standardZenDeck = ZenCardLoader().readAllZenCards(message.orderedPlayerNames.size)
         rootService.currentGame?.currentBonsaiGameState?.zenDeck =
-            message.orderedCards.map{
+            message.orderedCards.map {
                 standardZenDeck[it.second]
             }.toMutableList()
 
@@ -246,10 +252,22 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
     }
 
+    /**
+     * Receives and processes the Meditate action message from another player.
+     *
+     * @param message The Meditate message received from the opponent.
+     * @param sender The name of the sender (opponent).
+     */
     fun receiveMeditateMessage(message: MeditateMessage, sender: String) {
         //TODO
     }
 
+    /**
+     * Receives and processes the Cultivate action message from another player.
+     *
+     * @param message The Cultivate message received from the opponent.
+     * @param sender The name of the sender (opponent).
+     */
     fun receiveCultivateMessage(message: CultivateMessage, sender: String) {
         check(connectionState == ConnectionState.WAITING_FOR_OPPONENT)
         { "currently not expecting an opponent's turn." }
@@ -295,6 +313,14 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
     }
 
+    /**
+     * Attempts to connect to the server with the given secret and player name.
+     *
+     * @param secret The server secret for authentication.
+     * @param name The player's name.
+     *
+     * @return True if the connection was successful, false otherwise.
+     */
     private fun connect(secret: String, name: String): Boolean {
         require(connectionState == ConnectionState.DISCONNECTED && client == null)
         { "already connected to another game" }
@@ -332,6 +358,9 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         updateConnectionState(ConnectionState.DISCONNECTED)
     }
 
+    /**
+     * Redo the goal tile handling after a goal tile action.
+     */
     fun redoReceivedGoalTile() {
 
     }

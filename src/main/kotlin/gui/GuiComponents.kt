@@ -12,8 +12,11 @@ import tools.aqua.bgw.visual.CompoundVisual
 import tools.aqua.bgw.visual.ImageVisual
 import util.*
 
+/**
+ * Class design button style
+ */
 class ButtonStyle1(
-    posX : Int = 0, posY: Int = 0, text: String = "Button", width : Int = 450, height : Int = 100,
+    posX: Int = 0, posY: Int = 0, text: String = "Button", width: Int = 450, height: Int = 100,
 ) : Button(
     posX = posX,
     posY = posY,
@@ -26,8 +29,11 @@ class ButtonStyle1(
     }
 )
 
+/**
+ * Class design button style
+ */
 class ButtonStyle2(
-    posX : Int = 0, posY : Int = 0, text : String = "Button"
+    posX: Int = 0, posY: Int = 0, text: String = "Button"
 ) : Button(
     posX = posX,
     posY = posY,
@@ -40,9 +46,11 @@ class ButtonStyle2(
     }
 )
 
-
+/**
+ * Class design label
+ */
 class LabelStyle1(
-    posX : Int = 0, posY : Int = 0, text : String = "Label"
+    posX: Int = 0, posY: Int = 0, text: String = "Label"
 ) : Label(
     posX = posX,
     posY = posY,
@@ -55,8 +63,11 @@ class LabelStyle1(
     }
 )
 
+/**
+ * Class design label
+ */
 class LabelStyle2(
-    posX : Int = 0, posY : Int = 0, text : String = "Label"
+    posX: Int = 0, posY: Int = 0, text: String = "Label"
 ) : Label(
     posX = posX,
     posY = posY,
@@ -69,8 +80,11 @@ class LabelStyle2(
     }
 )
 
+/**
+ * Class design label
+ */
 class TextFieldStyle1(
-    posX : Int = 0, posY : Int = 0, text : String = "Text Field", prompt : String = ""
+    posX: Int = 0, posY: Int = 0, text: String = "Text Field", prompt: String = ""
 ) : TextField(
     posX = posX,
     posY = posY,
@@ -84,8 +98,11 @@ class TextFieldStyle1(
     }
 )
 
+/**
+ * Class design text
+ */
 class TextFieldStyle2(
-    posX : Int = 0, posY : Int = 0, text : String = "Text Field", prompt : String = ""
+    posX: Int = 0, posY: Int = 0, text: String = "Text Field", prompt: String = ""
 ) : TextField(
     posX = posX,
     posY = posY,
@@ -99,8 +116,11 @@ class TextFieldStyle2(
     }
 )
 
-class TurnLabel (
-    posX : Int = 0, posY : Int = 0, text : String = "1"
+/**
+ * Class design label
+ */
+class TurnLabel(
+    posX: Int = 0, posY: Int = 0, text: String = "1"
 ) : Label(
     posX = posX,
     posY = posY,
@@ -113,8 +133,11 @@ class TurnLabel (
     }
 )
 
-class CheckBoxStyle1 (
-    posX : Int = 0, posY : Int = 0,
+/**
+ * Class design check box
+ */
+class CheckBoxStyle1(
+    posX: Int = 0, posY: Int = 0,
 ) : CheckBox(
     posX = posX,
     posY = posY,
@@ -126,8 +149,11 @@ class CheckBoxStyle1 (
     }
 )
 
+/**
+ * Class design button
+ */
 class SquareButton(
-    posX : Int = 0, posY : Int = 0,
+    posX: Int = 0, posY: Int = 0,
 ) : Button(
     posX = posX,
     posY = posY,
@@ -140,8 +166,11 @@ class SquareButton(
     }
 )
 
+/**
+ * Class design check box button
+ */
 class CheckBoxButton(
-    posX: Int = 0 , posY: Int = 0,
+    posX: Int = 0, posY: Int = 0,
 ) : Button(
     posX = posX,
     posY = posY,
@@ -150,9 +179,12 @@ class CheckBoxButton(
     visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
-){
-    var isChecked : Boolean = false
+) {
+    var isChecked: Boolean = false
 
+    /**
+     * function for design
+     */
     fun change() {
         if (isChecked) {
             visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
@@ -169,12 +201,13 @@ class CheckBoxButton(
             isChecked = true
         }
     }
-
-
 }
 
+/**
+ * Class design check box button
+ */
 class CheckBoxButton2(
-    posX: Int = 0 , posY: Int = 0, text : String = ""
+    posX: Int = 0, posY: Int = 0, text: String = ""
 ) : Button(
     posX = posX,
     posY = posY,
@@ -185,8 +218,8 @@ class CheckBoxButton2(
     visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
         style.borderRadius = BorderRadius(20.0)
     }
-){
-    var isChecked : Boolean = false
+) {
+    var isChecked: Boolean = false
 
     fun change() {
         if (isChecked) {
@@ -208,8 +241,11 @@ class CheckBoxButton2(
 
 }
 
+/**
+ * Class design color button
+ */
 class ColourButton(
-    posX : Int = 0, posY : Int = 0,
+    posX: Int = 0, posY: Int = 0,
 ) : Button(
     posX = posX,
     posY = posY,

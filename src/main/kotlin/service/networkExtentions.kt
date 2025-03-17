@@ -3,16 +3,26 @@ package service
 import edu.udo.cs.sopra.ntf.*
 import entity.*
 
-fun ColorTypeMessage.toColor() : ColorType {
+/**
+ * Function to convert a [ColorTypeMessage] to a [ColorType].
+ *
+ * @return Corresponding [ColorType] value.
+ */
+fun ColorTypeMessage.toColor(): ColorType {
     return when (this) {
         ColorTypeMessage.BLUE -> ColorType.BLUE
         ColorTypeMessage.PURPLE -> ColorType.PURPLE
-        ColorTypeMessage.BLACK ->  ColorType.BLACK
+        ColorTypeMessage.BLACK -> ColorType.BLACK
         ColorTypeMessage.RED -> ColorType.RED
     }
 }
 
-fun ColorType.toColorMessage() : ColorTypeMessage {
+/**
+ * Function to convert a [ColorType] to a [ColorTypeMessage].
+ *
+ * @return Corresponding [ColorTypeMessage] value.
+ */
+fun ColorType.toColorMessage(): ColorTypeMessage {
     return when (this) {
         ColorType.BLUE -> ColorTypeMessage.BLUE
         ColorType.RED -> ColorTypeMessage.RED
@@ -21,7 +31,12 @@ fun ColorType.toColorMessage() : ColorTypeMessage {
     }
 }
 
-fun TileTypeMessage.toTileType() : TileType {
+/**
+ * Function to convert a [TileTypeMessage] to a [TileType].
+ *
+ * @return Corresponding [TileType] value.
+ */
+fun TileTypeMessage.toTileType(): TileType {
     return when (this) {
         TileTypeMessage.LEAF -> TileType.LEAF
         TileTypeMessage.WOOD -> TileType.WOOD
@@ -30,7 +45,12 @@ fun TileTypeMessage.toTileType() : TileType {
     }
 }
 
-fun TileType.toTileTypeMessage() : TileTypeMessage {
+/**
+ * Function to convert a [TileType] to a [TileTypeMessage].
+ *
+ * @return Corresponding [TileTypeMessage] value.
+ */
+fun TileType.toTileTypeMessage(): TileTypeMessage {
     return when (this) {
         TileType.LEAF -> TileTypeMessage.LEAF
         TileType.WOOD -> TileTypeMessage.WOOD
@@ -39,7 +59,12 @@ fun TileType.toTileTypeMessage() : TileTypeMessage {
     }
 }
 
-fun CardTypeMessage.toCardType() : CardType {
+/**
+ * Function to convert a [CardTypeMessage] to a [CardType].
+ *
+ * @return Corresponding [CardType] value.
+ */
+fun CardTypeMessage.toCardType(): CardType {
     return when (this) {
         CardTypeMessage.TOOL -> CardType.TOOLCARD
         CardTypeMessage.GROWTH -> CardType.GROWTHCARD
@@ -49,7 +74,12 @@ fun CardTypeMessage.toCardType() : CardType {
     }
 }
 
-fun CardType.toCardTypeMessage() : CardTypeMessage {
+/**
+ * Extension function to convert a [CardType] to a [CardTypeMessage].
+ *
+ * @return Corresponding [CardTypeMessage] value.
+ */
+fun CardType.toCardTypeMessage(): CardTypeMessage {
     return when (this) {
         CardType.TOOLCARD -> CardTypeMessage.TOOL
         CardType.GROWTHCARD -> CardTypeMessage.GROWTH
@@ -59,7 +89,12 @@ fun CardType.toCardTypeMessage() : CardTypeMessage {
     }
 }
 
-fun GoalTileTypeMessage.toGoalTileType() : GoalTileType {
+/**
+ * Function to convert a [GoalTileTypeMessage] to a [GoalTileType].
+ *
+ * @return Corresponding [GoalTileType] value.
+ */
+fun GoalTileTypeMessage.toGoalTileType(): GoalTileType {
     return when (this) {
         GoalTileTypeMessage.BLUE -> GoalTileType.BLUE
         GoalTileTypeMessage.GREEN -> GoalTileType.GREEN
@@ -69,7 +104,12 @@ fun GoalTileTypeMessage.toGoalTileType() : GoalTileType {
     }
 }
 
-fun GoalTileType.toGoalTileTypeMessage() : GoalTileTypeMessage {
+/**
+ * Function to convert a [GoalTileType] to a [GoalTileTypeMessage].
+ *
+ * @return Corresponding [GoalTileTypeMessage] value.
+ */
+fun GoalTileType.toGoalTileTypeMessage(): GoalTileTypeMessage {
     return when (this) {
         GoalTileType.BLUE -> GoalTileTypeMessage.BLUE
         GoalTileType.BROWN -> GoalTileTypeMessage.BROWN
@@ -79,6 +119,10 @@ fun GoalTileType.toGoalTileTypeMessage() : GoalTileTypeMessage {
     }
 }
 
+/**
+ * Data class representing a mutable meditate message with the necessary parameters
+ * for transmitting meditation-related actions in the game.
+ */
 data class MutableMeditateMessage(
     val removedTilesAxialCoordinates: MutableList<Pair<Int, Int>>,
     var chosenCardPosition: Int,
@@ -89,6 +133,10 @@ data class MutableMeditateMessage(
     val discardedTiles: MutableList<TileType>
 )
 
+/**
+ * Data class representing a mutable cultivate message with the necessary parameters
+ * for transmitting cultivation-related actions in the game.
+ */
 data class MutableCultivateMessage(
     val removedTilesAxialCoordinates: MutableList<Pair<Int, Int>>,
     val playedTiles: MutableList<Pair<TileType, Pair<Int, Int>>>,

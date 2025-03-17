@@ -151,7 +151,7 @@ class ResultScene(
      * The refreshAfterShowWinner method is called by the service layer after a game has ended.
      * It sets the result of the game
      *
-     * @param
+     * @param players is the list of players at the end
      */
     override fun refreshAfterShowWinner(players: List<Player>) {
         // Calculate scores for each player
@@ -168,6 +168,9 @@ class ResultScene(
         scoreBoard.items.addAll(playerScores)
     }
 
+    /**
+     * Needed for result table
+     */
     data class PlayerScore(
         val name: String,
         val eachScore: List<Int>

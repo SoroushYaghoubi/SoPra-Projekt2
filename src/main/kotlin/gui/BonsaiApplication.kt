@@ -9,7 +9,14 @@ import tools.aqua.bgw.util.Font
  */
 class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshable {
 
+    /**
+     * Central services for all scenes and holds current game as well
+     */
     private val rootService = RootService()
+
+    /**
+     * Initialization of all scene
+     */
     private val mainMenuScene = MainMenuScene(this)
     private val gameScene = BonsaiGameScene(rootService)
     private val configureGameMenuScene = ConfigureGameMenuScene(this, rootService)
