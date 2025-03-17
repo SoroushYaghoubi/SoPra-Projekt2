@@ -256,7 +256,47 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * @param sender The name of the sender (opponent).
      */
     fun receiveMeditateMessage(message: MeditateMessage, sender: String) {
-        //TODO
+        // --------------- prologue: state check ---------------
+        check(connectionState == ConnectionState.WAITING_FOR_OPPONENT)
+            { "currently not expecting an opponent's turn." }
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+
+        // --------------- main functionality ---------------
+        message.removedTilesAxialCoordinates
+            .forEach { rootService.treeService.removeFromTree(it) }
+
+            // processing `chosenCardPosition` in message
+        when (message.chosenCardPosition) {
+            1 -> rootService.playerActionService
+                .meditate (
+                        cardPosition = 1,
+                        chosenTile = message.drawnTiles[0].toTileType(),
+                    )
+            else -> rootService.playerActionService
+                .meditate (
+                    cardPosition = message.chosenCardPosition,
+                    chosenTile = null,
+                )
+        }
+
+        message.playedTiles
+            .forEach {
+                val tile = Tile(null, null, it.first.toTileType())
+                rootService.treeService.playTile(tile, it.second)
+            }
+        message.claimedGoals
+            .forEach { rootService.playerActionService
+                .claimOrRenounceGoal(true, it.first.toGoalTileType(), it.second) }
+        message.renouncedGoals
+            .forEach { rootService.playerActionService
+                .claimOrRenounceGoal(false, it.first.toGoalTileType(), it.second) }
+
+        // --------------- epilogue: state update ---------------
+        val currentIndex = game.players.indexOf(game.currentPlayer)
+        val nextIndex = (currentIndex + 1) % game.players.size
+        if (game.players[nextIndex].name == myName) updateConnectionState(ConnectionState.PLAYING_MY_TURN)
+        rootService.playerActionService.endTurn()
     }
 
     /**
