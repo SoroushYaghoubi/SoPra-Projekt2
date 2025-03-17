@@ -46,7 +46,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val fruitSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
     private val playerButtons: MutableList<Button> = mutableListOf()
     private val goalButtons: MutableList<Button> = mutableListOf()
-    private var goalTileList : List<GoalTile> = mutableListOf()
+    private var goalTileList : MutableList<GoalTile> = mutableListOf()
 
 
     // button for cultivate
@@ -348,8 +348,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                 GoalTileType.PINK -> 3
                 GoalTileType.BLUE -> 4
             }
-            //goalTileList = sortedGoalTiles.toMutable()
         }
+        goalTileList = sortedGoalTiles.toMutableList()
 
 
         // player buttons below the save button
@@ -892,7 +892,28 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         if (goalTileType != null) {
 
+            var goalTileScore = 0
+
+            for (goalTile in goalTileList) {
+                if(goalTile.goalTileType == goalTileType && goalTile.tier == tier){
+                    goalTileScore = goalTile.score
+                }
+            }
             //addComponents(goalTilePane)
+            goalTilePane.add(
+                Label(
+                    posX = 125,
+                    posY = 250,
+                    width = 500,
+                    height = 50,
+                    visual = ColorVisual(Color(getColorForGoalTile(goalTileType))).apply {
+                        style.borderRadius = BorderRadius(20.0)
+                    },
+                    text = "Goal Tile: $goalTileType Tier: $tier Score: $goalTileScore",
+                    font = Font(30)
+                )
+
+            )
             goalTilePane.apply { this.isVisible = true }
             goalTilePane.apply { this.isDisabled = false }
             claimButton.apply {
@@ -903,19 +924,17 @@ class BonsaiGameScene(private val rootService: RootService) :
 
                     goalTileList.forEach {
                         if(goalTileType == it.goalTileType && tier == it.tier){
-                            goalButtons[goalTileList.indexOf(it)].text = game.currentPlayer.name
+                            goalButtons[goalTileList.indexOf(it)].text = game.currentPlayer.name + ", Score:  ${goalTileScore}"
                         }
                     }
                 }
 
-                //removeComponents(goalTilePane)
             }
             renounceButton.apply {
                 onMouseClicked = {
                     rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
                     goalTilePane.isDisabled = true
                     goalTilePane.isVisible = false
-                    //removeComponents(goalTilePane)
                 }
             }
 
