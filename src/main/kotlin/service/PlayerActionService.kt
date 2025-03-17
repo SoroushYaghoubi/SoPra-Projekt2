@@ -96,14 +96,14 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             is MasterCard -> {
                 gameState.currentState = States.USING_MASTER
                 playMasterCard(drawnCard)
-                gameState.currentPlayer.hasPlayed = true
+                //gameState.currentPlayer.hasPlayed = true
                 return
             }
 
             is HelperCard -> {
                 gameState.currentState = States.USING_HELPER
                 playHelperCard(drawnCard)
-                gameState.currentPlayer.hasPlayed = true
+                //gameState.currentPlayer.hasPlayed = true
                 return
             }
            else -> {
