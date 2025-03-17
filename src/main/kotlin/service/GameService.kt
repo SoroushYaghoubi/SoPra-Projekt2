@@ -80,6 +80,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                 tiles.add(TileType.LEAF)
                 tiles.add(TileType.LEAF)
                 tiles.add(TileType.FRUIT)
+                repeat(8) {tiles.add(TileType.WOOD)}
             } else {
                 tiles.add(TileType.WOOD)
                 tiles.add(TileType.LEAF)

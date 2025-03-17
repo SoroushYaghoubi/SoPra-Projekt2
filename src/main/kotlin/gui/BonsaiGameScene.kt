@@ -563,8 +563,28 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (goalTileType == null) {
             println(leafSupplyDecks[0].components.size)
         }
-        checkNotNull(goalTileType)
-        if (rootService.playerActionService.canClaimOrRenounceGoal(goalTileType, tier)){
+
+        if (goalTileType != null){
+
+            addComponents(goalTilePane)
+            //goalTilePane.apply { this.isVisible = true }
+            //goalTilePane.apply { this.isDisabled = false }
+            claimButton.apply {
+                onMouseClicked = {
+                    rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)}
+                    //goalTilePane.isDisabled = true
+                    //goalTilePane.isVisible = false
+                    removeComponents(goalTilePane)
+                }
+            renounceButton.apply {
+                onMouseClicked = {
+                    rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
+                    //goalTilePane.isDisabled = true
+                    //goalTilePane.isVisible = false
+                    removeComponents(goalTilePane)
+                }
+            }
+
 
         }
     }
@@ -879,19 +899,38 @@ class BonsaiGameScene(private val rootService: RootService) :
         text = "Claim"
     )
 
-    // pane for collected card
+    private val renounceButton = Button(
+        posX = 400,
+        posY = 450,
+        width = 250,
+        height = 60,
+        text = "Renounce"
+    )
+
+    private val goalTileText = Label(
+        posX = 175,
+        posY = 100,
+        width = 400,
+        height = 50
+    )
+
+    // pane for claim or renounce goal tile
     private val goalTilePane =
         Pane<UIComponent>(
             posX = 585,
             posY = 240,
             width = 750,
             height = 600,
-            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+            visual = ColorVisual(Color(0x0ffff)).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
         ).apply {
-            isVisible = false
+            //isVisible = true
+            //isDisabled = true
             this.add(claimButton)
+            this.add(renounceButton)
+            this.add(goalTileText)
 
         }
+
 }
