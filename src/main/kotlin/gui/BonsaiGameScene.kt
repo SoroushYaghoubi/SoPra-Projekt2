@@ -393,15 +393,14 @@ class BonsaiGameScene(private val rootService: RootService) :
                 size = 30
             )
             treeHexagonGrid[it.first, it.second] = hexagon
+            if (it.first == 0 && it.second == 0) {
+                val root = player.bonsaiTree[0 to 0]
+                checkNotNull(root) {"not root"}
+                treeTileMaps[getOrder(player)].add(
+                    (root to hexagon)
+                )
+            }
         }
-
-        //map the tiles to hexagon
-        val game = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(game)
-        treeTileMaps[getOrder(player)].add(
-            (player.bonsaiTree[0 to 0] to treeHexagonGrid[0, 0]) as Pair<Tile, HexagonView>
-        )
-
         // get the empty tiles
         createEmptyHex(player)
     }
@@ -548,7 +547,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 cardView.apply {
                     frontVisual = CompoundVisual(
                         ColorVisual.WHITE,
-                        TextVisual("${card.cardType}\n" + "___2___")
+                        TextVisual("${card.cardType}\n___2___")
                     )
                 }
             }
@@ -558,7 +557,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 cardView.apply {
                     frontVisual = CompoundVisual(
                         ColorVisual.WHITE,
-                        TextVisual("${card.cardType}\n" + "___${card.tileType}___")
+                        TextVisual("${card.cardType}\n___${card.tileType}___")
                     )
 
                 }
@@ -569,7 +568,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 cardView.apply {
                     frontVisual = CompoundVisual(
                         ColorVisual.WHITE,
-                        TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___")
+                        TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___")
                     )
                 }
             }
@@ -580,17 +579,18 @@ class BonsaiGameScene(private val rootService: RootService) :
                     frontVisual = when (card.tileTypes.size) {
                         3 -> CompoundVisual(
                             ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___\n" + "___${card.tileTypes[2]}___")
+                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n" +
+                                    "___${card.tileTypes[1]}___\n___${card.tileTypes[2]}___")
                         )
 
                         2 -> CompoundVisual(
                             ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___")
+                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___")
                         )
 
                         else -> CompoundVisual(
                             ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___")
+                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___")
                         )
 
                     }
@@ -738,10 +738,14 @@ class BonsaiGameScene(private val rootService: RootService) :
                             )
                         )
                         rootService.treeService.playTile(tile, it)
-                        val parentDeck = comp.parent as Area<HexagonView>
+                        val parentDeck = comp.parent //as Area<HexagonView>
+                        check (parentDeck is Area<*>)
+
                         comp.removeFromParent()
                         if (parentDeck.components.isNotEmpty()){
-                            val supplyTileType = supplyTileMap.backward(parentDeck.last()).tileType
+                            val lastHex = parentDeck.last()
+                            check (lastHex is HexagonView)
+                            val supplyTileType = supplyTileMap.backward(lastHex).tileType
                             parentDeck.last().apply {
                                 this.visual = CompoundVisual(ColorVisual(Color(getColorForTileType(supplyTileType))),
                                     TextVisual("${parentDeck.components.size}",
