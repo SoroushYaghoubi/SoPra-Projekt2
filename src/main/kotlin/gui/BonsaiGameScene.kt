@@ -469,6 +469,12 @@ class BonsaiGameScene(private val rootService: RootService) :
         val leafSupplyDeck = leafSupplyDecks[getOrder(player)]
         val flowerSupplyDeck = flowerSupplyDecks[getOrder(player)]
         val fruitSupplyDeck = fruitSupplyDecks[getOrder(player)]
+        supplyTileMap.clear()
+        woodSupplyDeck.clear()
+        leafSupplyDeck.clear()
+        flowerSupplyDeck.clear()
+        fruitSupplyDeck.clear()
+
         player.personalSupply.forEachIndexed { index, it ->
             val supplyHex = HexagonView(
                 visual = CompoundVisual(
@@ -484,9 +490,11 @@ class BonsaiGameScene(private val rootService: RootService) :
                 }
             }
 
+            it.q = index
+            supplyTileMap.add(it to supplyHex)
 
             when (it.tileType) {
-                TileType.WOOD -> woodSupplyDeck.add(supplyHex).also {   println("WOOD supply size " + woodSupplyDeck.components.size) }
+                TileType.WOOD -> woodSupplyDeck.add(supplyHex)
                 TileType.LEAF -> leafSupplyDeck.add(supplyHex)
                 TileType.FLOWER -> flowerSupplyDeck.add(supplyHex)
                 else -> fruitSupplyDeck.add(supplyHex)
@@ -734,6 +742,10 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
     }
 
+    private fun switchPlayerPane(playerIndex: Int, hasEndTurn: Boolean) {
+
+    }
+
     /**
      * really important function for play tile
      */
@@ -745,73 +757,73 @@ class BonsaiGameScene(private val rootService: RootService) :
         val treeHexagonGrid = treeHexagonGrids[getOrder(player)]
 
         player.bonsaiTree.getEmptyTiles().forEach {
-                //println("${it.first}, ${it.second}")
-                val hexagon = HexagonView(
+            //println("${it.first}, ${it.second}")
+            val hexagon = HexagonView(
+                visual = CompoundVisual(
+                    ColorVisual(255, 255, 255, 0.3),
+                    TextVisual(
+                        text = "${it.first}, ${it.second}",
+                        font = Font(10.0, Color(0x000000))
+                    )
+                ),
+                size = 30
+            ).apply {
+                val emptyTile = Tile(it.first, it.second, TileType.EMPTY)
+                if (treeTileMap.contains(emptyTile to this)){
+                    treeTileMap.remove(emptyTile to this)
+                    treeTileMap.add(emptyTile to this)
+                } else {
+                    treeTileMap.add(emptyTile to this)
+                }
+
+
+                this.dropAcceptor = { dragEvent ->
+                    when (dragEvent.draggedComponent) {
+                        is HexagonView -> {
+                            // If the card is valid, the card can be dropped and played
+                            // some condition
+                            val comp = dragEvent.draggedComponent as HexagonView
+                            val tile = supplyTileMap.backward(comp)
+                            rootService.treeService.canPlayTile(tile, it)
+                        }
+                        else -> false
+                    }
+                }
+
+                this.onDragDropped = { dragEvent ->
+                    val comp = dragEvent.draggedComponent as HexagonView
+                    val tile = supplyTileMap.backward(comp)
+                    tile.q = it.first
+                    tile.r = it.second
+                    treeTileMap.remove(emptyTile to this)
+                    treeTileMap.add(tile to this)
                     visual = CompoundVisual(
-                        ColorVisual(255, 255, 255, 0.3),
+                        ColorVisual(Color(getColorForTileType(tile.tileType))),
                         TextVisual(
                             text = "${it.first}, ${it.second}",
                             font = Font(10.0, Color(0x000000))
                         )
-                    ),
-                    size = 30
-                ).apply {
-                    val emptyTile = Tile(it.first, it.second, TileType.EMPTY)
-                    if (treeTileMap.contains(emptyTile to this)){
-                        treeTileMap.remove(emptyTile to this)
-                        treeTileMap.add(emptyTile to this)
-                    } else {
-                        treeTileMap.add(emptyTile to this)
-                    }
+                    )
+                    rootService.treeService.playTile(tile, it)
+                    val parentDeck = comp.parent //as Area<HexagonView>
+                    check (parentDeck is Area<*>)
 
-
-                    this.dropAcceptor = { dragEvent ->
-                        when (dragEvent.draggedComponent) {
-                            is HexagonView -> {
-                                // If the card is valid, the card can be dropped and played
-                                // some condition
-                                val comp = dragEvent.draggedComponent as HexagonView
-                                val tile = supplyTileMap.backward(comp)
-                                rootService.treeService.canPlayTile(tile, it)
-                            }
-                            else -> false
+                    comp.removeFromParent()
+                    if (parentDeck.components.isNotEmpty()){
+                        val lastHex = parentDeck.last()
+                        check (lastHex is HexagonView)
+                        val supplyTileType = supplyTileMap.backward(lastHex).tileType
+                        parentDeck.last().apply {
+                            this.visual = CompoundVisual(ColorVisual(Color(getColorForTileType(supplyTileType))),
+                                TextVisual("${parentDeck.components.size}",
+                                    font = Font(30.0, Color(0x000000))))
                         }
                     }
-
-                    this.onDragDropped = { dragEvent ->
-                        val comp = dragEvent.draggedComponent as HexagonView
-                        val tile = supplyTileMap.backward(comp)
-                        tile.q = it.first
-                        tile.r = it.second
-                        treeTileMap.remove(emptyTile to this)
-                        treeTileMap.add(tile to this)
-                        visual = CompoundVisual(
-                            ColorVisual(Color(getColorForTileType(tile.tileType))),
-                            TextVisual(
-                                text = "${it.first}, ${it.second}",
-                                font = Font(10.0, Color(0x000000))
-                            )
-                        )
-                        rootService.treeService.playTile(tile, it)
-                        val parentDeck = comp.parent //as Area<HexagonView>
-                        check (parentDeck is Area<*>)
-
-                        comp.removeFromParent()
-                        if (parentDeck.components.isNotEmpty()){
-                            val lastHex = parentDeck.last()
-                            check (lastHex is HexagonView)
-                            val supplyTileType = supplyTileMap.backward(lastHex).tileType
-                            parentDeck.last().apply {
-                                this.visual = CompoundVisual(ColorVisual(Color(getColorForTileType(supplyTileType))),
-                                    TextVisual("${parentDeck.components.size}",
-                                        font = Font(30.0, Color(0x000000))))
-                            }
-                        }
-                        createEmptyHex(player)
-                    }
+                    createEmptyHex(player)
                 }
-                treeHexagonGrid[it.first, it.second] = hexagon
             }
+            treeHexagonGrid[it.first, it.second] = hexagon
+        }
 
     }
 
