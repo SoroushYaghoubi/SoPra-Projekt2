@@ -293,15 +293,10 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      */
     fun canPlayTile(tile: Tile, tilePosition: Pair<Int, Int>): Boolean {
         if (!canPlayTile(tile)) return false
-
         val currentPlayer = getCurrentPlayer()
 
         // Position of pot
-        //  TODO: you can import the POT from util
-        val forbiddenPositions = setOf(
-            Pair(-2, 0), Pair(-1, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0),
-            Pair(-2, 1), Pair(-1, 1), Pair(0, 1), Pair(1, 1), Pair(2, 1)
-        )
+        val forbiddenPositions = POT
 
         require(
             !currentPlayer.bonsaiTree.containsKey(tilePosition)
