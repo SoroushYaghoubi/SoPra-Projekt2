@@ -612,7 +612,7 @@ class HostScene(
 
     }
 
-    private fun addPlayer() {
+    private fun addPlayer(playerName: String) {
         val currentIndex = playerInputs.size
         if (currentIndex >= 4) return
 
@@ -635,7 +635,7 @@ class HostScene(
         val newPlayerInput = TextFieldStyle1(
             posX = 190,
             posY = 270 + 140 * currentIndex,
-            prompt = "INPUT NAME"
+            prompt = playerName
         )
 
         val newPlayerColour = ColourButton(
@@ -736,7 +736,6 @@ class HostScene(
     }
 
     private fun removePlayer(index: Int) {
-
         if (playerInputs.size <= 1) return
 
         contentPlayerPane.remove(playerTurns[index])
@@ -752,7 +751,6 @@ class HostScene(
         playerEasyBots.removeAt(index)
         playerHardBots.removeAt(index)
         playerInputs.removeAt(index)
-
 
         for (i in index until playerInputs.size) {
             playerTurns[i].posY -= 140
@@ -772,5 +770,9 @@ class HostScene(
                 removeHighlight()
             }
         }
+    }
+
+    override fun refreshAfterPlayerJoined(playerName: String) {
+        addPlayer(playerName)
     }
 }

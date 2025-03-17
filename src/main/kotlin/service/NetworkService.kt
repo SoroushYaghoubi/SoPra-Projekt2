@@ -349,6 +349,10 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
     }
 
+    fun receivePlayerJoinedMessage(playerName: String) {
+        onAllRefreshables { refreshAfterPlayerJoined(playerName) }
+    }
+
     /**
      * Attempts to connect to the server with the given secret and player name.
      *

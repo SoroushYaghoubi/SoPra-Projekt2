@@ -627,7 +627,6 @@ class ConfigureGameMenuScene(
         addComponents(contentPlayerPane, contentGoalTilePane)
 
         assignColorButtonFunctionality()
-
     }
 
     private fun addPlayer() {

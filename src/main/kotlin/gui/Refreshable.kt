@@ -103,4 +103,9 @@ interface Refreshable {
      * perform refreshes that are necessary to show the result scene
      */
     fun refreshAfterShowWinner(players: List<Player>){}
+
+    /**
+     * perform refreshes that are necessary after a player joins
+     */
+    fun refreshAfterPlayerJoined(player: String) {}
 }

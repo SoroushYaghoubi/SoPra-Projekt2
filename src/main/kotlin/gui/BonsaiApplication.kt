@@ -84,5 +84,4 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
      * Function [showGameScene] shows the GameScene
      */
     fun showGameScene() = this.showGameScene(gameScene)
-
 }

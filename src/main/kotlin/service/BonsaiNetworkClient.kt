@@ -93,6 +93,7 @@ class BonsaiNetworkClient(
             { "more than 4 players." }
 
             otherPlayerNames.add(notification.sender)
+            networkService.receivePlayerJoinedMessage(notification.sender)
         }
     }
 
