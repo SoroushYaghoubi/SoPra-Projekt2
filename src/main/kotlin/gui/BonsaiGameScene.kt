@@ -816,15 +816,15 @@ class BonsaiGameScene(private val rootService: RootService) :
                                         posX = 800, posY = 10,
                                         size = 40,
                                         visual = ColorVisual(Color(COLOUR_LEAF))
-                                    )
-                                        .apply {
+                                    ).apply {
                                             onMouseClicked = {
-                                                rootService.playerActionService.meditate(3, TileType.LEAF)
+                                                rootService.playerActionService.meditate(1, TileType.LEAF)
                                                 updateSupply(game.currentPlayer)
                                                 updateSupplyAmount(game.currentPlayer)
                                                 interactionPane.isVisible = false
                                             }
-                                        })
+                                        }
+                                )
                                 interactionPane.add(
                                     HexagonView(
                                         posX = 700, posY = 10,
@@ -832,7 +832,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                         visual = ColorVisual(Color(COLOUR_WOOD))
                                     ).apply {
                                         onMouseClicked = {
-                                            rootService.playerActionService.meditate(3, TileType.WOOD)
+                                            rootService.playerActionService.meditate(1, TileType.WOOD)
                                             updateSupply(game.currentPlayer)
                                             updateSupplyAmount(game.currentPlayer)
                                             interactionPane.isVisible = false
