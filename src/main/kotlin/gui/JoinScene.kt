@@ -10,6 +10,11 @@ import tools.aqua.bgw.visual.ImageVisual
 /**
  * The [JoinScene] is a [MenuScene] to join an online session for a game of bonsai
  *
+ * @param bonsaiApplication is the application
+ * @property titleLabel shows the title of the game
+ * @property sessionTextField is a text field that is used as an input for the session id
+ * @property nameTextField is a text field that is used as an input for the players name
+ *
  *
  */
 class JoinScene(bonsaiApplication: BonsaiApplication) : MenuScene(

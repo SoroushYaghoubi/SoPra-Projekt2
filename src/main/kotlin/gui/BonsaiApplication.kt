@@ -26,6 +26,8 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
     private val startSessionScene = StartSessionScene(this)
     private val showResultScene = ResultScene(this, rootService)
 
+    // loads to begin the used Font
+    // shows gameScene and shows the mainMenuScene
     init {
         rootService.addRefreshables(
             this,
@@ -41,14 +43,37 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
 
         loadFont("arial_black.ttf", "Arial Black", Font.FontWeight.NORMAL)
         //this.showGameScene(gameScene)
-        this.showMenuScene(mainMenuScene)
+        showMainMenuScene()
     }
 
+    /**
+     * Function [showMainMenuScene] shows the mainMenuScene
+     */
     fun showMainMenuScene() = this.showMenuScene(mainMenuScene)
+
+    /**
+     * Funktion [showConfigScene] shows the configScene
+     */
     fun showConfigScene() = this.showMenuScene(configureGameMenuScene)
+
+    /**
+     * Funktion [showJoinScene] shows the joinScene
+     */
     fun showJoinScene() = this.showMenuScene(joinScene)
+
+    /**
+     * Funktion [showHostScene] shows the hostScene
+     */
     fun showHostScene() = this.showMenuScene(hostScene)
+
+    /**
+     * Funktion [showStartSessionScene] shows the startSessionScene
+     */
     fun showStartSessionScene() = this.showMenuScene(startSessionScene)
+
+    /**
+     * Funktion [showWaitingScene] shows the waitingScene
+     */
     fun showWaitingScene() = this.showMenuScene(waitingScene)
     fun showGameScene() = this.showGameScene(gameScene)
 

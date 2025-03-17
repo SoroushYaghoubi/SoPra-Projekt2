@@ -305,7 +305,11 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         posX = 715,
         posY = 830,
         text = "START"
-    )
+    ).apply {
+        onMouseClicked = {
+            //TODO
+        }
+    }
 
     private val backButton = ButtonStyle2(
         posX = 175,
