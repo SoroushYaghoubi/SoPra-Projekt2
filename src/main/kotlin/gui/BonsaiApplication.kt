@@ -75,6 +75,10 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
      * Funktion [showWaitingScene] shows the waitingScene
      */
     fun showWaitingScene() = this.showMenuScene(waitingScene)
+
+    /**
+     * Function [showGameScene] shows the GameScene
+     */
     fun showGameScene() = this.showGameScene(gameScene)
 
 }
