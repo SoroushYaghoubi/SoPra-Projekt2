@@ -46,6 +46,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val fruitSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
     private val playerButtons: MutableList<Button> = mutableListOf()
     private val goalButtons: MutableList<Button> = mutableListOf()
+    private var goalTileList : List<GoalTile> = mutableListOf()
 
 
     // button for cultivate
@@ -347,6 +348,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 GoalTileType.PINK -> 3
                 GoalTileType.BLUE -> 4
             }
+            //goalTileList = sortedGoalTiles.toMutable()
         }
 
 
@@ -443,7 +445,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         playerPanes.add(playerPane)
         addComponents(playerPane)
     }
-    // Overlay the game scene to promt the player to choose tile
+    // Overlay the game scene to prompt the player to choose tile
     private val overlayPane = Pane<ComponentView>(
         posX = 0, posY = 0,
         width = 1920, height = 1080,
@@ -451,12 +453,58 @@ class BonsaiGameScene(private val rootService: RootService) :
         isVisible = false
     }
 
+
+    private val claimButton = Button(
+        posX = 100,
+        posY = 450,
+        width = 250,
+        height = 60,
+        text = "Claim"
+    )
+
+    private val renounceButton = Button(
+        posX = 400,
+        posY = 450,
+        width = 250,
+        height = 60,
+        text = "Renounce"
+    )
+
+    private val goalTileText = Label(
+        posX = 175,
+        posY = 100,
+        width = 400,
+        height = 50,
+        text = "You can claim a goal tile"
+    )
+
+    // pane for claim or renounce goal tile
+    private val goalTilePane =
+        Pane<UIComponent>(
+            posX = 585,
+            posY = 240,
+            width = 750,
+            height = 600,
+            visual = ColorVisual(Color(0xbebebe)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        ).apply {
+            zIndex = 1
+            isVisible = false
+            isDisabled = true
+            this.add(claimButton)
+            this.add(renounceButton)
+            this.add(goalTileText)
+
+        }
+
+
     init {
         addComponents(
             zenCardPane, infoPane, interactionPane, collectedCardPane,
             removeButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards,
-            overlayPane
+            overlayPane, goalTilePane
         )
     }
 
@@ -818,23 +866,30 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         if (goalTileType != null) {
 
-            addComponents(goalTilePane)
+            //addComponents(goalTilePane)
             goalTilePane.apply { this.isVisible = true }
             goalTilePane.apply { this.isDisabled = false }
             claimButton.apply {
                 onMouseClicked = {
                     rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
+                    goalTilePane.isDisabled = true
+                    goalTilePane.isVisible = false
+
+                    goalTileList.forEach {
+                        if(goalTileType == it.goalTileType && tier == it.tier){
+                            goalButtons[goalTileList.indexOf(it)].text = game.currentPlayer.name
+                        }
+                    }
                 }
-                goalTilePane.isDisabled = true
-                goalTilePane.isVisible = false
-                removeComponents(goalTilePane)
+
+                //removeComponents(goalTilePane)
             }
             renounceButton.apply {
                 onMouseClicked = {
                     rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
                     goalTilePane.isDisabled = true
                     goalTilePane.isVisible = false
-                    removeComponents(goalTilePane)
+                    //removeComponents(goalTilePane)
                 }
             }
 
@@ -1258,48 +1313,5 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
         return -1
     }
-
-    private val claimButton = Button(
-        posX = 100,
-        posY = 450,
-        width = 250,
-        height = 60,
-        text = "Claim"
-    )
-
-    private val renounceButton = Button(
-        posX = 400,
-        posY = 450,
-        width = 250,
-        height = 60,
-        text = "Renounce"
-    )
-
-    private val goalTileText = Label(
-        posX = 175,
-        posY = 100,
-        width = 400,
-        height = 50
-    )
-
-    // pane for claim or renounce goal tile
-    private val goalTilePane =
-        Pane<UIComponent>(
-            posX = 585,
-            posY = 240,
-            width = 750,
-            height = 600,
-            visual = ColorVisual(Color(0x0ffff)).apply {
-                style.borderRadius = BorderRadius(20.0)
-            }
-        ).apply {
-            zIndex = 1
-            //isVisible = true
-            //isDisabled = true
-            this.add(claimButton)
-            this.add(renounceButton)
-            this.add(goalTileText)
-
-        }
 
 }
