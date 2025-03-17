@@ -370,12 +370,20 @@ class BonsaiGameScene(private val rootService: RootService) :
         playerPanes.add(playerPane)
         addComponents(playerPane)
     }
+    // Overlay the game scene to promt the player to choose tile
+    private val overlayPane = Pane<ComponentView>(
+        posX = 0, posY = 0,
+        width = 1920, height = 1080,
+    ).apply {
+        isVisible = false
+    }
 
     init {
         addComponents(
             zenCardPane, infoPane, interactionPane, collectedCardPane,
             removeButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards,
+            overlayPane
         )
     }
 
@@ -830,33 +838,69 @@ class BonsaiGameScene(private val rootService: RootService) :
                             ) {
                                 interactionText.text = "Choose tile to claim: "
 
-                                interactionPane.isVisible = true
-                                interactionPane.add(
+                                //Interaction here causes some trouble :/ i have changed to overlay
+//                                interactionPane.isVisible = true
+//                                interactionPane.add(
+//                                    HexagonView(
+//                                        posX = 800, posY = 10,
+//                                        size = 40,
+//                                        visual = ColorVisual(Color(COLOUR_LEAF))
+//                                    ).apply {
+//                                        onMouseClicked = {
+//                                            rootService.playerActionService.meditate(1, TileType.LEAF)
+//                                            interactionPane.isVisible = false
+//                                        }
+//                                    }
+//                                )
+//                                interactionPane.add(
+//                                    HexagonView(
+//                                        posX = 700, posY = 10,
+//                                        size = 40,
+//                                        visual = ColorVisual(Color(COLOUR_WOOD))
+//                                    ).apply {
+//                                        onMouseClicked = {
+//                                            rootService.playerActionService.meditate(1, TileType.WOOD)
+//                                            interactionPane.isVisible = false
+//                                        }
+//                                    }
+//                                )
+                                overlayPane.clear()
+                                overlayPane.isVisible = true
+
+                                overlayPane.add(
                                     HexagonView(
-                                        posX = 800, posY = 10,
+                                        posX = 1260, posY = 270,
                                         size = 40,
                                         visual = ColorVisual(Color(COLOUR_LEAF))
-                                    ).apply {
-                                        onMouseClicked = {
-                                            rootService.playerActionService.meditate(1, TileType.LEAF)
-                                            interactionPane.isVisible = false
-                                        }
-                                    }
-                                )
-                                interactionPane.add(
+                                    )
+                                        .apply {
+                                            onMouseClicked = {
+                                                rootService.playerActionService.meditate(1, TileType.LEAF)
+                                                updateSupply(game.currentPlayer)
+                                                updateSupplyAmount(game.currentPlayer)
+                                                overlayPane.isVisible = false
+                                                interactionText.text = "You have received a leaf tile"
+
+                                            }
+                                        })
+                                overlayPane.add(
                                     HexagonView(
-                                        posX = 700, posY = 10,
+                                        posX = 1380, posY = 270,
                                         size = 40,
                                         visual = ColorVisual(Color(COLOUR_WOOD))
                                     ).apply {
                                         onMouseClicked = {
                                             rootService.playerActionService.meditate(1, TileType.WOOD)
-                                            interactionPane.isVisible = false
+                                            updateSupply(game.currentPlayer)
+                                            updateSupplyAmount(game.currentPlayer)
+                                            overlayPane.isVisible = false
+                                            interactionText.text = "You have received a wood tile"
+
                                         }
-                                    }
-                                )
+                                    })
+
                                 removeFromParent()
-                                updateSupply(game.currentPlayer)
+                                //updateSupply(game.currentPlayer)
                                 updateZenBoard()
                             }
                         }
@@ -870,7 +914,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 game.currentState == States.CHOOSE_ACTION ||
                                 game.currentState == States.REMOVE_TILES
                             ) {
-                                interactionText.text = " you have received a wood and a flower tile "
+                                interactionText.text = "You have received a wood and a flower tile"
                                 rootService.playerActionService.meditate(2, null)
                                 removeFromParent()
                                 updateSupply(game.currentPlayer)
@@ -888,7 +932,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 game.currentState == States.CHOOSE_ACTION ||
                                 game.currentState == States.REMOVE_TILES
                             ) {
-                                interactionText.text = "you have received a leaf and a fruit tile "
+                                interactionText.text = "You have received a leaf and a fruit tile"
                                 rootService.playerActionService.meditate(3, null)
                                 removeFromParent()
                                 updateSupply(game.currentPlayer)
