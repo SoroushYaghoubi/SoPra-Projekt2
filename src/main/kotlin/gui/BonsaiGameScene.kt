@@ -115,9 +115,17 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
 
 
+    // text for how many cards there are
+    private val cardSumText = Label(
+        posX = 50, posY = 50,
+        visual = ColorVisual(Color(0, 0, 0, 0)),
+        text = "",
+        font = Font(30, Color.BLACK)
+    )
+
     // pane for the cards
     private val zenCardPane =
-        Pane<UIComponent>(
+        Pane<ComponentView>(
             posX = 20, posY = 20,
             width = 700,
             height = 220,
@@ -567,8 +575,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             zenDeckView.add(cardView)
             zenCardMap.add(it to cardView)
         }
-
-
+        cardSumText.text = "${game.zenDeck.size}"
 
         game.faceUpCards.forEach {
             val cardView = CardView(
@@ -582,8 +589,23 @@ class BonsaiGameScene(private val rootService: RootService) :
             faceUpCards.add(cardView)
             zenCardMap.add(it to cardView)
         }
-
         applyCardPosition()
+    }
+
+    private fun updateZenBoard() {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        if (game.zenDeck.isNotEmpty()) {
+            val newCardView = zenDeckView.pop()
+            newCardView.showFront()
+            val oldCardViews = faceUpCards.components.toMutableList()
+            faceUpCards.clear()
+            faceUpCards.add(newCardView)
+            faceUpCards.addAll(oldCardViews)
+            applyCardPosition()
+            cardSumText.text = "${game.zenDeck.size}"
+        }
+        // TODO(pane needs to be smaller when less than four)
     }
 
     //refresher do something
@@ -783,19 +805,17 @@ class BonsaiGameScene(private val rootService: RootService) :
             when (index) {
                 0 -> {
                     card.apply {
-                        if (game.currentState == States.START_TURN ||
-                            game.currentState == States.CHOOSE_ACTION ||
-                            game.currentState == States.REMOVE_TILES
-                        ) {
-                            onMouseClicked = {
-                                if (game.currentState == States.START_TURN ||
-                                    game.currentState == States.CHOOSE_ACTION ||
-                                    game.currentState == States.REMOVE_TILES
-                                ) {
-                                    interactionText.text = " no extra tiles "
-                                    rootService.playerActionService.meditate(0, null)
-                                    updateSupply(game.currentPlayer)
-                                }
+
+                        onMouseClicked = {
+                            if (game.currentState == States.START_TURN ||
+                                game.currentState == States.CHOOSE_ACTION ||
+                                game.currentState == States.REMOVE_TILES
+                            ) {
+                                interactionText.text = " no extra tiles "
+                                rootService.playerActionService.meditate(0, null)
+                                removeFromParent()
+                                updateSupply(game.currentPlayer)
+                                updateZenBoard()
                             }
                         }
                     }
@@ -817,13 +837,11 @@ class BonsaiGameScene(private val rootService: RootService) :
                                         size = 40,
                                         visual = ColorVisual(Color(COLOUR_LEAF))
                                     ).apply {
-                                            onMouseClicked = {
-                                                rootService.playerActionService.meditate(1, TileType.LEAF)
-                                                updateSupply(game.currentPlayer)
-                                                updateSupplyAmount(game.currentPlayer)
-                                                interactionPane.isVisible = false
-                                            }
+                                        onMouseClicked = {
+                                            rootService.playerActionService.meditate(1, TileType.LEAF)
+                                            interactionPane.isVisible = false
                                         }
+                                    }
                                 )
                                 interactionPane.add(
                                     HexagonView(
@@ -833,12 +851,13 @@ class BonsaiGameScene(private val rootService: RootService) :
                                     ).apply {
                                         onMouseClicked = {
                                             rootService.playerActionService.meditate(1, TileType.WOOD)
-                                            updateSupply(game.currentPlayer)
-                                            updateSupplyAmount(game.currentPlayer)
                                             interactionPane.isVisible = false
                                         }
                                     }
                                 )
+                                removeFromParent()
+                                updateSupply(game.currentPlayer)
+                                updateZenBoard()
                             }
                         }
                     }
@@ -853,8 +872,9 @@ class BonsaiGameScene(private val rootService: RootService) :
                             ) {
                                 interactionText.text = " you have received a wood and a flower tile "
                                 rootService.playerActionService.meditate(2, null)
-
+                                removeFromParent()
                                 updateSupply(game.currentPlayer)
+                                updateZenBoard()
                             }
                         }
                     }
@@ -870,8 +890,9 @@ class BonsaiGameScene(private val rootService: RootService) :
                             ) {
                                 interactionText.text = "you have received a leaf and a fruit tile "
                                 rootService.playerActionService.meditate(3, null)
-
+                                removeFromParent()
                                 updateSupply(game.currentPlayer)
+                                updateZenBoard()
                             }
                         }
                     }
@@ -970,7 +991,6 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     }
 
-    // TODO(also not working)
     private fun updateSupplyAmount(player: Player) {
 
         if (woodSupplyDecks[getOrder(player)].components.isNotEmpty()) {
