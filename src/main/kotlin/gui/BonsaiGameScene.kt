@@ -724,6 +724,74 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
     }
 
+    override fun refreshAfterDrawingMasterCardAny(){
+
+
+        println("hello")
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+
+        overlayPane.clear()
+        overlayPane.isVisible = true
+        interactionText.text = "choose one tile"
+        overlayPane.add(
+            HexagonView(
+                posX = 1060, posY = 270,
+                size = 40,
+                visual = ColorVisual(Color(COLOUR_LEAF))
+            )
+                .apply {
+                    onMouseClicked = {
+                        rootService.playerActionService.chooseTile(TileType.LEAF)
+                        updateSupply(game.currentPlayer)
+                        overlayPane.isVisible = false
+                        interactionText.text = "You have received a leaf tile"
+
+                    }
+                })
+        overlayPane.add(
+            HexagonView(
+                posX = 1160, posY = 270,
+                size = 40,
+                visual = ColorVisual(Color(COLOUR_WOOD))
+            ).apply {
+                onMouseClicked = {
+                    rootService.playerActionService.chooseTile(TileType.WOOD)
+                    updateSupply(game.currentPlayer)
+                    overlayPane.isVisible = false
+                    interactionText.text = "You have received a wood tile"
+
+                }
+            })
+        overlayPane.add(
+            HexagonView(
+                posX = 1260, posY = 270,
+                size = 40,
+                visual = ColorVisual(Color(COLOUR_FRUIT))
+            ).apply {
+                onMouseClicked = {
+                    rootService.playerActionService.chooseTile(TileType.FRUIT)
+                    updateSupply(game.currentPlayer)
+                    overlayPane.isVisible = false
+                    interactionText.text = "You have received a fruit tile"
+
+                }
+            })
+        overlayPane.add(
+            HexagonView(
+                posX = 1360, posY = 270,
+                size = 40,
+                visual = ColorVisual(Color(COLOUR_FLOWER))
+            ).apply {
+                onMouseClicked = {
+                    rootService.playerActionService.chooseTile(TileType.FLOWER)
+                    updateSupply(game.currentPlayer)
+                    overlayPane.isVisible = false
+                    interactionText.text = "You have received a flower tile"
+
+                }
+            })
+    }
     override fun refreshAfterCultivateStart() {
         // refresh information telling the player to pick a tile
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -918,32 +986,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                             ) {
                                 interactionText.text = "Choose tile to claim: "
 
-                                //Interaction here causes some trouble :/ i have changed to overlay
-//                                interactionPane.isVisible = true
-//                                interactionPane.add(
-//                                    HexagonView(
-//                                        posX = 800, posY = 10,
-//                                        size = 40,
-//                                        visual = ColorVisual(Color(COLOUR_LEAF))
-//                                    ).apply {
-//                                        onMouseClicked = {
-//                                            rootService.playerActionService.meditate(1, TileType.LEAF)
-//                                            interactionPane.isVisible = false
-//                                        }
-//                                    }
-//                                )
-//                                interactionPane.add(
-//                                    HexagonView(
-//                                        posX = 700, posY = 10,
-//                                        size = 40,
-//                                        visual = ColorVisual(Color(COLOUR_WOOD))
-//                                    ).apply {
-//                                        onMouseClicked = {
-//                                            rootService.playerActionService.meditate(1, TileType.WOOD)
-//                                            interactionPane.isVisible = false
-//                                        }
-//                                    }
-//                                )
                                 overlayPane.clear()
                                 overlayPane.isVisible = true
 
@@ -957,7 +999,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                                             onMouseClicked = {
                                                 rootService.playerActionService.meditate(1, TileType.LEAF)
                                                 updateSupply(game.currentPlayer)
-                                                updateSupplyAmount(game.currentPlayer)
                                                 overlayPane.isVisible = false
                                                 interactionText.text = "You have received a leaf tile"
 
@@ -972,7 +1013,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                                         onMouseClicked = {
                                             rootService.playerActionService.meditate(1, TileType.WOOD)
                                             updateSupply(game.currentPlayer)
-                                            updateSupplyAmount(game.currentPlayer)
                                             overlayPane.isVisible = false
                                             interactionText.text = "You have received a wood tile"
 
@@ -980,7 +1020,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                     })
 
                                 removeFromParent()
-                                //updateSupply(game.currentPlayer)
+                                updateSupply(game.currentPlayer)
                                 updateZenBoard()
                             }
                         }
