@@ -3,6 +3,7 @@ package gui
 import service.RootService
 import tools.aqua.bgw.core.BoardGameApplication
 import tools.aqua.bgw.util.Font
+import util.DEFAULT_NAME
 
 /**
  * The [BonsaiApplication] is a [BoardGameApplication] that is the main class of the application
@@ -21,9 +22,9 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
     private val gameScene = BonsaiGameScene(rootService)
     private val configureGameMenuScene = ConfigureGameMenuScene(this, rootService)
     private val joinScene = JoinScene(this)
-    private val hostScene = HostScene()
+    private val hostScene = HostScene(this, rootService)
     private val waitingScene = WaitingScene()
-    private val startSessionScene = StartSessionScene(this)
+    private val startSessionScene = StartSessionScene(this, rootService)
     private val showResultScene = ResultScene(this, rootService)
 
     // loads to begin the used Font
@@ -64,7 +65,10 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
     /**
      * Funktion [showHostScene] shows the hostScene
      */
-    fun showHostScene() = this.showMenuScene(hostScene)
+    fun showHostScene() {
+        hostScene.playerInput.prompt = rootService.networkService.myName ?: DEFAULT_NAME
+        this.showMenuScene(hostScene)
+    }
 
     /**
      * Funktion [showStartSessionScene] shows the startSessionScene
