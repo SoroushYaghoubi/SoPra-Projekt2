@@ -334,7 +334,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
     /**
      * create a deepcopy of the game state
-     * ToDo need to check if some of there need to be deep copies
+     * ToDo need to check if some of them need to be deep copies
+     * probably does not work correctly right now
      */
     fun BonsaiGameState.deepCopy(): BonsaiGameState {
         return BonsaiGameState(
@@ -351,6 +352,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             copy.goalTiles = this.goalTiles.map { it.copy() }.toMutableList()
         }
     }
+
 
     /**
      * Player claims or renounces goal tile.

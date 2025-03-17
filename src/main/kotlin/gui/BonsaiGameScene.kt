@@ -209,29 +209,99 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     private val undoButton =
         Button(
-            posX = 20, // Adjusted to fit within the buttonPane
-            posY = 30, // Adjusted to fit within the buttonPane
+            posX = 20,
+            posY = 30,
             width = 50,
             height = 40,
             visual = ColorVisual(Color(0xffffff)).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
-            text = "⬅", // Thick left arrow Unicode symbol
-            font = Font(36) // Adjust font size as needed
-        )
+            text = "⬅",
+            font = Font(36)
+        ).apply {
+            onMouseClicked = {
+                if (rootService.historyService.canUndo()) {
+                    rootService.historyService.undo()
+                }
+            }
+            //hide the button in network games
+            isVisible = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true
+        }
 
+    /**
+     * This just does not work at all, probable because relevant parts of the history are not deep copies
+     * ToDo make redo and undo not broken
+     */
     private val redoButton =
         Button(
-            posX = 230, // Adjusted to fit within the buttonPane
-            posY = 30, // Adjusted to fit within the buttonPane
+            posX = 230,
+            posY = 30,
             width = 50,
             height = 40,
             visual = ColorVisual(Color(0xffffff)).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
-            text = "➡", // Thick right arrow Unicode symbol
-            font = Font(36) // Adjust font size as needed
-        )
+            text = "➡",
+            font = Font(36)
+        ).apply {
+            onMouseClicked = {
+                if (rootService.historyService.canRedo()) {
+                    rootService.historyService.redo()
+                }
+            }
+            //hide the button in network games
+            isVisible = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true
+        }
+
+    override fun refreshAfterRedoOrUndo() {
+        val gameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(gameState) { "Game state is not initialized." }
+
+        // Refresh player name and supply amount
+        nameText.text = "Player: ${gameState.currentPlayer.name}"
+        updateSupplyAmount(gameState.currentPlayer)
+
+        // Refresh the zen board
+        faceUpCards.clear()
+        zenDeckView.clear()
+        zenCardMap.clear()
+
+        gameState.faceUpCards.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showFront()
+            faceUpCards.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+
+        gameState.zenDeck.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showBack()
+            zenDeckView.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+
+        // Refresh supply tiles
+        updateSupply(gameState.currentPlayer)
+
+        // Refresh tree tiles
+        createEmptyHex(gameState.currentPlayer)
+
+        // Refresh interaction text
+        interactionText.text = "Undo/Redo performed. Current player: ${gameState.currentPlayer.name}"
+    }
+
 
     private val saveButton =
         Button(
@@ -244,7 +314,10 @@ class BonsaiGameScene(private val rootService: RootService) :
             },
             text = "SAVE GAME",
             font = Font(36)
-        )
+        ).apply {
+            // hide the button in network game
+            isVisible = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true
+        }
 
     // right side pane
     private val buttonPane = Pane<UIComponent>(
@@ -620,6 +693,13 @@ class BonsaiGameScene(private val rootService: RootService) :
     override fun refreshAfterGameStart() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
+
+        //invisible buttons in network game
+        val isLocalPlayer = game.currentPlayer.isLocal
+        undoButton.isVisible = isLocalPlayer
+        redoButton.isVisible = isLocalPlayer
+        saveButton.isVisible = isLocalPlayer
+
         initZenBoard()
         game.players.forEach {
             createPlayerPane(it)
