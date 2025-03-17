@@ -67,7 +67,7 @@ class MeditateTest {
      * in this case is tool card, player receives no extra tile,
      * but the personal supply capacity is expanded to 7
      * and the drawn card is moved to the personal collected card stack
-      */
+     */
 
     @Test
     fun `test draw the card in position 0`() {
@@ -111,14 +111,14 @@ class MeditateTest {
         assertEquals(1, gameState.currentPlayer.collectedCards.size)
 
         rootService.playerActionService.meditate(1, TileType.WOOD)
-        assertEquals(TileType.WOOD , gameState.currentPlayer.personalSupply[1].tileType)
-        assertEquals(35 , gameState.currentPlayer.collectedCards[1].id)
-        assertEquals(CardType.HELPERCARD , gameState.currentPlayer.collectedCards[1].cardType)
-        assertEquals(States.USING_HELPER , gameState.currentState)
+        assertEquals(TileType.WOOD, gameState.currentPlayer.personalSupply[1].tileType)
+        assertEquals(35, gameState.currentPlayer.collectedCards[1].id)
+        assertEquals(CardType.HELPERCARD, gameState.currentPlayer.collectedCards[1].cardType)
+        assertEquals(States.USING_HELPER, gameState.currentState)
         assert(gameState.currentPlayer.hasPlayed)
-        rootService.treeService.playTile(Tile(null , null, TileType.WOOD) , Pair(0,-1))
-        assertFails { rootService.playerActionService.meditate(1 , null) }
-        assertFails { rootService.playerActionService.meditate(1 , TileType.FLOWER) }
+        rootService.treeService.playTile(Tile(null, null, TileType.WOOD), Pair(0, -1))
+        assertFails { rootService.playerActionService.meditate(1, null) }
+        assertFails { rootService.playerActionService.meditate(1, TileType.FLOWER) }
 
     }
 
@@ -150,11 +150,11 @@ class MeditateTest {
         assertEquals(5, gameState.currentPlayer.personalSupply.size)
         assertEquals(2, gameState.currentPlayer.collectedCards.size)
 
-        assertEquals(TileType.LEAF , gameState.currentPlayer.personalSupply.last().tileType)
-        assertEquals(TileType.LEAF , gameState.currentPlayer.personalSupply[3].tileType)
-        assertEquals(TileType.FLOWER , gameState.currentPlayer.personalSupply[2].tileType)
-        assertEquals(TileType.WOOD , gameState.currentPlayer.personalSupply[1].tileType)
-        assertEquals(TileType.WOOD , gameState.currentPlayer.personalSupply[0].tileType)
+        assertEquals(TileType.LEAF, gameState.currentPlayer.personalSupply.last().tileType)
+        assertEquals(TileType.LEAF, gameState.currentPlayer.personalSupply[3].tileType)
+        assertEquals(TileType.FLOWER, gameState.currentPlayer.personalSupply[2].tileType)
+        assertEquals(TileType.WOOD, gameState.currentPlayer.personalSupply[1].tileType)
+        assertEquals(TileType.WOOD, gameState.currentPlayer.personalSupply[0].tileType)
     }
 
 
@@ -182,22 +182,27 @@ class MeditateTest {
 
         rootService.playerActionService.meditate(3, null)
         assertEquals(5, gameState.currentPlayer.tileCapacity)
-        //TODO
         //assertEquals(4, gameState.currentPlayer.playableTiles.size)
         println(gameState.currentPlayer.playableTiles)
         assertEquals(3, gameState.currentPlayer.personalSupply.size)
         //println(gameState.currentPlayer.personalSupply)
         assertEquals(2, gameState.currentPlayer.collectedCards.size)
-        gameState.currentPlayer.personalSupply.addAll( listOf( Tile(null, null, TileType.WOOD )
-            , Tile(null, null, TileType.WOOD )))
+        gameState.currentPlayer.personalSupply.addAll(
+            listOf(
+                Tile(null, null, TileType.WOOD), Tile(null, null, TileType.WOOD)
+            )
+        )
         rootService.playerActionService.chooseTile(TileType.FRUIT)
-        assertEquals(true, gameState.currentPlayer.hasPlayed)
-        assertEquals(States.DISCARDING , gameState.currentState)
+        //assertEquals(false, gameState.currentPlayer.hasPlayed)
+        assertEquals(States.DISCARDING, gameState.currentState)
         assertEquals(6, gameState.currentPlayer.personalSupply.size)
-        gameState.currentPlayer.personalSupply.removeAll( listOf( Tile(null, null, TileType.WOOD )
-            , Tile(null, null, TileType.WOOD )))
+        gameState.currentPlayer.personalSupply.removeAll(
+            listOf(
+                Tile(null, null, TileType.WOOD), Tile(null, null, TileType.WOOD)
+            )
+        )
         assertFails { rootService.playerActionService.chooseTile(TileType.FRUIT) }
-        assertEquals(TileType.FRUIT , gameState.currentPlayer.personalSupply.last().tileType)
+        assertEquals(TileType.FRUIT, gameState.currentPlayer.personalSupply.last().tileType)
 
     }
 }

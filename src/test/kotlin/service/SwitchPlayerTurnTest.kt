@@ -50,6 +50,4 @@ class SwitchPlayerTurnTest {
         assertEquals("Tom", gameState.currentPlayer.name)
     }
 
-
-
 }

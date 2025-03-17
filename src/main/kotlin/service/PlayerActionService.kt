@@ -70,13 +70,13 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             2 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.WOOD))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FLOWER))
-                msg.drawnTiles += mutableListOf(TileType.WOOD ,TileType.FLOWER)
+                msg.drawnTiles += mutableListOf(TileType.WOOD, TileType.FLOWER)
             }
 
             3 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.LEAF))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FRUIT))
-                msg.drawnTiles += mutableListOf(TileType.LEAF ,TileType.FRUIT)
+                msg.drawnTiles += mutableListOf(TileType.LEAF, TileType.FRUIT)
             }
         }
 
@@ -106,7 +106,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 //gameState.currentPlayer.hasPlayed = true
                 return
             }
-           else -> {
+
+            else -> {
                 println("parchment")
             }
         }
@@ -120,7 +121,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         actPlayer.hasPlayed = true
-        onAllRefreshables{refreshAfterMeditate()}
+        onAllRefreshables { refreshAfterMeditate() }
     }
 
     /**
@@ -132,7 +133,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
-       println("master")
+        println("master")
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         require(gameState.currentState == States.USING_MASTER)
@@ -165,8 +166,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
         actPlayer.hasPlayed = true
-        onAllRefreshables {refreshAfterMeditate() }
-        gameState.currentState =States.END_TURN
+        onAllRefreshables { refreshAfterMeditate() }
+        gameState.currentState = States.END_TURN
     }
 
     /**
@@ -197,7 +198,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         actPlayer.hasPlayed = true
         onAllRefreshables { refreshAfterMeditate() }
-        gameState.currentState =States.END_TURN
+        gameState.currentState = States.END_TURN
 
     }
 

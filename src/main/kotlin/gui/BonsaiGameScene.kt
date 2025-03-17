@@ -46,7 +46,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val fruitSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
     private val playerButtons: MutableList<Button> = mutableListOf()
     private val goalButtons: MutableList<Button> = mutableListOf()
-    private var goalTileList : MutableList<GoalTile> = mutableListOf()
+    private var goalTileList: MutableList<GoalTile> = mutableListOf()
 
 
     // button for cultivate
@@ -445,6 +445,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         playerPanes.add(playerPane)
         addComponents(playerPane)
     }
+
     // Overlay the game scene to prompt the player to choose tile
     private val overlayPane = Pane<ComponentView>(
         posX = 0, posY = 0,
@@ -499,7 +500,6 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
 
 
-
     private val leafTile = HexagonView(
         posY = 100,
         posX = 500,
@@ -541,6 +541,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             this.add(flowerTile)
 
         }
+
     init {
         addComponents(
             zenCardPane, infoPane, interactionPane, collectedCardPane,
@@ -815,13 +816,13 @@ class BonsaiGameScene(private val rootService: RootService) :
     }
 
     override fun refreshAfterReceivedTile(discard: Boolean) {
-        if (discard){
+        if (discard) {
             interactionText.text = ""
             val game = rootService.currentGame?.currentBonsaiGameState
             checkNotNull(game)
             // val playerIndex = getOrder(game.currentPlayer)
-           // val supplyTileMap = supplyTileMaps[playerIndex]
-            val  tobeRemoved : MutableList<Tile> = mutableListOf()
+            // val supplyTileMap = supplyTileMaps[playerIndex]
+            val tobeRemoved: MutableList<Tile> = mutableListOf()
             // make the supply tiles draggable after cultivate start
             /*
             game.players[playerIndex].personalSupply.forEach { supplyTile ->
@@ -840,27 +841,28 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     }
 
-    override fun refreshAfterDrawingMasterCardAny(){
+    override fun refreshAfterDrawingMasterCardAny() {
 
         println("hello")
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
 
         choseAnyTilePane.apply { isVisible = true }
-        leafTile.apply { onMouseClicked = {
-            rootService.playerActionService.chooseTile(TileType.LEAF)
-            updateSupply(game.currentPlayer)
-            interactionText.text = "You have received a leaf tile"
-            game.currentPlayer.hasPlayed =true
-            choseAnyTilePane.isVisible = false
-        }
+        leafTile.apply {
+            onMouseClicked = {
+                rootService.playerActionService.chooseTile(TileType.LEAF)
+                updateSupply(game.currentPlayer)
+                interactionText.text = "You have received a leaf tile"
+                game.currentPlayer.hasPlayed = true
+                choseAnyTilePane.isVisible = false
+            }
             woodTile.apply {
                 onMouseClicked = {
                     rootService.playerActionService.chooseTile(TileType.WOOD)
                     updateSupply(game.currentPlayer)
                     choseAnyTilePane.isVisible = false
                     interactionText.text = "You have received a wood tile"
-                    game.currentPlayer.hasPlayed =true
+                    game.currentPlayer.hasPlayed = true
                 }
             }
             fruitTile.apply {
@@ -869,7 +871,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                     updateSupply(game.currentPlayer)
                     choseAnyTilePane.isVisible = false
                     interactionText.text = "You have received a wood tile"
-                    game.currentPlayer.hasPlayed =true
+                    game.currentPlayer.hasPlayed = true
                 }
             }
             flowerTile.apply {
@@ -878,16 +880,15 @@ class BonsaiGameScene(private val rootService: RootService) :
                     updateSupply(game.currentPlayer)
                     choseAnyTilePane.isVisible = false
                     interactionText.text = "You have received a wood tile"
-                    game.currentPlayer.hasPlayed =true
+                    game.currentPlayer.hasPlayed = true
                 }
             }
 
         }
 
 
-
-
     }
+
     override fun refreshAfterCultivateStart() {
         // refresh information telling the player to pick a tile
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -917,7 +918,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             var goalTileScore = 0
 
             for (goalTile in goalTileList) {
-                if(goalTile.goalTileType == goalTileType && goalTile.tier == tier){
+                if (goalTile.goalTileType == goalTileType && goalTile.tier == tier) {
                     goalTileScore = goalTile.score
                 }
             }
@@ -945,8 +946,9 @@ class BonsaiGameScene(private val rootService: RootService) :
                     goalTilePane.isVisible = false
 
                     goalTileList.forEach {
-                        if(goalTileType == it.goalTileType && tier == it.tier){
-                            goalButtons[goalTileList.indexOf(it)].text = game.currentPlayer.name + ", Score:  ${goalTileScore}"
+                        if (goalTileType == it.goalTileType && tier == it.tier) {
+                            goalButtons[goalTileList.indexOf(it)].text =
+                                game.currentPlayer.name + ", Score:  ${goalTileScore}"
                         }
                     }
                 }
@@ -1074,7 +1076,6 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
     }
 
-    // TODO(it's not working)
     private fun applyCardPosition() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
