@@ -501,9 +501,24 @@ class BonsaiGameScene(private val rootService: RootService) :
 
 
     private val leafTile = HexagonView(
-        posY = 150,
-        posX = 100,
+        posY = 100,
+        posX = 500,
         visual = ColorVisual(Color(COLOUR_LEAF))
+    )
+    private val woodTile = HexagonView(
+        posY = 100,
+        posX = 150,
+        visual = ColorVisual(Color(COLOUR_WOOD))
+    )
+    private val fruitTile = HexagonView(
+        posY = 350,
+        posX = 150,
+        visual = ColorVisual(Color(COLOUR_FRUIT))
+    )
+    private val flowerTile = HexagonView(
+        posY = 350,
+        posX = 500,
+        visual = ColorVisual(Color(COLOUR_FLOWER))
     )
 
     // pane for claim or renounce goal tile
@@ -521,6 +536,9 @@ class BonsaiGameScene(private val rootService: RootService) :
             isVisible = false
             isDisabled = true
             this.add(leafTile)
+            this.add(woodTile)
+            this.add(fruitTile)
+            this.add(flowerTile)
 
         }
     init {
@@ -796,6 +814,32 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
     }
 
+    override fun refreshAfterReceivedTile(discard: Boolean) {
+        if (discard){
+            interactionText.text = ""
+            val game = rootService.currentGame?.currentBonsaiGameState
+            checkNotNull(game)
+            // val playerIndex = getOrder(game.currentPlayer)
+           // val supplyTileMap = supplyTileMaps[playerIndex]
+            val  tobeRemoved : MutableList<Tile> = mutableListOf()
+            // make the supply tiles draggable after cultivate start
+            /*
+            game.players[playerIndex].personalSupply.forEach { supplyTile ->
+                checkNotNull(supplyTileMap[supplyTile])
+                supplyTileMap[supplyTile].apply {
+                    onMouseClicked = {
+
+
+                    }
+                } ?: println("Warning: supplyTileMap does not contain $supplyTile")
+            }
+            rootService.playerActionService.discardSupplyTile(tobeRemoved)
+            */
+        }
+
+
+    }
+
     override fun refreshAfterDrawingMasterCardAny(){
 
         println("hello")
@@ -803,68 +847,46 @@ class BonsaiGameScene(private val rootService: RootService) :
         checkNotNull(game)
 
         choseAnyTilePane.apply { isVisible = true }
-        leafTile.apply { onMouseClicked = { choseAnyTilePane.isVisible = false} }
-
-        overlayPane.clear()
-        overlayPane.isVisible = true
-        interactionText.text = "choose one tile"
-        overlayPane.add(
-            HexagonView(
-                posX = 1060, posY = 270,
-                size = 40,
-                visual = ColorVisual(Color(COLOUR_LEAF))
-            )
-                .apply {
-                    onMouseClicked = {
-                        rootService.playerActionService.chooseTile(TileType.LEAF)
-                        updateSupply(game.currentPlayer)
-                        overlayPane.isVisible = false
-                        interactionText.text = "You have received a leaf tile"
-
-                    }
-                })
-        overlayPane.add(
-            HexagonView(
-                posX = 1160, posY = 270,
-                size = 40,
-                visual = ColorVisual(Color(COLOUR_WOOD))
-            ).apply {
+        leafTile.apply { onMouseClicked = {
+            rootService.playerActionService.chooseTile(TileType.LEAF)
+            updateSupply(game.currentPlayer)
+            interactionText.text = "You have received a leaf tile"
+            game.currentPlayer.hasPlayed =true
+            choseAnyTilePane.isVisible = false
+        }
+            woodTile.apply {
                 onMouseClicked = {
                     rootService.playerActionService.chooseTile(TileType.WOOD)
                     updateSupply(game.currentPlayer)
-                    overlayPane.isVisible = false
+                    choseAnyTilePane.isVisible = false
                     interactionText.text = "You have received a wood tile"
-
+                    game.currentPlayer.hasPlayed =true
                 }
-            })
-        overlayPane.add(
-            HexagonView(
-                posX = 1260, posY = 270,
-                size = 40,
-                visual = ColorVisual(Color(COLOUR_FRUIT))
-            ).apply {
+            }
+            fruitTile.apply {
                 onMouseClicked = {
                     rootService.playerActionService.chooseTile(TileType.FRUIT)
                     updateSupply(game.currentPlayer)
-                    overlayPane.isVisible = false
-                    interactionText.text = "You have received a fruit tile"
-
+                    choseAnyTilePane.isVisible = false
+                    interactionText.text = "You have received a wood tile"
+                    game.currentPlayer.hasPlayed =true
                 }
-            })
-        overlayPane.add(
-            HexagonView(
-                posX = 1360, posY = 270,
-                size = 40,
-                visual = ColorVisual(Color(COLOUR_FLOWER))
-            ).apply {
+            }
+            flowerTile.apply {
                 onMouseClicked = {
                     rootService.playerActionService.chooseTile(TileType.FLOWER)
                     updateSupply(game.currentPlayer)
-                    overlayPane.isVisible = false
-                    interactionText.text = "You have received a flower tile"
-
+                    choseAnyTilePane.isVisible = false
+                    interactionText.text = "You have received a wood tile"
+                    game.currentPlayer.hasPlayed =true
                 }
-            })
+            }
+
+        }
+
+
+
+
     }
     override fun refreshAfterCultivateStart() {
         // refresh information telling the player to pick a tile
