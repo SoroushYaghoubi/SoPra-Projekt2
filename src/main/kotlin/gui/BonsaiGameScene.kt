@@ -563,6 +563,10 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (goalTileType == null) {
             println(leafSupplyDecks[0].components.size)
         }
+        checkNotNull(goalTileType)
+        if (rootService.playerActionService.canClaimOrRenounceGoal(goalTileType, tier)){
+
+        }
     }
 
     override fun refreshAfterEndTurn() {
@@ -866,4 +870,28 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
         return -1
     }
+
+    private val claimButton = Button(
+        posX = 100,
+        posY = 450,
+        width = 250,
+        height = 60,
+        text = "Claim"
+    )
+
+    // pane for collected card
+    private val goalTilePane =
+        Pane<UIComponent>(
+            posX = 585,
+            posY = 240,
+            width = 750,
+            height = 600,
+            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        ).apply {
+            isVisible = false
+            this.add(claimButton)
+
+        }
 }
