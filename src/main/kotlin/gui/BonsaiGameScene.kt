@@ -499,12 +499,36 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
 
 
+
+    private val leafTile = HexagonView(
+        posY = 150,
+        posX = 100,
+        visual = ColorVisual(Color(COLOUR_LEAF))
+    )
+
+    // pane for claim or renounce goal tile
+    private val choseAnyTilePane =
+        Pane<ComponentView>(
+            posX = 585,
+            posY = 240,
+            width = 750,
+            height = 600,
+            visual = ColorVisual(Color(0xbebebe)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        ).apply {
+            zIndex = 1
+            isVisible = false
+            isDisabled = true
+            this.add(leafTile)
+
+        }
     init {
         addComponents(
             zenCardPane, infoPane, interactionPane, collectedCardPane,
             removeButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards,
-            overlayPane, goalTilePane
+            overlayPane, goalTilePane, choseAnyTilePane
         )
     }
 
@@ -774,10 +798,12 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     override fun refreshAfterDrawingMasterCardAny(){
 
-
         println("hello")
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
+
+        choseAnyTilePane.apply { isVisible = true }
+        leafTile.apply { onMouseClicked = { choseAnyTilePane.isVisible = false} }
 
         overlayPane.clear()
         overlayPane.isVisible = true
