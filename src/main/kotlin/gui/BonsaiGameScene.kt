@@ -819,21 +819,21 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (goalTileType != null) {
 
             addComponents(goalTilePane)
-            //goalTilePane.apply { this.isVisible = true }
-            //goalTilePane.apply { this.isDisabled = false }
+            goalTilePane.apply { this.isVisible = true }
+            goalTilePane.apply { this.isDisabled = false }
             claimButton.apply {
                 onMouseClicked = {
                     rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
                 }
-                //goalTilePane.isDisabled = true
-                //goalTilePane.isVisible = false
+                goalTilePane.isDisabled = true
+                goalTilePane.isVisible = false
                 removeComponents(goalTilePane)
             }
             renounceButton.apply {
                 onMouseClicked = {
                     rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
-                    //goalTilePane.isDisabled = true
-                    //goalTilePane.isVisible = false
+                    goalTilePane.isDisabled = true
+                    goalTilePane.isVisible = false
                     removeComponents(goalTilePane)
                 }
             }
@@ -1293,6 +1293,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 style.borderRadius = BorderRadius(20.0)
             }
         ).apply {
+            zIndex = 1
             //isVisible = true
             //isDisabled = true
             this.add(claimButton)
