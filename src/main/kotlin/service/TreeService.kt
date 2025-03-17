@@ -49,6 +49,9 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             net.toBeSentCultivateMessage.playedTiles.add(
                 (tile.tileType to (tilePosition))
             )
+            net.toBeSentMeditateMessage.playedTiles.add(
+                (tile.tileType to (tilePosition))
+            )
         }
         // TODO: check if player has achieved a goal tile
 
@@ -126,6 +129,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             currentPlayer.isLocal
         ) {
             net.toBeSentCultivateMessage.removedTilesAxialCoordinates.add(tilePosition)
+            net.toBeSentMeditateMessage.removedTilesAxialCoordinates.add(tilePosition)
         }
     }
 

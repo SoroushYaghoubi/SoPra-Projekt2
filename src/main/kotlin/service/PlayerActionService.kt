@@ -392,6 +392,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 player.isLocal
             ) {
                 net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
+                net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
             }
         } else {
             gameState.goalTiles.removeIf { tile ->
@@ -405,6 +406,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 player.isLocal
             ) {
                 net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
+                net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
             }
         }
 
