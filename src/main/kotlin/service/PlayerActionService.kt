@@ -314,6 +314,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 net.hasCultivated = false
             }
         }
+
+        getCurrentPlayer().hasPlayed = false
         onAllRefreshables { refreshAfterEndTurn() }
 
         // TODO: Update history -> later
