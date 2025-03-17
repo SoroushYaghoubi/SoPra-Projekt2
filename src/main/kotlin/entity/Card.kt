@@ -11,4 +11,9 @@ import kotlinx.serialization.Serializable
  * @throws IllegalArgumentException If [id] is negative or not an int
  */
 @Serializable
-abstract class Card(val id: Int, val cardType: CardType)
+abstract class Card(val id: Int, val cardType: CardType) {
+    // does nothing but is needed for the deepcopy
+    open fun copyCard(): Card {
+        return this
+    }
+}

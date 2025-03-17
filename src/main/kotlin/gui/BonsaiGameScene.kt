@@ -203,7 +203,13 @@ class BonsaiGameScene(private val rootService: RootService) :
             },
             text = "⬅", // Thick left arrow Unicode symbol
             font = Font(36) // Adjust font size as needed
-        )
+        ).apply {
+            onMouseClicked = {
+                if (rootService.historyService.canUndo()) {
+                    rootService.historyService.undo()
+                }
+            }
+        }
 
     private val redoButton =
         Button(
@@ -216,7 +222,61 @@ class BonsaiGameScene(private val rootService: RootService) :
             },
             text = "➡", // Thick right arrow Unicode symbol
             font = Font(36) // Adjust font size as needed
-        )
+        ).apply {
+            onMouseClicked = {
+                if (rootService.historyService.canRedo()) {
+                    rootService.historyService.redo()
+                }
+            }
+        }
+
+    override fun refreshAfterRedoOrUndo() {
+        val gameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(gameState) { "Game state is not initialized." }
+
+        nameText.text = "Player: ${gameState.currentPlayer.name}"
+        updateSupplyAmount(gameState.currentPlayer)
+
+        // refresh the zen board
+        faceUpCards.clear()
+        zenDeckView.clear()
+        zenCardMap.clear()
+
+        gameState.faceUpCards.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showFront()
+            faceUpCards.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+
+        gameState.zenDeck.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showBack()
+            zenDeckView.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+
+        // refresh supply
+        updateSupply(gameState.currentPlayer)
+
+        // refresh tree emptys
+        createEmptyHex(gameState.currentPlayer)
+
+        // refresh text
+        interactionText.text = "Undo/Redo performed. Current player: ${gameState.currentPlayer.name}"
+    }
 
     private val saveButton =
         Button(
