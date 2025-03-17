@@ -20,3 +20,8 @@ const val COLOUR_FRUIT = 0xFFB330
 
 const val CULTIVATE = 0
 const val MEDITATE = 1
+
+const val OTHERPLAYER_LAYER = 0
+const val CURRENTPLAYER_LAYER = 1
+const val PLAYERBUTTON_LAYER = 2
+const val POPUP_LAYER = 3
