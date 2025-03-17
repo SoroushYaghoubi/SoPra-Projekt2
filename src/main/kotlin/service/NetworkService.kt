@@ -165,7 +165,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
 
         // --------------- epilogue: state update ---------------
         toBeSentMeditateMessage.removedTilesAxialCoordinates.clear()
-        toBeSentCultivateMessage.removedTilesAxialCoordinates.clear()
         toBeSentMeditateMessage.playedTiles.clear()
         toBeSentMeditateMessage.claimedGoals.clear()
         toBeSentMeditateMessage.renouncedGoals.clear()
