@@ -36,7 +36,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val supplyTileMaps: MutableList<BidirectionalMap<Tile, HexagonView>> = mutableListOf()
     private val zenCardMap: BidirectionalMap<Card, CardView> = BidirectionalMap()
 
-    private val playerPanes: MutableList<Pane<UIComponent>> = mutableListOf()
+    private val playerPanes: MutableList<Pane<ComponentView>> = mutableListOf()
     private val treeHexagonGrids: MutableList<HexagonGrid<HexagonView>> = mutableListOf()
     private val targetLayouts: MutableList<Pane<ComponentView>> = mutableListOf()
     private val treePanes: MutableList<ComponentView> = mutableListOf()
@@ -51,8 +51,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     // button for cultivate
     private val cultivateButton =
         Button(
-            posX = 190,
-            posY = 270,
+            posX = 190, posY = 270,
             width = 150,
             height = 80,
             visual = ColorVisual(Color(0xffffff)).apply {
@@ -110,14 +109,15 @@ class BonsaiGameScene(private val rootService: RootService) :
     // pane for the cards
     private val zenCardPane =
         Pane<UIComponent>(
-            posX = 20,
-            posY = 20,
+            posX = 20, posY = 20,
             width = 700,
             height = 220,
             visual = ImageVisual("zenBoard.JPG").apply {
                 style.borderRadius = BorderRadius(20.0)
             }
-        )
+        ).apply {
+            zIndex = 1
+        }
 
     private val nameText = Label(
         posY = 10,
@@ -181,7 +181,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val zenDeckView = CardStack<CardView>(
         posX = 60, posY = 40,
         width = 110, height = 160
-    )
+    ).apply {
+        zIndex = CURRENTPLAYER_LAYER
+    }
 
     //faceup cards
     private val faceUpCards = LinearLayout<CardView>(
@@ -190,7 +192,9 @@ class BonsaiGameScene(private val rootService: RootService) :
         width = 500,
         height = 160,
         spacing = 13
-    )
+    ).apply {
+        zIndex = CURRENTPLAYER_LAYER
+    }
 
     private val undoButton =
         Button(
@@ -345,9 +349,26 @@ class BonsaiGameScene(private val rootService: RootService) :
                 },
                 text = player.name,
                 font = Font(30)
-            )
+            ).apply {
+                playerButtons.add(this)
+                onMouseClicked = {
+                    val game = rootService.currentGame?.currentBonsaiGameState
+                    checkNotNull(game)
+                    playerPanes.forEachIndexed { index, playerPane ->
+                        val currentPlayerIndex = getOrder(game.currentPlayer)
+                        if (index == i) {
+                            playerPane.isVisible = true
+                            if (index == currentPlayerIndex) {
+                                showSupply(index)
+                            }
+                        } else {
+                            playerPane.isVisible = false
+                            hideSupply(index)
+                        }
+                    }
+                }
+            }
             buttonPane.add(playerButton)
-            playerButtons.add(playerButton)
         }
 
         val buttonHeight = 45
@@ -370,8 +391,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                 text = "Tier: ${goalTile.tier} Score: ${goalTile.score}",
                 font = Font(30)
             )
-            buttonPane.add(goalButton)
             goalButtons.add(goalButton)
+            buttonPane.add(goalButton)
             currentY += buttonHeight + buttonSpacing
         }
 
@@ -379,12 +400,32 @@ class BonsaiGameScene(private val rootService: RootService) :
         addComponents(buttonPane)
     }
 
-
-    /* Create three rings of hexagons */
-
-
-    //initialize cardviews
-    //map the cardviews to cards
+    private fun createPlayerPane(player: Player) {
+        val playerPane =
+            Pane<ComponentView>(
+                posY = 380,
+                width = 1920,
+                height = 1080,
+                visual = ColorVisual(Color(0,0,0,0)),
+            ).apply {
+                val game = rootService.currentGame?.currentBonsaiGameState
+                checkNotNull(game)
+                if (player != game.currentPlayer) {
+                    //zIndex = OTHERPLAYER_LAYER
+                    isVisible = false
+                } else {
+                    //zIndex = CURRENTPLAYER_LAYER
+                    isVisible = true
+                }
+                //this.add()
+            }
+        playerPanes.add(playerPane)
+        addComponents(playerPane)
+        if (getOrder(player) != 0) {
+            playerPane.isVisible = false
+            //playerPane.isDisabled = true
+        }
+    }
 
     init {
         addComponents(
@@ -397,6 +438,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     //components for the tree boards
 
     private fun initPot(player: Player) {
+        val playerPane = playerPanes[getOrder(player)]
         val treeHexagonGrid = HexagonGrid<HexagonView>(
             posX = 1000,
             posY = 1000,
@@ -415,7 +457,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         val treePane = CameraPane(
             posX = 240,
-            posY = 380,
+            posY = 0,
             width = 1320,
             height = 680,
             target = targetLayout,
@@ -424,6 +466,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             this.interactive = true
         }
         treePanes.add(treePane)
+        playerPane.add(treePane)
 
         POT.forEach {
             var color = getColorForPot(player.color)
@@ -458,34 +501,39 @@ class BonsaiGameScene(private val rootService: RootService) :
     private fun initSupply(player: Player) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
+        val playerPane = playerPanes[getOrder(player)]
         val supplyTileMap = supplyTileMaps[getOrder(player)]
         val woodSupplyDeck = Area<HexagonView>(
-            posX = 60, posY = 410,
+            posX = 60, posY = 30,
             width = 100, height = 100,
             visual = ColorVisual(Color(255, 255, 255, 0))
         )
         woodSupplyDecks.add(woodSupplyDeck)
+        playerPane.add(woodSupplyDeck)
         // leaf supply deck
         val leafSupplyDeck = Area<HexagonView>(
-            posX = 60, posY = 560,
+            posX = 60, posY = 180,
             width = 100, height = 100,
             visual = ColorVisual(Color(255, 255, 255, 0))
         )
         leafSupplyDecks.add(leafSupplyDeck)
+        playerPane.add(leafSupplyDeck)
         // flower supply deck
         val flowerSupplyDeck = Area<HexagonView>(
-            posX = 60, posY = 710,
+            posX = 60, posY = 330,
             width = 100, height = 100,
             visual = ColorVisual(Color(255, 255, 255, 0))
         )
         flowerSupplyDecks.add(flowerSupplyDeck)
+        playerPane.add(flowerSupplyDeck)
         // fruit supply deck
         val fruitSupplyDeck = Area<HexagonView>(
-            posX = 60, posY = 860,
+            posX = 60, posY = 480,
             width = 100, height = 100,
             visual = ColorVisual(Color(255, 255, 255, 0))
         )
         fruitSupplyDecks.add(fruitSupplyDeck)
+        playerPane.add(fruitSupplyDeck)
 
         player.personalSupply.forEachIndexed { index, it ->
             val supplyHex = HexagonView(
@@ -572,7 +620,9 @@ class BonsaiGameScene(private val rootService: RootService) :
                 width = 110,
                 front = CompoundVisual(ColorVisual.WHITE, TextVisual("${it.id}")),
                 back = ColorVisual.BLACK,
-            )
+            ).apply {
+                zIndex = OTHERPLAYER_LAYER
+            }
             cardFrontSetter(it, cardView)
             cardView.showBack()
             zenDeckView.add(cardView)
@@ -602,17 +652,14 @@ class BonsaiGameScene(private val rootService: RootService) :
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         initZenBoard()
-        createRightSidePane()
         game.players.forEach {
+            createPlayerPane(it)
             treeTileMaps.add(BidirectionalMap())
             supplyTileMaps.add(BidirectionalMap())
             initPot(it)
             initSupply(it)
         }
-
-        addComponents(treePanes[0], woodSupplyDecks[0], leafSupplyDecks[0],
-            flowerSupplyDecks[0], fruitSupplyDecks[0])
-
+        createRightSidePane()
 
 
         interactionText.text = "Please select Cultivate or Meditate"
@@ -660,8 +707,23 @@ class BonsaiGameScene(private val rootService: RootService) :
     override fun refreshAfterEndTurn() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
+        val currentPlayerIndex = getOrder(game.currentPlayer)
+        val lastPlayerIndex = when (currentPlayerIndex) {
+            0 -> game.players.size - 1
+            else -> currentPlayerIndex - 1
+        }
         nameText.text = game.currentPlayer.name
         updateSupplyAmount(game.currentPlayer)
+        showSupply(currentPlayerIndex)
+        playerPanes[currentPlayerIndex].apply {
+            //zIndex = CURRENTPLAYER_LAYER
+            isVisible = true
+        }
+        hideSupply(lastPlayerIndex)
+        playerPanes[lastPlayerIndex].apply {
+            //zIndex = OTHERPLAYER_LAYER
+            isVisible = false
+        }
     }
 
 
@@ -922,6 +984,20 @@ class BonsaiGameScene(private val rootService: RootService) :
                         font = Font(30.0, Color(0x000000))))
             }
         }
+    }
+
+    private fun showSupply(index: Int) {
+        woodSupplyDecks[index].isVisible = true
+        leafSupplyDecks[index].isVisible = true
+        flowerSupplyDecks[index].isVisible = true
+        fruitSupplyDecks[index].isVisible = true
+    }
+
+    private fun hideSupply(index: Int) {
+        woodSupplyDecks[index].isVisible = false
+        leafSupplyDecks[index].isVisible = false
+        flowerSupplyDecks[index].isVisible = false
+        fruitSupplyDecks[index].isVisible = false
     }
 
     private fun getColorForGoalTile(goalTileType: GoalTileType): Int {
