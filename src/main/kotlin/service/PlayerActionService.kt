@@ -4,6 +4,8 @@ package service
 import entity.*
 import kotlin.math.max
 
+// todo: `msgToBeSent` should even be handled in the `refreshAfter` methods.
+
 /**
  * The service layer class which contains the player's action functions.
  */
@@ -33,6 +35,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @throws IllegalStateException if player has already done an action during his current turn.
      */
     fun meditate(cardPosition: Int, chosenTile: TileType?) {
+        require(cardPosition in 0..3)
+        val msg = rootService.networkService.toBeSentMeditateMessage
+        msg.chosenCardPosition = cardPosition
 
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
@@ -58,16 +63,19 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 checkNotNull(chosenTile)
                 require(chosenTile == TileType.WOOD || chosenTile == TileType.LEAF) { "Please choose WOOD or LEAF" }
                 actPlayer.personalSupply.add(Tile(null, null, chosenTile))
+                msg.drawnTiles += chosenTile
             }
 
             2 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.WOOD))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FLOWER))
+                msg.drawnTiles += mutableListOf(TileType.WOOD ,TileType.FLOWER)
             }
 
             3 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.LEAF))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FRUIT))
+                msg.drawnTiles += mutableListOf(TileType.LEAF ,TileType.FRUIT)
             }
         }
 
@@ -79,6 +87,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
             is GrowthCard -> {
                 actPlayer.playableTiles.add(drawnCard.tileType)
+                msg.drawnTiles += drawnCard.tileType
             }
 
             is MasterCard -> {
@@ -104,7 +113,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
 
-
         actPlayer.hasPlayed = true
         onAllRefreshables{refreshAfterMeditate()}
     }
@@ -114,6 +122,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param drawnCard : the drawn MasterCard
      */
     private fun playMasterCard(drawnCard: MasterCard) {
+        val msg = rootService.networkService.toBeSentMeditateMessage
+
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -132,12 +142,14 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             2 -> {
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[1]))
+                msg.drawnTiles += drawnCard.tileTypes
             }
 
             3 -> {
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[1]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[2]))
+                msg.drawnTiles += drawnCard.tileTypes
             }
         }
         // Check personal supply limit
@@ -188,6 +200,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param drawnCard : the drawn MasterCard
      */
     private fun playHelperCard(drawnCard: HelperCard) {
+        val msg = rootService.networkService.toBeSentMeditateMessage
 
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
