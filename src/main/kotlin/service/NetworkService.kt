@@ -139,9 +139,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * Holds the message to be sent for a Meditate action.
      */
     fun sendMeditateMessage() {
-        // TODO(some of its code should be implemented in other service classes)
-        // TODO(for the example, please check playTile())
-
         // --------------- prologue: state check ---------------
         check(connectionState == ConnectionState.PLAYING_MY_TURN)
         { "currently not expecting your turn." }
