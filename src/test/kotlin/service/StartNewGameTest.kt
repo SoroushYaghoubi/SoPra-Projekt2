@@ -24,7 +24,8 @@ class StartNewGameTest {
         val player1 = Player("Tom", PlayerType.HUMAN, true, ColorType.RED)
         val player2 = Player("Tomy", PlayerType.HUMAN, true, ColorType.BLACK)
         val player3 = Player("Tomi", PlayerType.HUMAN, true, ColorType.BLUE)
-        val playerOrder = mutableListOf(player1, player2, player3)
+        val player4 = Player("Tomii", PlayerType.HUMAN, true, ColorType.PURPLE)
+        val playerOrder = mutableListOf(player1, player2, player3, player4)
         val goalTiles = mutableListOf(GoalTileType.BLUE, GoalTileType.PINK, GoalTileType.GREEN)
         gameService.startNewGame(playerOrder, false, goalTiles)
         return rootService
@@ -48,7 +49,7 @@ class StartNewGameTest {
         val rootService = setUpGame()
         val game = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
         val players = game.players
-        assertEquals(3, players.size)
+        assertEquals(4, players.size)
     }
 
     /**
@@ -71,7 +72,7 @@ class StartNewGameTest {
         val bonsaiGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
         val players = bonsaiGameState.players
         assertEquals("Tom", players.first().name)
-        assertEquals("Tomi", players.last().name)
+        assertEquals("Tomii", players.last().name)
     }
 
     /**
@@ -83,5 +84,20 @@ class StartNewGameTest {
         val bonsaiGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
         assertEquals(4, bonsaiGameState.faceUpCards.size)
     }
+
+    /**
+     * Tests starting tiles
+     */
+    @Test
+    fun testStartingTiles() {
+        val rootService = setUpGame()
+        val bonsaiGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
+        val players = bonsaiGameState.players
+        assertEquals(players[0].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD) )
+        assertEquals(players[1].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD, TileType.LEAF) )
+        assertEquals(players[2].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER) )
+        assertEquals(players[3].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER, TileType.FRUIT) )
+    }
+
 
 }
