@@ -82,10 +82,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         when (drawnCard) {
 
             is ToolCard -> {
+                println("Growth")
                 actPlayer.tileCapacity += 2
             }
 
             is GrowthCard -> {
+                println("Growth")
                 actPlayer.playableTiles.add(drawnCard.tileType)
                 msg.drawnTiles += drawnCard.tileType
             }
@@ -102,6 +104,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 playHelperCard(drawnCard)
                 gameState.currentPlayer.hasPlayed = true
                 return
+            }
+           else -> {
+                println("parchment")
             }
         }
 
@@ -126,7 +131,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
-
+       println("master")
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         require(gameState.currentState == States.USING_MASTER)
@@ -201,7 +206,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      */
     private fun playHelperCard(drawnCard: HelperCard) {
         val msg = rootService.networkService.toBeSentMeditateMessage
-
+        println("helper")
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -299,6 +304,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         gameState.currentState = States.START_TURN
+        gameState.currentPlayer.hasPlayed = false
 
         val net = rootService.networkService
         // if it's online and we're the local player
