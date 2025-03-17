@@ -14,7 +14,6 @@ import tools.aqua.bgw.components.layoutviews.Pane
 import tools.aqua.bgw.components.uicomponents.Button
 import tools.aqua.bgw.components.uicomponents.Label
 import tools.aqua.bgw.components.uicomponents.UIComponent
-import tools.aqua.bgw.core.Alignment
 import tools.aqua.bgw.core.BoardGameScene
 import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.style.BorderRadius
@@ -25,7 +24,6 @@ import tools.aqua.bgw.visual.CompoundVisual
 import tools.aqua.bgw.visual.ImageVisual
 import tools.aqua.bgw.visual.TextVisual
 import util.*
-import kotlin.math.E
 
 /**
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
@@ -34,10 +32,19 @@ import kotlin.math.E
 class BonsaiGameScene(private val rootService: RootService) :
     BoardGameScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
 
-    private val treeTileMap: BidirectionalMap<Tile, HexagonView> = BidirectionalMap()
-    private val supplyTileMap: BidirectionalMap<Tile, HexagonView> = BidirectionalMap()
+    private val treeTileMaps: MutableList<BidirectionalMap<Tile, HexagonView>> = mutableListOf()
+    private val supplyTileMaps: MutableList<BidirectionalMap<Tile, HexagonView>> = mutableListOf()
     private val zenCardMap: BidirectionalMap<Card, CardView> = BidirectionalMap()
-    private val clickedSupply : HexagonView? = null
+
+    private val playerPanes: MutableList<Pane<UIComponent>> = mutableListOf()
+    private val treeHexagonGrids: MutableList<HexagonGrid<HexagonView>> = mutableListOf()
+    private val targetLayouts: MutableList<Pane<ComponentView>> = mutableListOf()
+    private val treePanes: MutableList<ComponentView> = mutableListOf()
+    private val woodSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
+    private val leafSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
+    private val flowerSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
+    private val fruitSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
+
 
     // button for cultivate
     private val cultivateButton =
@@ -52,7 +59,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             text = "cultivate",
             font = Font(36)
         ).apply {
-            onMouseClicked= {
+            onMouseClicked = {
                 rootService.playerActionService.cultivate()
             }
         }
@@ -105,7 +112,11 @@ class BonsaiGameScene(private val rootService: RootService) :
             },
             text = "EndTurn",
             font = Font(36)
-        )
+        ).apply {
+            onMouseClicked = {
+                rootService.playerActionService.endTurn()
+            }
+        }
 
     // pane for the cards
     private val zenCardPane =
@@ -119,9 +130,17 @@ class BonsaiGameScene(private val rootService: RootService) :
             }
         )
 
+    private val nameText = Label(
+        posY = 10,
+        width = 380,
+        height = 60,
+        text = "",
+        font = Font(40, Color(TERTIARY_COLOUR))
+    )
+
     // pane for player info
     private val infoPane =
-        Pane<UIComponent>(
+        Pane<ComponentView>(
             posX = 737,
             posY = 20,
             width = 400,
@@ -129,7 +148,9 @@ class BonsaiGameScene(private val rootService: RootService) :
             visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
-        )
+        ).apply {
+            this.add(nameText)
+        }
 
     // pane for collected card
     private val collectedCardPane =
@@ -143,131 +164,33 @@ class BonsaiGameScene(private val rootService: RootService) :
             }
         )
 
+    private val interactionText = Label(
+        posY = 20,
+        width = 800,
+        height = 60,
+        text = "",
+        font = Font(40, Color(TERTIARY_COLOUR))
+    )
+
     // pane for the interaction
     private val interactionPane =
-        Pane<UIComponent>(
+        Pane<ComponentView>(
             posX = 540,
             posY = 260,
             width = 840,
             height = 100,
             visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
                 style.borderRadius = BorderRadius(20.0)
-            }
-        )
-
-
-    //components for the zenCards area
-    //components for the personal information
-    //components for the discardTree, meditate, cultivate buttons
-    //components for the interaction dialogue area
-    //components for the redo and undo area
-    //components for other players and its buttons
-    //components for goal tiles
-
-    //camera pane
-
-    private val panLabel = Label(
-        posX = 300,
-        posY = 410,
-        width = 400,
-        height = 200,
-        text = "Drag to pan the camera. Scroll to zoom.",
-        alignment = Alignment.CENTER,
-        font = Font(20.0, Color.WHITE)
-    )
-
-    private val targetLayout = Pane<ComponentView>(
-        width = 2000,
-        height = 2000,
-        visual = ColorVisual(Color(SECONDARY_COLOUR))
-        //visual = ImageVisual("background.png")
-    ).apply {
-        this.add(panLabel)
-    }
-
-
-    // components for the tree
-    private val treeHexagonGrid = HexagonGrid<HexagonView>(
-        posX = 1000,
-        posY = 1000,
-        coordinateSystem = HexagonGrid.CoordinateSystem.AXIAL
-    )
-
-    private val treePane = CameraPane(
-        posX = 240,
-        posY = 380,
-        width = 1320,
-        height = 680,
-        target = targetLayout,
-        limitBounds = true
-    ).apply {
-        this.interactive = true
-    }
-
-    //components for the supplies
-    private val woodSupply = HexagonView(
-        posX = 60,
-        posY = 410,
-        visual = CompoundVisual(
-            ColorVisual(Color(COLOUR_WOOD)),
-            TextVisual(
-                text = "5",
-                font = Font(30.0, Color(0x000000))
-            )
-        ),
-        size = 60
-    )
-
-    private val leafSupply = HexagonView(
-        posX = 60,
-        posY = 560,
-        visual = CompoundVisual(
-            ColorVisual(Color(COLOUR_LEAF)),
-            TextVisual(
-                text = "5",
-                font = Font(30.0, Color(0x000000))
-            )
-        ),
-       size = 60
-    ).apply {
-            this.isDraggable  = true
-            this.onDragGestureEnded = { _, success ->
-                if (success) {
-                    this.isDraggable = false
-                }
-            }
-    }
-
-    private val flowerSupply = HexagonView(
-        posX = 60,
-        posY = 710,
-        visual = CompoundVisual(
-            ColorVisual(Color(COLOUR_FLOWER)),
-            TextVisual(
-                text = "5",
-                font = Font(30.0, Color(0x000000))
-            )
-        ),
-        size = 60
-    )
-
-    private val fruitSupply = HexagonView(
-        posX = 60,
-        posY = 860,
-        visual = CompoundVisual(
-            ColorVisual(Color(COLOUR_FRUIT)),
-            TextVisual(
-                text = "5",
-                font = Font(30.0, Color(0x000000))
-            )
-        ),
-        size = 60
-    )
+            },
+        ).apply {
+            this.add(interactionText)
+        }
 
     //zenDeck
     private val zenDeckView = CardStack<CardView>(
         posX = 60, posY = 40,
-        width = 110, height = 160)
+        width = 110, height = 160
+    )
 
     //faceup cards
     private val faceUpCards = LinearLayout<CardView>(
@@ -318,7 +241,6 @@ class BonsaiGameScene(private val rootService: RootService) :
         )
 
 
-
     private fun createRightSidePane() {
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState) { "Game state is not initialized." }
@@ -356,12 +278,12 @@ class BonsaiGameScene(private val rootService: RootService) :
         val playerButtonSpacing = 20
 
         // number of necessary player buttons
-        val numberOfPlayerButtons = gameState.players.size - 1
+        val numberOfPlayerButtons = gameState.players.size
 
         // created player buttons
         for (i in 0 until numberOfPlayerButtons) {
             // current player needs no buttons
-            val player = gameState.players[i + 1]
+            val player = gameState.players[i]
             val playerButton = Button(
                 posX = saveButton.posX,
                 posY = playerButtonsY + (playerButtonHeight + playerButtonSpacing) * i,
@@ -373,7 +295,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                 text = player.name,
                 font = Font(20)
             )
-
             buttonPane.add(playerButton)
         }
 
@@ -407,67 +328,58 @@ class BonsaiGameScene(private val rootService: RootService) :
         addComponents(buttonPane)
     }
 
-    private fun getColorForGoalTile(goalTileType: GoalTileType): Int {
-        return when (goalTileType) {
-            GoalTileType.BROWN -> COLOUR_WOOD
-            GoalTileType.GREEN -> COLOUR_LEAF
-            GoalTileType.ORANGE -> COLOUR_FRUIT
-            GoalTileType.PINK -> COLOUR_FLOWER
-            GoalTileType.BLUE -> COLOUR_BLUE
-        }
-    }
-
-
-
-
 
     /* Create three rings of hexagons */
-
 
 
     //initialize cardviews
     //map the cardviews to cards
 
     init {
-        addComponents(leafSupply, woodSupply, flowerSupply, fruitSupply,
+        addComponents(
             zenCardPane, infoPane, interactionPane, collectedCardPane,
             removeButton, meditateButton, cultivateButton, endTurnButton,
-            zenDeckView, faceUpCards,)
+            zenDeckView, faceUpCards,
+        )
     }
 
     //components for the tree boards
-    //initialize board
-    /**
-    //create hexagon
-    fun initHexagon() {
-        for (row in -8..8) {
-            for (col in -8..8) {
-                /* Only add hexagons that would fit in a circle */
-                if(row + col in -8..8) {
-                    val hexagon = HexagonView(
-                        visual = CompoundVisual(
-                            ColorVisual(Color(0xc6ff6e)),
-                            TextVisual(
-                                text = "$col, $row",
-                                font = Font(10.0, Color(0x0f141f))
-                            )
-                        ),
-                        size = 30
-                    )
-                    treeHexagonGrid[col, row] = hexagon
-                }
-            }
-        }
-    }
-    */
 
-    private fun initPot() {
-        POT.forEach{
-            var color = COLOUR_RED
+    private fun initPot(player: Player) {
+        val treeHexagonGrid = HexagonGrid<HexagonView>(
+            posX = 1000,
+            posY = 1000,
+            coordinateSystem = HexagonGrid.CoordinateSystem.AXIAL
+        )
+        treeHexagonGrids.add(treeHexagonGrid)
+
+        val targetLayout = Pane<ComponentView>(
+            width = 2000,
+            height = 2000,
+            visual = ColorVisual(Color(SECONDARY_COLOUR))
+            //visual = ImageVisual("background.png")
+        ).apply {
+            this.add(treeHexagonGrid)
+        }
+
+        val treePane = CameraPane(
+            posX = 240,
+            posY = 380,
+            width = 1320,
+            height = 680,
+            target = targetLayout,
+            limitBounds = true
+        ).apply {
+            this.interactive = true
+        }
+        treePanes.add(treePane)
+
+        POT.forEach {
+            var color = getColorForPot(player.color)
             if (it.second == 0) {
                 color = 0x000000
             }
-            if (it.first == 0 && it.second == 0){
+            if (it.first == 0 && it.second == 0) {
                 color = COLOUR_WOOD
             }
             val hexagon = HexagonView(
@@ -486,47 +398,72 @@ class BonsaiGameScene(private val rootService: RootService) :
         //map the tiles to hexagon
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        treeTileMap.add((game.currentPlayer.bonsaiTree[0 to 0] to treeHexagonGrid[0,0]) as Pair<Tile, HexagonView>)
+        treeTileMaps[getOrder(player)].add(
+            (player.bonsaiTree[0 to 0] to treeHexagonGrid[0, 0]) as Pair<Tile, HexagonView>
+        )
 
         // get the empty tiles
-        game.currentPlayer.bonsaiTree.getEmptyTiles().forEach{
-            val hexagon = HexagonView(
+        createEmptyHex(player)
+    }
+
+    private fun initSupply(player: Player) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        val supplyTileMap = supplyTileMaps[getOrder(player)]
+        val woodSupplyDeck = Area<HexagonView>(
+            posX = 60, posY = 410,
+            width = 100, height = 100,
+            visual = ColorVisual(Color(255, 255, 255, 0))
+        )
+        woodSupplyDecks.add(woodSupplyDeck)
+        // leaf supply deck
+        val leafSupplyDeck = Area<HexagonView>(
+            posX = 60, posY = 560,
+            width = 100, height = 100,
+            visual = ColorVisual(Color(255, 255, 255, 0))
+        )
+        leafSupplyDecks.add(leafSupplyDeck)
+        // flower supply deck
+        val flowerSupplyDeck = Area<HexagonView>(
+            posX = 60, posY = 710,
+            width = 100, height = 100,
+            visual = ColorVisual(Color(255, 255, 255, 0))
+        )
+        flowerSupplyDecks.add(flowerSupplyDeck)
+        // fruit supply deck
+        val fruitSupplyDeck = Area<HexagonView>(
+            posX = 60, posY = 860,
+            width = 100, height = 100,
+            visual = ColorVisual(Color(255, 255, 255, 0))
+        )
+        fruitSupplyDecks.add(fruitSupplyDeck)
+
+        player.personalSupply.forEachIndexed { index, it ->
+            val supplyHex = HexagonView(
                 visual = CompoundVisual(
-                    ColorVisual(255,255,255, 0.3),
-                    TextVisual(
-                        text = "${it.first}, ${it.second}",
-                        font = Font(10.0, Color(0x000000))
-                    )
+                    ColorVisual(Color(getColorForTileType(it.tileType)))
                 ),
-                size = 30
+                size = 60
             ).apply {
-                val emptyTile = Tile(it.first, it.second, TileType.EMPTY)
-                treeTileMap.add(emptyTile to this)
-                this.dropAcceptor = { dragEvent ->
-                    when (dragEvent.draggedComponent) {
-                        is HexagonView -> {
-                            val q = treeTileMap.backward(this).q
-                            val r = treeTileMap.backward(this).r
-                            val tile = Tile(q, r, TileType.LEAF)
-                            treeTileMap.remove(emptyTile to this)
-                            // TODO it needs to map to new hexagon
-                            treeTileMap.add(tile to this)
-                            // TODO temperory for the view
-                            visual = CompoundVisual(
-                                ColorVisual(255,255,255, 0.3),
-                                TextVisual(
-                                    text = "${it.first}, ${it.second}",
-                                    font = Font(10.0, Color(COLOUR_LEAF))
-                                ))
-                            rootService.treeService.playTile(tile,
-                                (q as Int to r as Int))
-                            dragEvent.draggedComponent == this
-                        }
-                        else -> false
+                this.isDraggable = true
+                this.onDragGestureEnded = { _, success ->
+                    if (success) {
+                        this.isDraggable = false
                     }
                 }
             }
-            treeHexagonGrid[it.first, it.second] = hexagon
+            it.q = index
+            if (supplyTileMap.containsForward(it)) {
+                supplyTileMap.removeForward(it)
+            }
+            supplyTileMap.add(it to supplyHex)
+
+            when (it.tileType) {
+                TileType.WOOD -> woodSupplyDeck.add(supplyHex)
+                TileType.LEAF -> leafSupplyDeck.add(supplyHex)
+                TileType.FLOWER -> flowerSupplyDeck.add(supplyHex)
+                else -> fruitSupplyDeck.add(supplyHex)
+            }
         }
     }
 
@@ -537,7 +474,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             val cardView = CardView(
                 height = 160,
                 width = 110,
-                front = CompoundVisual(ColorVisual.WHITE),
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${it.id}")),
                 back = ColorVisual.BLACK,
             )
             cardFrontSetter(it, cardView)
@@ -549,7 +486,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             val cardView = CardView(
                 height = 160,
                 width = 110,
-                front  = ColorVisual.WHITE,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${it.id}")),
                 back = ColorVisual.BLACK,
             )
             cardFrontSetter(it, cardView)
@@ -557,89 +494,340 @@ class BonsaiGameScene(private val rootService: RootService) :
             faceUpCards.add(cardView)
             zenCardMap.add(it to cardView)
         }
-        println(game.zenDeck.size)
-        println(game.faceUpCards.size)
+        applyCardPosition()
     }
 
     //refresher do something
     override fun refreshAfterGameStart() {
-        initPot()
-        targetLayout.apply {
-            this.add(treeHexagonGrid)
-        }
-        addComponents(treePane)
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
         initZenBoard()
         createRightSidePane()
+        game.players.forEach {
+            treeTileMaps.add(BidirectionalMap())
+            supplyTileMaps.add(BidirectionalMap())
+            initPot(it)
+            initSupply(it)
+        }
+
+        addComponents(treePanes[0], woodSupplyDecks[0], leafSupplyDecks[0],
+            flowerSupplyDecks[0], fruitSupplyDecks[0])
+
+
+
+        interactionText.text = "Please select Cultivate or Meditate"
+        nameText.text = "Player: " + game.players[0].name
+        updateSupplyAmount(game.players[0])
     }
 
     override fun refreshAfterCultivateStart() {
         // refresh information telling the player to pick a tile
+        interactionText.text = "You may now place your tiles"
     }
 
-    private fun cardFrontSetter(generalCard : Card, cardView : CardView) {
-        when (generalCard.cardType){
+    override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        if (goalTileType == null) {
+            println(leafSupplyDecks[0].components.size)
+        }
+    }
+
+    override fun refreshAfterEndTurn() {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        nameText.text = game.currentPlayer.name
+        updateSupplyAmount(game.currentPlayer)
+    }
+
+
+    private fun cardFrontSetter(generalCard: Card, cardView: CardView) {
+        when (generalCard.cardType) {
             CardType.TOOLCARD -> {
                 val card = generalCard as ToolCard
-                CompoundVisual(ColorVisual.WHITE,
-                    TextVisual("${card.cardType}\n" + "___2___"))
+                cardView.apply {
+                    frontVisual = CompoundVisual(
+                        ColorVisual.WHITE,
+                        TextVisual("${card.cardType}\n" + "___2___")
+                    )
+                }
             }
+
             CardType.GROWTHCARD -> {
                 val card = generalCard as GrowthCard
                 cardView.apply {
-                    card.apply {
-                        frontVisual = CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n" +"___${card.tileType}___",
-                            font = Font(15)))
-                    }
+                    frontVisual = CompoundVisual(
+                        ColorVisual.WHITE,
+                        TextVisual("${card.cardType}\n" + "___${card.tileType}___")
+                    )
+
                 }
             }
+
             CardType.HELPERCARD -> {
                 val card = generalCard as HelperCard
                 cardView.apply {
-                    card.apply {
-                        frontVisual = CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___",
-                                font = Font(15)))
-                    }
+                    frontVisual = CompoundVisual(
+                        ColorVisual.WHITE,
+                        TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___")
+                    )
                 }
             }
+
             CardType.MASTERCARD -> {
                 val card = generalCard as MasterCard
                 cardView.apply {
                     frontVisual = when (card.tileTypes.size) {
                         3 -> CompoundVisual(
                             ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___\n___${card.tileTypes[2]}___")
+                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___\n" + "___${card.tileTypes[2]}___")
                         )
 
                         2 -> CompoundVisual(
                             ColorVisual.WHITE,
-                            TextVisual(
-                                "${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___",
-                                font = Font(15)
-                            )
+                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___\n" + "___${card.tileTypes[1]}___")
                         )
 
                         else -> CompoundVisual(
                             ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n___${card.tileTypes[0]}___")
+                            TextVisual("${card.cardType}\n" + "___${card.tileTypes[0]}___")
                         )
 
                     }
                 }
             }
+
             CardType.PARCHMENTCARD -> {
                 val card = generalCard as ParchmentCard
                 cardView.apply {
                     frontVisual = if (card.parchmentCardType != null) {
-                        CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n___${card.parchmentCardType}___\n___${card.basePoints}___"))
+                        CompoundVisual(
+                            ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.parchmentCardType}___\n___${card.basePoints}___")
+                        )
                     } else {
-                        CompoundVisual(ColorVisual.WHITE,
-                            TextVisual("${card.cardType}\n___${card.parchmentTileType}___\n___${card.basePoints}___"))
+                        CompoundVisual(
+                            ColorVisual.WHITE,
+                            TextVisual("${card.cardType}\n___${card.parchmentTileType}___\n___${card.basePoints}___")
+                        )
                     }
                 }
             }
         }
+    }
+
+    // TODO(it's not working)
+    private fun applyCardPosition() {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        faceUpCards.forEachIndexed {  index, card ->
+            when (index) {
+                3 -> {
+                    card.apply {
+                        // TODO(need to make a choose pane)
+                        onMouseClicked = {
+                            rootService.playerActionService.meditate(3, TileType.LEAF)
+                        }
+                    }
+                }
+
+                2 -> {
+                    card.apply {
+                        onMouseClicked = {
+                            rootService.playerActionService.meditate(2, null)
+                        }
+                    }
+                }
+
+                1 -> {
+                    card.apply {
+                        onMouseClicked = {
+                            rootService.playerActionService.meditate(1, null)
+                        }
+                    }
+                }
+
+                else -> {} }
+            /**
+        game.faceUpCards.forEachIndexed { index, card ->
+            when (index) {
+                2 -> {
+                    zenCardMap.forward(card).apply {
+                        // TODO(need to make a choose pane)
+                        onMouseClicked = {
+                            rootService.playerActionService.meditate(1, TileType.LEAF)
+                        }
+                    }
+                }
+
+                1 -> {
+                    zenCardMap.forward(card).apply {
+                        onMouseClicked = {
+                            rootService.playerActionService.meditate(2, null)
+                        }
+                    }
+                }
+
+                0 -> {
+                    zenCardMap.forward(card).apply {
+                        onMouseClicked = {
+                            rootService.playerActionService.meditate(3, null)
+                        }
+                    }
+                }
+
+                else -> {}
+            }
+        */
+        }
+    }
+
+    /**
+     * really important function for play tile
+     */
+    private fun createEmptyHex(player: Player) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        val treeTileMap = treeTileMaps[getOrder(player)]
+        val supplyTileMap = supplyTileMaps[getOrder(player)]
+        val treeHexagonGrid = treeHexagonGrids[getOrder(player)]
+
+        player.bonsaiTree.getEmptyTiles().forEach {
+                println("${it.first}, ${it.second}")
+                val hexagon = HexagonView(
+                    visual = CompoundVisual(
+                        ColorVisual(255, 255, 255, 0.3),
+                        TextVisual(
+                            text = "${it.first}, ${it.second}",
+                            font = Font(10.0, Color(0x000000))
+                        )
+                    ),
+                    size = 30
+                ).apply {
+                    val emptyTile = Tile(it.first, it.second, TileType.EMPTY)
+                    if (treeTileMap.contains(emptyTile to this)){
+                        treeTileMap.remove(emptyTile to this)
+                        treeTileMap.add(emptyTile to this)
+                    } else {
+                        treeTileMap.add(emptyTile to this)
+                    }
+                    this.dropAcceptor = { dragEvent ->
+                        when (dragEvent.draggedComponent) {
+                            is HexagonView -> {
+                                // If the card is valid, the card can be dropped and played
+                                // some condition
+                                val comp = dragEvent.draggedComponent as HexagonView
+                                val tile = supplyTileMap.backward(comp)
+                                rootService.treeService.canPlayTile(tile, it)
+                            }
+                            else -> false
+                        }
+                    }
+                    this.onDragDropped = { dragEvent ->
+                        val comp = dragEvent.draggedComponent as HexagonView
+                        val tile = supplyTileMap.backward(comp)
+                        tile.q = it.first
+                        tile.r = it.second
+                        treeTileMap.remove(emptyTile to this)
+                        treeTileMap.add(tile to this)
+                        visual = CompoundVisual(
+                            ColorVisual(Color(getColorForTileType(tile.tileType))),
+                            TextVisual(
+                                text = "${it.first}, ${it.second}",
+                                font = Font(10.0, Color(0x000000))
+                            )
+                        )
+                        rootService.treeService.playTile(tile, it)
+                        val parentDeck = comp.parent as Area<HexagonView>
+                        comp.removeFromParent()
+                        if (parentDeck.components.isNotEmpty()){
+                            val supplyTileType = supplyTileMap.backward(parentDeck.last()).tileType
+                            parentDeck.last().apply {
+                                this.visual = CompoundVisual(ColorVisual(Color(getColorForTileType(supplyTileType))),
+                                    TextVisual("${parentDeck.components.size}",
+                                        font = Font(30.0, Color(0x000000))))
+                            }
+                        }
+                        createEmptyHex(player)
+                    }
+                }
+                treeHexagonGrid[it.first, it.second] = hexagon
+            }
+
+    }
+
+    // TODO(also not working)
+    private fun updateSupplyAmount(player: Player) {
+
+        if (woodSupplyDecks[getOrder(player)].components.isNotEmpty()){
+            woodSupplyDecks[getOrder(player)].components.last().apply {
+                this.visual = CompoundVisual(ColorVisual(Color(COLOUR_WOOD)),
+                    TextVisual("${woodSupplyDecks[getOrder(player)].components.size}",
+                        font = Font(30.0, Color(0x000000))))
+            }
+        }
+
+        if (leafSupplyDecks[getOrder(player)].components.isNotEmpty()){
+            leafSupplyDecks[getOrder(player)].components.last().apply {
+                this.visual = CompoundVisual(ColorVisual(Color(COLOUR_LEAF)),
+                    TextVisual("${leafSupplyDecks[getOrder(player)].components.size}",
+                        font = Font(30.0, Color(0x000000))))
+            }
+        }
+
+        if (flowerSupplyDecks[getOrder(player)].components.isNotEmpty()){
+            flowerSupplyDecks[getOrder(player)].components.last().apply {
+                this.visual = CompoundVisual(ColorVisual(Color(COLOUR_FLOWER)),
+                    TextVisual("${flowerSupplyDecks[getOrder(player)].components.size}",
+                        font = Font(30.0, Color(0x000000))))
+            }
+        }
+
+        if (fruitSupplyDecks[getOrder(player)].components.isNotEmpty()){
+            fruitSupplyDecks[getOrder(player)].components.last().apply {
+                this.visual = CompoundVisual(ColorVisual(Color(COLOUR_FRUIT)),
+                    TextVisual("${fruitSupplyDecks[getOrder(player)].components.size}",
+                        font = Font(30.0, Color(0x000000))))
+            }
+        }
+    }
+
+    private fun getColorForGoalTile(goalTileType: GoalTileType): Int {
+        return when (goalTileType) {
+            GoalTileType.BROWN -> COLOUR_WOOD
+            GoalTileType.GREEN -> COLOUR_LEAF
+            GoalTileType.ORANGE -> COLOUR_FRUIT
+            GoalTileType.PINK -> COLOUR_FLOWER
+            GoalTileType.BLUE -> COLOUR_BLUE
+        }
+    }
+
+    private fun getColorForTileType(tileType: TileType): Int {
+        return when (tileType) {
+            TileType.WOOD -> COLOUR_WOOD
+            TileType.LEAF -> COLOUR_LEAF
+            TileType.FLOWER -> COLOUR_FLOWER
+            else -> COLOUR_FRUIT
+        }
+    }
+
+    private fun getColorForPot(color: ColorType): Int {
+        return when (color) {
+            ColorType.RED -> COLOUR_RED
+            ColorType.PURPLE -> COLOUR_PURPLE
+            ColorType.BLACK -> COLOUR_BLACK
+            ColorType.BLUE -> COLOUR_BLUE
+        }
+    }
+
+    private fun getOrder(player: Player): Int {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        game.players.forEachIndexed { index, playerInList ->
+            if (player == playerInList) {
+                return index
+            }
+        }
+        return -1
     }
 }

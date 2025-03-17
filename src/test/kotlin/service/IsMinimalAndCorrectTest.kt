@@ -3,13 +3,14 @@ package service
 import entity.*
 import kotlin.test.*
 
-
+/**
+ * Tests the [TreeService.isMinimalAndCorrect] function
+ */
 class IsMinimalAndCorrectTest {
 
     /**
-     * test canPlaceWoodTile returns true for valid placement of leaf, wood, flower, fruit
+     * test minimal removal
      */
-
     @Test
     fun `test isMinimal`() {
         val rootService = RootService()
@@ -18,7 +19,6 @@ class IsMinimalAndCorrectTest {
         val players = mutableListOf(
             Player("Alice", PlayerType.HUMAN, true, ColorType.RED),
             Player("Bob", PlayerType.HUMAN, true, ColorType.BLUE),
-            Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
         )
 
         val gameState = BonsaiGameState(
@@ -30,61 +30,31 @@ class IsMinimalAndCorrectTest {
 
         //SETUP for player
         val playerBonsaiTree = mutableMapOf(
-            (0 to 0) to Tile(null, null, TileType.WOOD),
-            (-2 to -1) to Tile(null, null, TileType.FLOWER),
-            (-1 to -1) to Tile(null, null, TileType.LEAF),
-            (0 to -1) to Tile(null, null, TileType.WOOD),
+            (0 to 0) to Tile(null, null, TileType.WOOD), (-2 to -1) to Tile(null, null, TileType.FLOWER),
+            (-1 to -1) to Tile(null, null, TileType.LEAF), (0 to -1) to Tile(null, null, TileType.WOOD),
             (1 to -1) to Tile(null, null, TileType.LEAF),
 
+            (-2 to -2) to Tile(null, null, TileType.FRUIT), (-1 to -2) to Tile(null, null, TileType.LEAF),
+            (0 to -2) to Tile(null, null, TileType.LEAF), (1 to -2) to Tile(null, null, TileType.WOOD),
+            (2 to -2) to Tile(null, null, TileType.LEAF), (3 to -2) to Tile(null, null, TileType.FLOWER),
 
-            (-2 to -2) to Tile(null, null, TileType.FRUIT),
-            (-1 to -2) to Tile(null, null, TileType.LEAF),
-            (0 to -2) to Tile(null, null, TileType.LEAF),
-            (1 to -2) to Tile(null, null, TileType.WOOD),
-            (2 to -2) to Tile(null, null, TileType.LEAF),
-            (3 to -2) to Tile(null, null, TileType.FLOWER),
+            (-1 to -3) to Tile(null, null, TileType.LEAF), (0 to -3) to Tile(null, null, TileType.WOOD),
+            (1 to -3) to Tile(null, null, TileType.WOOD), (2 to -3) to Tile(null, null, TileType.WOOD),
+            (3 to -3) to Tile(null, null, TileType.LEAF), (4 to -3) to Tile(null, null, TileType.FLOWER),
 
-            (-1 to -3) to Tile(null, null, TileType.LEAF),
-            (0 to -3) to Tile(null, null, TileType.WOOD),
-            (1 to -3) to Tile(null, null, TileType.WOOD),
-            (2 to -3) to Tile(null, null, TileType.WOOD),
-            (3 to -3) to Tile(null, null, TileType.LEAF),
-            (4 to -3) to Tile(null, null, TileType.FLOWER),
+            (0 to -4) to Tile(null, null, TileType.LEAF), (1 to -4) to Tile(null, null, TileType.WOOD),
+            (2 to -4) to Tile(null, null, TileType.LEAF), (3 to -4) to Tile(null, null, TileType.WOOD),
 
-            (0 to -4) to Tile(null, null, TileType.LEAF),
-            (1 to -4) to Tile(null, null, TileType.WOOD),
-            (2 to -4) to Tile(null, null, TileType.LEAF),
-            (3 to -4) to Tile(null, null, TileType.WOOD),
-            //(4 to -4) to Tile(null, null, TileType.LEAF),
+            (0 to -5) to Tile(null, null, TileType.FLOWER), (1 to -5) to Tile(null, null, TileType.WOOD),
+            (2 to -5) to Tile(null, null, TileType.LEAF), (3 to -5) to Tile(null, null, TileType.LEAF),
+            (4 to -5) to Tile(null, null, TileType.LEAF), (5 to -5) to Tile(null, null, TileType.FLOWER),
 
-
-            (0 to -5) to Tile(null, null, TileType.FLOWER),
-            (1 to -5) to Tile(null, null, TileType.WOOD),
-            (2 to -5) to Tile(null, null, TileType.LEAF),
-            (3 to -5) to Tile(null, null, TileType.LEAF),
-            (4 to -5) to Tile(null, null, TileType.LEAF),
-            (5 to -5) to Tile(null, null, TileType.FLOWER),
-
-            (1 to -6) to Tile(null, null, TileType.LEAF),
-            (2 to -6) to Tile(null, null, TileType.LEAF),
-            (3 to -6) to Tile(null, null, TileType.FLOWER),
-            (4 to -6) to Tile(null, null, TileType.LEAF),
-
+            (1 to -6) to Tile(null, null, TileType.LEAF), (2 to -6) to Tile(null, null, TileType.LEAF),
+            (3 to -6) to Tile(null, null, TileType.FLOWER), (4 to -6) to Tile(null, null, TileType.LEAF),
 
             (2 to -7) to Tile(null, null, TileType.FRUIT)
         )
-
-        val playerCollectedCard = mutableListOf(
-            ToolCard(41),
-            MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
-            HelperCard(TileType.LEAF, 35),
-            GrowthCard(TileType.LEAF, 3),
-            MasterCard(mutableListOf(TileType.ANY), 24)
-        )
-
-        gameState.currentPlayer.collectedCards = playerCollectedCard
         gameState.currentPlayer.bonsaiTree = playerBonsaiTree
-
         val game = BonsaiGame()
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
@@ -100,6 +70,9 @@ class IsMinimalAndCorrectTest {
          assertFalse( rootService.treeService.isMinimalAndCorrect(Pair(2, -6)) )
     }
 
+    /**
+     * other test case minimal removal
+     */
     @Test
     fun `test another time `(){
         val rootService = RootService()
@@ -108,59 +81,37 @@ class IsMinimalAndCorrectTest {
         val players = mutableListOf(
             Player("Alice", PlayerType.HUMAN, true, ColorType.RED),
             Player("Bob", PlayerType.HUMAN, true, ColorType.BLUE),
-            Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
         )
 
         val gameState = BonsaiGameState(
-            currentPlayer = players.first(),
-            players = players,
-            botSpeed = 1,
-            currentState = States.DISCARDING
+            currentPlayer = players.first(), players = players,
+            botSpeed = 1, currentState = States.DISCARDING
         )
+
         val playerBonsaiTree = mutableMapOf(
-            (0 to 0) to Tile(null, null, TileType.WOOD),
-            (-2 to -1) to Tile(null, null, TileType.FRUIT),
-            (-1 to -1) to Tile(null, null, TileType.LEAF),
-            (0 to -1) to Tile(null, null, TileType.WOOD),
-            (1 to -1) to Tile(null, null, TileType.LEAF),
-            (2 to -1) to Tile(null, null, TileType.FRUIT),
+            (0 to 0) to Tile(null, null, TileType.WOOD), (-2 to -1) to Tile(null, null, TileType.FRUIT),
+            (-1 to -1) to Tile(null, null, TileType.LEAF), (0 to -1) to Tile(null, null, TileType.WOOD),
+            (1 to -1) to Tile(null, null, TileType.LEAF), (2 to -1) to Tile(null, null, TileType.FRUIT),
 
+            (-2 to -2) to Tile(null, null, TileType.FRUIT), (-1 to -2) to Tile(null, null, TileType.LEAF),
+            (0 to -2) to Tile(null, null, TileType.LEAF), (1 to -2) to Tile(null, null, TileType.WOOD),
+            (2 to -2) to Tile(null, null, TileType.LEAF), (3 to -2) to Tile(null, null, TileType.FLOWER),
 
-            (-2 to -2) to Tile(null, null, TileType.FRUIT),
-            (-1 to -2) to Tile(null, null, TileType.LEAF),
-            (0 to -2) to Tile(null, null, TileType.LEAF),
-            (1 to -2) to Tile(null, null, TileType.WOOD),
-            (2 to -2) to Tile(null, null, TileType.LEAF),
-            (3 to -2) to Tile(null, null, TileType.FLOWER),
+            (-1 to -3) to Tile(null, null, TileType.LEAF), (0 to -3) to Tile(null, null, TileType.WOOD),
+            (1 to -3) to Tile(null, null, TileType.WOOD), (2 to -3) to Tile(null, null, TileType.WOOD),
+            (3 to -3) to Tile(null, null, TileType.LEAF), (4 to -3) to Tile(null, null, TileType.FLOWER),
 
-            (-1 to -3) to Tile(null, null, TileType.LEAF),
-            (0 to -3) to Tile(null, null, TileType.WOOD),
-            (1 to -3) to Tile(null, null, TileType.WOOD),
-            (2 to -3) to Tile(null, null, TileType.WOOD),
-            (3 to -3) to Tile(null, null, TileType.LEAF),
-            (4 to -3) to Tile(null, null, TileType.FLOWER),
-
-            (-1 to -4) to Tile(null, null, TileType.FRUIT),
-            (0 to -4) to Tile(null, null, TileType.LEAF),
-            (1 to -4) to Tile(null, null, TileType.WOOD),
-            (2 to -4) to Tile(null, null, TileType.LEAF),
-            (3 to -4) to Tile(null, null, TileType.WOOD),
-            (4 to -4) to Tile(null, null, TileType.LEAF),
+            (-1 to -4) to Tile(null, null, TileType.FRUIT), (0 to -4) to Tile(null, null, TileType.LEAF),
+            (1 to -4) to Tile(null, null, TileType.WOOD), (2 to -4) to Tile(null, null, TileType.LEAF),
+            (3 to -4) to Tile(null, null, TileType.WOOD), (4 to -4) to Tile(null, null, TileType.LEAF),
             (5 to -4) to Tile(null, null, TileType.FLOWER),
 
+            (0 to -5) to Tile(null, null, TileType.FLOWER), (1 to -5) to Tile(null, null, TileType.WOOD),
+            (2 to -5) to Tile(null, null, TileType.LEAF), (3 to -5) to Tile(null, null, TileType.LEAF),
+            (4 to -5) to Tile(null, null, TileType.LEAF), (5 to -5) to Tile(null, null, TileType.FLOWER),
 
-            (0 to -5) to Tile(null, null, TileType.FLOWER),
-            (1 to -5) to Tile(null, null, TileType.WOOD),
-            (2 to -5) to Tile(null, null, TileType.LEAF),
-            (3 to -5) to Tile(null, null, TileType.LEAF),
-            (4 to -5) to Tile(null, null, TileType.LEAF),
-            (5 to -5) to Tile(null, null, TileType.FLOWER),
-
-            (1 to -6) to Tile(null, null, TileType.LEAF),
-            (2 to -6) to Tile(null, null, TileType.LEAF),
-            (3 to -6) to Tile(null, null, TileType.FLOWER),
-            (4 to -6) to Tile(null, null, TileType.FRUIT),
-
+            (1 to -6) to Tile(null, null, TileType.LEAF), (2 to -6) to Tile(null, null, TileType.LEAF),
+            (3 to -6) to Tile(null, null, TileType.FLOWER), (4 to -6) to Tile(null, null, TileType.FRUIT),
 
             (2 to -7) to Tile(null, null, TileType.FRUIT)
 

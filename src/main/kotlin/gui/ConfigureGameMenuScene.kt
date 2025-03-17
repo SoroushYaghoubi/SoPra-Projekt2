@@ -517,7 +517,20 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
                             playerHardBots[index].isChecked -> PlayerType.HARDBOT
                             else -> PlayerType.HUMAN
                         }
-                        entity.Player(it.text.trim(), playerType, true, color)
+                        println(it.text.trim())
+                        val name =
+                            if (it.text.trim() == "") {
+                                when (index) {
+                                    3 -> "Alice"
+                                    2 -> "Bob"
+                                    1 -> "Cody"
+                                    else -> "Dirk"
+                                }
+                            }else {
+                                    it.text.trim()
+
+                            }
+                        entity.Player(name, playerType, true, color)
                     }.toMutableList()
 
                     rootService.gameService.startNewGame(guiPlayer, false,

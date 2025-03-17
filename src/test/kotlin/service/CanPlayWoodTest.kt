@@ -5,9 +5,16 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+/**
+ * Tests the [TreeService.canPlayWood] function
+ */
 class CanPlayWoodTest {
+
+    /**
+     * Test can place wood tiles
+     */
     @Test
-    fun `test canPlaceWoodTile returns true for valid play`() {
+    fun `test canPlayWood returns true for valid play`() {
         val rootService = RootService()
 
         //SETUP for game
@@ -31,12 +38,9 @@ class CanPlayWoodTest {
             (-1 to -1) to Tile(null, null, TileType.LEAF),
             (1 to -1) to Tile(null, null, TileType.LEAF),
 
-
-            //   (-1 to -2) to Tile(null, null, TileType.FLOWER),
             (0 to -2) to Tile(null, null, TileType.WOOD),
             (1 to -2) to Tile(null, null, TileType.LEAF),
             (2 to -2) to Tile(null, null, TileType.LEAF),
-            //(3 to -2) to Tile(null, null, TileType.FLOWER),
 
             (0 to -3) to Tile(null, null, TileType.FLOWER),
             (1 to -3) to Tile(null, null, TileType.LEAF),
@@ -45,10 +49,7 @@ class CanPlayWoodTest {
 
         val playerCollectedCard = mutableListOf(
             ToolCard(41),
-            MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27),
-            HelperCard(TileType.LEAF, 35),
-            GrowthCard(TileType.LEAF, 3),
-            MasterCard(mutableListOf(TileType.ANY), 24)
+            MasterCard(mutableListOf(TileType.LEAF, TileType.FRUIT), 27)
         )
 
         gameState.currentPlayer.collectedCards = playerCollectedCard
@@ -61,8 +62,11 @@ class CanPlayWoodTest {
         assertTrue(rootService.treeService.canPlayWood())
     }
 
+    /**
+     * Test can place wood tiles fails
+     */
     @Test
-    fun `test canPlaceWoodTile fails`() {
+    fun `test canPlayWood fails`() {
         val rootService = RootService()
 
         //SETUP for game
@@ -86,12 +90,10 @@ class CanPlayWoodTest {
             (-1 to -1) to Tile(null, null, TileType.LEAF),
             (1 to -1) to Tile(null, null, TileType.LEAF),
 
-
             (-1 to -2) to Tile(null, null, TileType.FLOWER),
             (0 to -2) to Tile(null, null, TileType.WOOD),
             (1 to -2) to Tile(null, null, TileType.LEAF),
             (2 to -2) to Tile(null, null, TileType.LEAF),
-            //(3 to -2) to Tile(null, null, TileType.FLOWER),
 
             (0 to -3) to Tile(null, null, TileType.FLOWER),
             (1 to -3) to Tile(null, null, TileType.LEAF),

@@ -11,9 +11,11 @@ import kotlinx.serialization.Serializable
  * @param tileType is bonsai [TileType]
  */
 @Serializable
-data class Tile(val q: Int? = null, val r: Int? = null, val tileType: TileType) {
+data class Tile(var q: Int? = null, var r: Int? = null, val tileType: TileType) {
+    /**
     val s: Int?
         get() = if (q != null && r != null) (-q - r) else null
+    */
 
     override fun toString(): String {
         return "Tile Type: ${this.tileType}"
