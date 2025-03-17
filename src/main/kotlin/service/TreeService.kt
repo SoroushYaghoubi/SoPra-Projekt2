@@ -69,7 +69,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier) }
             }
         }
-        if (!reached){
+        if (!reached) {
             // do other stuff in gui
             onAllRefreshables { refreshAfterPlayTile(null, 0) }
         }
@@ -231,7 +231,8 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      */
     fun canPlayTile(tile: Tile): Boolean {
         val currentPlayer = getCurrentPlayer()
-        require(currentPlayer.personalSupply.contains(tile)) { "Player does not have this bonsai tile in hand" }
+        require(currentPlayer.personalSupply.contains(tile))
+        { "Player does not have this bonsai tile in hand" }
 
         return currentPlayer.playableTilesCopy.contains(tile.tileType)
                 || currentPlayer.playableTilesCopy.contains(TileType.ANY)
@@ -247,7 +248,8 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      * - It is **not** part of the predefined `POT` (restricted area).
      * - It is currently unoccupied
      *
-     * If at least one WOOD tile has an open space next to it, the function returns `true`; otherwise, it returns `false`.
+     * If at least one WOOD tile has an open space next to it,
+     * the function returns `true`; otherwise, it returns `false`.
      *
      * @return `true` if a WOOD tile can be placed, otherwise `false`.
      */

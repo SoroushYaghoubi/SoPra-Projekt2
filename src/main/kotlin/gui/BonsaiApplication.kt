@@ -23,7 +23,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
     private val joinScene = JoinScene(this)
     private val hostScene = HostScene()
     private val waitingScene = WaitingScene()
-    private val startSessionScene = StartSessionScene(this)
+    private val startSessionScene = StartSessionScene(this, rootService)
     private val showResultScene = ResultScene(this, rootService)
 
     // loads to begin the used Font

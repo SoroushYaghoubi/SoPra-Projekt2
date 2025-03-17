@@ -167,7 +167,8 @@ class CalculateScoreTest {
             GrowthCard(TileType.LEAF, 3),
             MasterCard(mutableListOf(TileType.ANY), 24),
             ParchmentCard(TileType.LEAF, null, 1, 39),
-            ParchmentCard(TileType.FLOWER, null, 2, 37)
+            ParchmentCard(TileType.FLOWER, null, 2, 37),
+            ParchmentCard(null, CardType.MASTERCARD,2, 34)
         )
 
         val playerClaimedGoal = mutableListOf(
@@ -199,7 +200,7 @@ class CalculateScoreTest {
         checkNotNull(gameState) { "No active game state." }
 
         assertEquals(
-            intArrayOf(39, 14, 19, 5, 23, 100).toList(),
+            intArrayOf(39, 14, 19, 5, 25, 102).toList(),
             rootService.gameService.calculateScore(player = gameState.currentPlayer)
         )
     }

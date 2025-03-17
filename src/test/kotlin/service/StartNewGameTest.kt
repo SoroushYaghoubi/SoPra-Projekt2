@@ -93,11 +93,19 @@ class StartNewGameTest {
         val rootService = setUpGame()
         val bonsaiGameState = checkNotNull(rootService.currentGame?.currentBonsaiGameState)
         val players = bonsaiGameState.players
-        assertEquals(players[0].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD) )
-        assertEquals(players[1].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD, TileType.LEAF) )
-        assertEquals(players[2].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER) )
-        assertEquals(players[3].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER, TileType.FRUIT) )
+        assertEquals(players[0].personalSupply.map { it.tileType }, mutableListOf(TileType.WOOD))
+        assertEquals(
+            players[1].personalSupply.map { it.tileType },
+            mutableListOf(TileType.WOOD, TileType.LEAF)
+        )
+        assertEquals(
+            players[2].personalSupply.map { it.tileType },
+            mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER)
+        )
+        assertEquals(
+            players[3].personalSupply.map { it.tileType },
+            mutableListOf(TileType.WOOD, TileType.LEAF, TileType.FLOWER, TileType.FRUIT)
+        )
     }
-
 
 }

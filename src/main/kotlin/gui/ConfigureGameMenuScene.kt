@@ -19,13 +19,15 @@ import util.TERTIARY_COLOUR
 import util.*
 
 
-
 /**
  * The [ConfigureGameMenuScene] is a [MenuScene] to configure the starting parameters
  * of a game of bonsai in hot seat mode
  */
-class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
-                             private val rootService: RootService) : MenuScene(1920,1080, ColorVisual(Color(PRIMARY_COLOUR))) , Refreshable {
+class ConfigureGameMenuScene(
+    private val bonsaiApplication: BonsaiApplication,
+    private val rootService: RootService
+) :
+    MenuScene(1920, 1080, ColorVisual(Color(PRIMARY_COLOUR))), Refreshable {
 
     private val playerColors = mutableListOf(
         ColorType.RED,
@@ -47,9 +49,10 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         ColorType.BLACK to COLOUR_BLACK,
         ColorType.BLUE to COLOUR_BLUE
     )
+
     /**
-    * determines which color should be chosen for new player
-    */
+     * determines which color should be chosen for new player
+     */
     private fun nextColor(currentColor: ColorType): ColorType {
         val currentIndex = availableColors.indexOf(currentColor)
         return if (currentIndex == -1 || currentIndex == availableColors.lastIndex)
@@ -57,6 +60,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         else
             availableColors[currentIndex + 1]
     }
+
     /**
      * changes color to next one on click
      */
@@ -222,6 +226,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             posY = 870,
             text = "RANDOM"
         )
+
     /**
      * deselects all goal tiles and chooses and selects three goal tiles at random
      */
@@ -234,6 +239,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             selectRandomGoalTiles()
         }
     }
+
     /**
      * chooses and selects three goal tiles at random
      */
@@ -243,11 +249,12 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
 
         for (goalTile in selectedTiles) {
             val button = getGoalTileButton(goalTile)
-                button.change()
+            button.change()
 
             selectedGoalTiles.add(goalTile)
         }
     }
+
     /**
      * clears all goal tiles is used in randomGoalTileButton
      */
@@ -260,6 +267,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         }
         selectedGoalTiles.clear()
     }
+
     /**
      * returns checkbox status of goals
      */
@@ -309,7 +317,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
                     style.borderRadius = BorderRadius(20.0)
                 },
                 ImageVisual("add.png")
-            ) ,
+            ),
         ).apply {
             onMouseClicked = {
                 addPlayer()
@@ -346,6 +354,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             randomizePlayerOrder()
         }
     }
+
     /**
      * randomizes the order of the player
      */
@@ -385,6 +394,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
 
         updatePlayerPositions()
     }
+
     /**
      * sets bots to the correct players after randomizing players
      */
@@ -425,6 +435,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             removeHighlight()
         }
     }
+
     /**
      * current players starting position and next players starting position is switched
      * player 4 is switched with player 1
@@ -493,8 +504,8 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
     }
 
     private val playerInput = TextFieldStyle1(
-        posX = 190 ,
-        posY = 270 ,
+        posX = 190,
+        posY = 270,
         prompt = "INPUT NAME"
     )
 
@@ -543,13 +554,12 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
 
     // Group all player inputs in lists to easily manage them
 
-    private val playerTurns : MutableList<Label> = mutableListOf(playerTurn)
-    private val playerInputs : MutableList<TextField> = mutableListOf(playerInput)
-    private val playerColours : MutableList<Button> = mutableListOf(playerColour)
-    private val playerRemoves : MutableList<Button> = mutableListOf(playerRemove)
-    private val playerEasyBots : MutableList<CheckBoxButton> = mutableListOf(playerEasyBot)
-    private val playerHardBots : MutableList<CheckBoxButton> = mutableListOf(playerHardBot)
-
+    private val playerTurns: MutableList<Label> = mutableListOf(playerTurn)
+    private val playerInputs: MutableList<TextField> = mutableListOf(playerInput)
+    private val playerColours: MutableList<Button> = mutableListOf(playerColour)
+    private val playerRemoves: MutableList<Button> = mutableListOf(playerRemove)
+    private val playerEasyBots: MutableList<CheckBoxButton> = mutableListOf(playerEasyBot)
+    private val playerHardBots: MutableList<CheckBoxButton> = mutableListOf(playerHardBot)
 
 
     init {
@@ -560,7 +570,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             playerOrderButton,
             startButton.apply {
                 onMouseClicked = {
-                    val guiPlayer = playerInputs.mapIndexed() { index, it->
+                    val guiPlayer = playerInputs.mapIndexed() { index, it ->
                         val color = playerColors[index]
                         val playerType = when {
                             playerEasyBots[index].isChecked -> PlayerType.EASYBOT
@@ -576,21 +586,23 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
                                     1 -> "Cody"
                                     else -> "Dirk"
                                 }
-                            }else {
-                                    it.text.trim()
+                            } else {
+                                it.text.trim()
 
                             }
                         entity.Player(name, playerType, true, color)
                     }.toMutableList()
 
-                    rootService.gameService.startNewGame(guiPlayer, false,
-                        selectedGoalTiles)
+                    rootService.gameService.startNewGame(
+                        guiPlayer, false,
+                        selectedGoalTiles
+                    )
                     bonsaiApplication.hideMenuScene()
                     bonsaiApplication.showGameScene()
                 }
             },
             playerTurn,
-            playerInput ,
+            playerInput,
             playerRemove,
             playerColour,
             playerEasyBot,
@@ -612,7 +624,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             randomGoalTileLabel,
             randomGoalTileButton,
         )
-        addComponents(contentPlayerPane,contentGoalTilePane)
+        addComponents(contentPlayerPane, contentGoalTilePane)
 
         assignColorButtonFunctionality()
 
@@ -748,7 +760,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         }
     }
 
-    private fun removePlayer(index : Int) {
+    private fun removePlayer(index: Int) {
 
         if (playerInputs.size <= 1) return
 
@@ -767,7 +779,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         playerInputs.removeAt(index)
 
 
-        for (i in index until playerInputs.size){
+        for (i in index until playerInputs.size) {
             playerTurns[i].posY -= 140
             playerColours[i].posY -= 140
             playerRemoves[i].posY -= 140
