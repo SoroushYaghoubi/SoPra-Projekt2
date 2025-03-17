@@ -44,28 +44,12 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val leafSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
     private val flowerSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
     private val fruitSupplyDecks: MutableList<Area<HexagonView>> = mutableListOf()
+    private val playerButtons: MutableList<Button> = mutableListOf()
+    private val goalButtons: MutableList<Button> = mutableListOf()
 
 
     // button for cultivate
     private val cultivateButton =
-        Button(
-            posX = 360,
-            posY = 270,
-            width = 150,
-            height = 80,
-            visual = ColorVisual(Color(0xffffff)).apply {
-                style.borderRadius = BorderRadius(20.0)
-            },
-            text = "cultivate",
-            font = Font(36)
-        ).apply {
-            onMouseClicked = {
-                rootService.playerActionService.cultivate()
-            }
-        }
-
-    // button for meditate
-    private val meditateButton =
         Button(
             posX = 190,
             posY = 270,
@@ -74,9 +58,31 @@ class BonsaiGameScene(private val rootService: RootService) :
             visual = ColorVisual(Color(0xffffff)).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
-            text = "meditate",
+            text = "Cultivate",
             font = Font(36)
-        )
+        ).apply {
+            onMouseClicked = {
+                rootService.playerActionService.cultivate()
+            }
+        }
+
+    // button for meditate
+    private val endTurnButton =
+        Button(
+            posX = 360,
+            posY = 270,
+            width = 150,
+            height = 80,
+            visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
+            text = "EndTurn",
+            font = Font(36)
+        ).apply {
+            onMouseClicked = {
+                rootService.playerActionService.endTurn()
+            }
+        }
 
     // button for remove from tree
     private val removeButton =
@@ -100,23 +106,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             }
         }
 
-    // button for end turn
-    private val endTurnButton =
-        Button(
-            posX = 1400,
-            posY = 270,
-            width = 150,
-            height = 80,
-            visual = ColorVisual(Color(0xffffff)).apply {
-                style.borderRadius = BorderRadius(20.0)
-            },
-            text = "EndTurn",
-            font = Font(36)
-        ).apply {
-            onMouseClicked = {
-                rootService.playerActionService.endTurn()
-            }
-        }
 
     // pane for the cards
     private val zenCardPane =
@@ -168,7 +157,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     private val interactionText = Label(
         posY = 20,
-        width = 800,
+        width = 990,
         height = 60,
         text = "",
         font = Font(40, Color(TERTIARY_COLOUR))
@@ -179,7 +168,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         Pane<ComponentView>(
             posX = 540,
             posY = 260,
-            width = 840,
+            width = 1020,
             height = 100,
             visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
                 style.borderRadius = BorderRadius(20.0)
@@ -242,6 +231,20 @@ class BonsaiGameScene(private val rootService: RootService) :
             font = Font(36)
         )
 
+    // right side pane
+    private val buttonPane = Pane<UIComponent>(
+        posX = 1600,
+        posY = 20,
+        width = 300,
+        height = 1040,
+        visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+            style.borderRadius = BorderRadius(20.0)
+        }
+    ).apply {
+        this.add(undoButton)
+        this.add(redoButton)
+        this.add(saveButton)
+    }
 
     private fun createRightSidePane() {
         val gameState = rootService.currentGame?.currentBonsaiGameState
@@ -256,23 +259,9 @@ class BonsaiGameScene(private val rootService: RootService) :
                 GoalTileType.PINK -> 3
                 GoalTileType.BLUE -> 4
             }
-        }.map { it.goalTileType }
+        }
 
-        // right side pane
-        val buttonPane = Pane<UIComponent>(
-            posX = 1600,
-            posY = 20,
-            width = 300,
-            height = 1040,
-            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
-                style.borderRadius = BorderRadius(20.0)
-            }
-        )
 
-        // undo, redo, and save buttons
-        buttonPane.add(undoButton)
-        buttonPane.add(redoButton)
-        buttonPane.add(saveButton)
 
         // player buttons below the save button
         val playerButtonsY = saveButton.posY + saveButton.height + 20
@@ -295,9 +284,10 @@ class BonsaiGameScene(private val rootService: RootService) :
                     style.borderRadius = BorderRadius(20.0)
                 },
                 text = player.name,
-                font = Font(20)
+                font = Font(30)
             )
             buttonPane.add(playerButton)
+            playerButtons.add(playerButton)
         }
 
         val buttonHeight = 45
@@ -309,20 +299,19 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         // create goal tile buttons in correct order
         for (i in 0 until numberOfButtons) {
-            val goalTileType = sortedGoalTiles[i % sortedGoalTiles.size]
-            val button = Button(
+            val goalTile = sortedGoalTiles[i % sortedGoalTiles.size]
+            val goalButton = Button(
                 posX = 20,
                 posY = currentY,
                 width = 260,
                 height = buttonHeight,
-                visual = ColorVisual(Color(getColorForGoalTile(goalTileType))).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
-                text = goalTileType.name,
-                font = Font(20)
+                visual = ColorVisual(Color(getColorForGoalTile(goalTile.goalTileType))).apply {
+                    style.borderRadius = BorderRadius(20.0) },
+                text = "Tier: ${goalTile.tier} Score: ${goalTile.score}",
+                font = Font(30)
             )
-
-            buttonPane.add(button)
+            buttonPane.add(goalButton)
+            goalButtons.add(goalButton)
             currentY += buttonHeight + buttonSpacing
         }
 
@@ -340,7 +329,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     init {
         addComponents(
             zenCardPane, infoPane, interactionPane, collectedCardPane,
-            removeButton, meditateButton, cultivateButton, endTurnButton,
+            removeButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards,
         )
     }
@@ -651,37 +640,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                 }
 
                 else -> {} }
-            /**
-        game.faceUpCards.forEachIndexed { index, card ->
-            when (index) {
-                2 -> {
-                    zenCardMap.forward(card).apply {
-                        // TODO(need to make a choose pane)
-                        onMouseClicked = {
-                            rootService.playerActionService.meditate(1, TileType.LEAF)
-                        }
-                    }
-                }
-
-                1 -> {
-                    zenCardMap.forward(card).apply {
-                        onMouseClicked = {
-                            rootService.playerActionService.meditate(2, null)
-                        }
-                    }
-                }
-
-                0 -> {
-                    zenCardMap.forward(card).apply {
-                        onMouseClicked = {
-                            rootService.playerActionService.meditate(3, null)
-                        }
-                    }
-                }
-
-                else -> {}
-            }
-        */
         }
     }
 
