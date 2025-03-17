@@ -16,3 +16,7 @@ const val COLOUR_WOOD = 0x633924
 const val COLOUR_LEAF = 0x4C962C
 const val COLOUR_FLOWER = 0xFF8CE4
 const val COLOUR_FRUIT = 0xFFB330
+
+
+const val CULTIVATE = 0
+const val MEDITATE = 1
