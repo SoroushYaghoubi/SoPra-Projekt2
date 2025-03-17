@@ -5,6 +5,7 @@ package service
 //import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 import util.ZenCardLoader
+import util.getEmptyTiles
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
@@ -73,6 +74,12 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
             if (index == 0) {
                 tiles.add(TileType.WOOD)
+
+                //TODO() for guiteing
+                tiles.add(TileType.LEAF)
+                tiles.add(TileType.LEAF)
+                tiles.add(TileType.LEAF)
+                tiles.add(TileType.FRUIT)
             } else {
                 tiles.add(TileType.WOOD)
                 tiles.add(TileType.LEAF)

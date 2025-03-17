@@ -139,6 +139,8 @@ class BonsaiGameScene(private val rootService: RootService) :
     )
 
     // pane for player info
+    // tiles capacity
+    // play capacity
     private val infoPane =
         Pane<ComponentView>(
             posX = 737,
@@ -396,8 +398,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             if (it.first == 0 && it.second == 0) {
                 val root = player.bonsaiTree[0 to 0]
                 checkNotNull(root) {"not root"}
-                treeTileMaps[getOrder(player)].add(
-                    (root to hexagon)
+                treeTileMaps[getOrder(player)].add((root to hexagon)
                 )
             }
         }
@@ -451,6 +452,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                     }
                 }
             }
+
             it.q = index
             if (supplyTileMap.containsForward(it)) {
                 supplyTileMap.removeForward(it)
@@ -541,6 +543,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
 
     private fun cardFrontSetter(generalCard: Card, cardView: CardView) {
+
         when (generalCard.cardType) {
             CardType.TOOLCARD -> {
                 val card = generalCard as ToolCard
@@ -693,7 +696,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         val treeHexagonGrid = treeHexagonGrids[getOrder(player)]
 
         player.bonsaiTree.getEmptyTiles().forEach {
-                println("${it.first}, ${it.second}")
+                //println("${it.first}, ${it.second}")
                 val hexagon = HexagonView(
                     visual = CompoundVisual(
                         ColorVisual(255, 255, 255, 0.3),
@@ -711,6 +714,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                     } else {
                         treeTileMap.add(emptyTile to this)
                     }
+
+
                     this.dropAcceptor = { dragEvent ->
                         when (dragEvent.draggedComponent) {
                             is HexagonView -> {
@@ -723,6 +728,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                             else -> false
                         }
                     }
+
                     this.onDragDropped = { dragEvent ->
                         val comp = dragEvent.draggedComponent as HexagonView
                         val tile = supplyTileMap.backward(comp)
