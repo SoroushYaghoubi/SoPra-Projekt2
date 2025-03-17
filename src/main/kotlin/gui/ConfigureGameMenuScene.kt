@@ -47,7 +47,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         ColorType.BLACK to COLOUR_BLACK,
         ColorType.BLUE to COLOUR_BLUE
     )
-
+    /**
+    * determines which color should be chosen for new player
+    */
     private fun nextColor(currentColor: ColorType): ColorType {
         val currentIndex = availableColors.indexOf(currentColor)
         return if (currentIndex == -1 || currentIndex == availableColors.lastIndex)
@@ -55,7 +57,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         else
             availableColors[currentIndex + 1]
     }
-
+    /**
+     * changes color to next one on click
+     */
     private fun assignColorButtonFunctionality() {
         playerColours.forEachIndexed { index, button ->
             button.onMouseClicked = {
@@ -72,7 +76,7 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
     }
 
     private val selectedGoalTiles = mutableListOf<GoalTileType>()
-    //private val orderedPlayer
+
     private val contentPlayerPane =
         Pane<UIComponent>(
             posX = 80,
@@ -218,7 +222,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             posY = 870,
             text = "RANDOM"
         )
-
+    /**
+     * deselects all goal tiles and chooses and selects three goal tiles at random
+     */
     private val randomGoalTileButton = CheckBoxButton(
         posX = 390,
         posY = 870
@@ -228,7 +234,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             selectRandomGoalTiles()
         }
     }
-
+    /**
+     * chooses and selects three goal tiles at random
+     */
     private fun selectRandomGoalTiles() {
         val allGoalTiles = GoalTileType.entries.shuffled()
         val selectedTiles = allGoalTiles.take(3)
@@ -240,7 +248,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             selectedGoalTiles.add(goalTile)
         }
     }
-
+    /**
+     * clears all goal tiles is used in randomGoalTileButton
+     */
     private fun clearSelectedGoalTiles() {
         for (goalTile in selectedGoalTiles) {
             val button = getGoalTileButton(goalTile)
@@ -250,7 +260,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         }
         selectedGoalTiles.clear()
     }
-
+    /**
+     * returns checkbox status of goals
+     */
     private fun getGoalTileButton(goalTileType: GoalTileType): CheckBoxButton {
         return when (goalTileType) {
             GoalTileType.BROWN -> woodGoalTileButton
@@ -261,6 +273,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         }
     }
 
+    /**
+     * toggles selected goals and adds them to a list used in start game
+     */
     private fun toggleGoalTile(goalTileType: GoalTileType, button: CheckBoxButton) {
         if (button.isChecked) {
             if (selectedGoalTiles.size >= 3) {
@@ -331,7 +346,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             randomizePlayerOrder()
         }
     }
-
+    /**
+     * randomizes the order of the player
+     */
     private fun randomizePlayerOrder() {
         val indices = playerInputs.indices.toList().shuffled()
 
@@ -368,7 +385,9 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
 
         updatePlayerPositions()
     }
-
+    /**
+     * sets bots to the correct players after randomizing players
+     */
     private fun rebindBotHandlers() {
         for (i in playerEasyBots.indices) {
             playerEasyBots[i].onMouseClicked = {
@@ -399,13 +418,24 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         onMouseClicked = {
             swapPlayerWithNext(0)
         }
+        onMouseEntered = {
+            highlightPlayers(0)
+        }
+        onMouseExited = {
+            removeHighlight()
+        }
     }
-
+    /**
+     * current players starting position and next players starting position is switched
+     * player 4 is switched with player 1
+     */
     private fun swapPlayerWithNext(index: Int) {
+        // for player 4
         val nextIndex = if (index == playerInputs.size - 1) 0 else index + 1
 
         println("Tausche Spieler ${index + 1} mit Spieler ${nextIndex + 1}")
 
+        // Swap the players in all lists
         swapInList(playerInputs, index, nextIndex)
         swapInList(playerColors, index, nextIndex)
         swapInList(playerEasyBots, index, nextIndex)
@@ -414,10 +444,17 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         swapInList(playerColours, index, nextIndex)
         swapInList(playerRemoves, index, nextIndex)
 
+        // update the positions and click handlers
         updatePlayerPositions()
         updatePlayerClickHandlers()
+
+        // highlight the newly swapped players
+        highlightPlayers(index)
     }
 
+    /**
+     * updates where the player boxes have to be after swapping the players
+     */
     private fun updatePlayerPositions() {
         for (i in playerInputs.indices) {
 
@@ -432,10 +469,19 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         }
     }
 
+    /**
+     * help funktion for swap players and highlighting players
+     */
     private fun updatePlayerClickHandlers() {
         for (i in playerTurns.indices) {
             playerTurns[i].onMouseClicked = {
                 swapPlayerWithNext(i)
+            }
+            playerTurns[i].onMouseEntered = {
+                highlightPlayers(i)
+            }
+            playerTurns[i].onMouseExited = {
+                removeHighlight()
             }
         }
     }
@@ -584,6 +630,12 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
             onMouseClicked = {
                 swapPlayerWithNext(currentIndex)
             }
+            onMouseEntered = {
+                highlightPlayers(currentIndex)
+            }
+            onMouseExited = {
+                removeHighlight()
+            }
         }
 
         val newPlayerInput = TextFieldStyle1(
@@ -676,6 +728,26 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
         addPlayerButton.posY += 140
     }
 
+    private fun highlightPlayers(index: Int) {
+        val nextIndex = if (index == playerInputs.size - 1) 0 else index + 1
+
+        playerInputs[index].visual = ColorVisual(Color(0xFFFF00)).apply { // Yellow color for highlight
+            style.borderRadius = BorderRadius(20.0)
+        }
+
+        playerInputs[nextIndex].visual = ColorVisual(Color(0x00FF00)).apply { // Green color for highlight
+            style.borderRadius = BorderRadius(20.0)
+        }
+    }
+
+    private fun removeHighlight() {
+        playerInputs.forEach { textField ->
+            textField.visual = ColorVisual(Color(TERTIARY_COLOUR)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        }
+    }
+
     private fun removePlayer(index : Int) {
 
         if (playerInputs.size <= 1) return
@@ -705,6 +777,12 @@ class ConfigureGameMenuScene(private val bonsaiApplication: BonsaiApplication,
 
             playerRemoves[i].onMouseClicked = {
                 removePlayer(i)
+            }
+            playerTurns[i].onMouseEntered = {
+                highlightPlayers(i)
+            }
+            playerTurns[i].onMouseExited = {
+                removeHighlight()
             }
         }
 
