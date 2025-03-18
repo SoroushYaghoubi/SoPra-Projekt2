@@ -119,9 +119,9 @@ class RefreshableTest(val rootService: RootService) : Refreshable {
         refreshAfterDrawingMasterCardAnyCalled = true
     }
 
-    override fun refreshAfterDrawingHelperCard(secondTileTypeToPlace: TileType) {
-        refreshAfterDrawingHelperCardCalled = false
-    }
+//    override fun refreshAfterDrawingHelperCard(secondTileTypeToPlace: TileType) {
+//        refreshAfterDrawingHelperCardCalled = false
+//    }
 
     override fun refreshAfterReceivedTile(discard: Boolean) {
         refreshAfterReceivedTileCalled = false
