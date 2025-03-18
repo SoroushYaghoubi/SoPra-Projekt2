@@ -216,9 +216,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val actPlayer = gameState.currentPlayer
         gameState.currentPlayer.playableTilesCopy.clear()
         // val tileTypeToPlay2 = drawnCard.tileTypes[1]
-        gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
+       // gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
         // gameState.currentPlayer.playableTiles.toMutableList()
-        onAllRefreshables { refreshAfterDrawingHelperCard() }
+        onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
         // Check personal supply limit
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
