@@ -10,7 +10,7 @@ class DeepCopyExtensionsTest {
 
         val originalGameState = BonsaiGameState(
             currentPlayer = Player("Alice", PlayerType.HUMAN, isLocal = true, ColorType.RED),
-            players = mutableListOf(Player("Bob", PlayerType.HUMAN, isLocal = false, ColorType.BLUE)),
+            players = mutableListOf(Player("Bob", PlayerType.HUMAN, isLocal = true, ColorType.BLUE)),
             botSpeed = 1,
             currentState = States.START_TURN
         ).apply {
