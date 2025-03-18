@@ -246,6 +246,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         } else {
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
         }
+
+        onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
