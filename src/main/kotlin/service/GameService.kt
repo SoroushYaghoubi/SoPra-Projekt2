@@ -5,7 +5,7 @@ package service
 //import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 import util.ZenCardLoader
-import util.getEmptyTiles
+//import util.getEmptyTiles
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
