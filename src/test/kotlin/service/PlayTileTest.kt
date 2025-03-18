@@ -228,6 +228,25 @@ class PlayTileTest {
 
     }
 
+    /**
+     * Tests for canPlayTile, tests if both neighbor tiles are leafs, fruit can be placed
+     */
+    @Test
+    fun testNeighbourTilesForFruit() {
+        val rootService = setUpGame()
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+        val tile = Tile(null, null, TileType.FRUIT)
+        gameState.currentPlayer.personalSupply.add(tile)
+        gameState.currentPlayer.playableTilesCopy.add(
+            TileType.FRUIT
+        )
+        assertTrue(rootService.treeService.canPlayTile(tile, Pair (2,-4)))
+        assertFalse(rootService.treeService.canPlayTile(tile, Pair (1,-4)))
+    }
+
 }
 
 

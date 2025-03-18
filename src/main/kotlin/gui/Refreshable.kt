@@ -39,7 +39,7 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player has started the cultivate action
      */
-     fun refreshAfterCultivateStart(){}
+    fun refreshAfterCultivateStart(){}
 
     /**
      * perform refreshes that are necessary after a player has chosen a card
@@ -107,5 +107,5 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player joins
      */
-    fun refreshAfterPlayerJoined(player: String) {}
+    fun refreshAfterPlayerJoined(playerName: String) {}
 }

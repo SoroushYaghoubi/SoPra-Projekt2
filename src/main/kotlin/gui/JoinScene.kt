@@ -1,10 +1,12 @@
 package gui
 
+import service.RootService
 import tools.aqua.bgw.components.uicomponents.Label
 import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.core.MenuScene
 import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.ImageVisual
+import util.SECRET_KEY
 
 
 /**
@@ -17,7 +19,7 @@ import tools.aqua.bgw.visual.ImageVisual
  *
  *
  */
-class JoinScene(bonsaiApplication: BonsaiApplication) : MenuScene(
+class JoinScene(bonsaiApplication: BonsaiApplication, rootService: RootService) : MenuScene(
     1920,1080, ImageVisual("Backgrounds/Hintergrund2.png",1920,1080)
 ) , Refreshable {
 
@@ -91,7 +93,12 @@ class JoinScene(bonsaiApplication: BonsaiApplication) : MenuScene(
             text = "JOIN",
         ).apply {
             onMouseClicked = {
-                // TODO
+                rootService.networkService
+                    .joinGame(
+                        SECRET_KEY,
+                        nameTextField.text,
+                        sessionTextField.text,
+                    )
                 bonsaiApplication.hideMenuScene()
                 bonsaiApplication.showWaitingScene()
             }
