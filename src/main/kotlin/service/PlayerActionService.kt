@@ -166,8 +166,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
-        gameState.currentState = States.END_TURN
+        onAllRefreshables {refreshAfterMeditate() }
+
     }
 
     /**
@@ -198,7 +198,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         actPlayer.hasPlayed = true
         onAllRefreshables { refreshAfterMeditate() }
-        gameState.currentState = States.END_TURN
 
     }
 
@@ -214,11 +213,22 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
+        val actPlayer = gameState.currentPlayer
+        gameState.currentPlayer.playableTilesCopy.clear()
+       // val tileTypeToPlay2 = drawnCard.tileTypes[1]
+        gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
+        // gameState.currentPlayer.playableTiles.toMutableList()
+        onAllRefreshables { refreshAfterDrawingHelperCard() }
+        // Check personal supply limit
+        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
+            gameState.currentState = States.DISCARDING
+            onAllRefreshables { refreshAfterReceivedTile(true) }
+            return
+        }
 
-        val tileTypeToPlay2 = drawnCard.tileTypes[1]
-        gameState.currentPlayer.playableTilesCopy = gameState.currentPlayer.playableTiles.toMutableList()
-        onAllRefreshables { refreshAfterDrawingHelperCard(tileTypeToPlay2) }
-        gameState.currentPlayer.hasPlayed = true
+        actPlayer.hasPlayed = true
+        onAllRefreshables { refreshAfterMeditate() }
+
 
     }
 
