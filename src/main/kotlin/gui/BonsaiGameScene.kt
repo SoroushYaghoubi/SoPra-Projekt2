@@ -457,6 +457,13 @@ class BonsaiGameScene(private val rootService: RootService) :
         isVisible = false
     }
 
+    private val overlayPaneDiscard = Pane<ComponentView>(
+        posX = 0, posY = 0,
+        width = 1920, height = 1080,
+    ).apply {
+        isVisible = false
+    }
+
 
     private val claimButton = Button(
         posX = 100,
@@ -550,7 +557,8 @@ class BonsaiGameScene(private val rootService: RootService) :
             zenCardPane, infoPane, interactionPane, collectedCardPane,
             removeButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards,
-            overlayPane, goalTilePane, choseAnyTilePane
+            overlayPane, goalTilePane, choseAnyTilePane,
+            overlayPaneDiscard
         )
     }
 
@@ -823,44 +831,17 @@ class BonsaiGameScene(private val rootService: RootService) :
             interactionText.text = "Choose tiles to remove until you're within the limit."
             val game = rootService.currentGame?.currentBonsaiGameState
             checkNotNull(game)
-            val playerIndex = getOrder(game.currentPlayer)
-            val supplyTileMap = supplyTileMaps[playerIndex]
-            //val tobeRemoved: MutableList<Tile> = mutableListOf()
-            // make the supply tiles draggable after cultivate start
-            println("123")
-//
 
-            overlayPane.clear()
-            overlayPane.isVisible = true
-//            game.currentPlayer.personalSupply.forEach { tile ->
-//                val hexagonView = Area<HexagonView>(
-//                    posX = 585,
-//                   posY = 240,
-//                    visual = CompoundVisual(
-//                        ColorVisual(Color(getColorForTileType(tile.tileType))) // Set color based on tile type
-//                    ),
-//                ).apply {
-//                    onMouseClicked = {
-//                        // Add the selected tile to the list of tiles to be removed
-//                        //tobeRemoved.add(tile)
-//
-//                        // Discard the tile after selection
-//                        rootService.playerActionService.discardSupplyTile(tile)
-//
-//                        // Update the supply after discarding
-//                        updateSupply(game.currentPlayer)
-//
-//                        // Close the popup and hide the overlay after a tile is discarded
-//                        overlayPane.isVisible = false
-//                    }
-//                }
-//                overlayPane.add(hexagonView)
+            playerPanes[getOrder(game.currentPlayer)].isVisible = false
+            overlayPaneDiscard.clear()
+            overlayPaneDiscard.isVisible = true
+
             val tilesToRemove = mutableListOf<Tile>()
 
             game.currentPlayer.personalSupply.forEachIndexed { index, tile ->
                 val hexagonView = HexagonView(
-                    posX = 585 + (index % 4) * 100,
-                    posY = 240 + (index / 4) * 100,
+                    posX = 585 + (index % 4) * 200,
+                    posY = 500 + (index / 4) * 200,
                     visual = CompoundVisual(
                         ColorVisual(Color(getColorForTileType(tile.tileType)))
                     ),
@@ -872,39 +853,37 @@ class BonsaiGameScene(private val rootService: RootService) :
                             this.visual = CompoundVisual(ColorVisual(Color(getColorForTileType(tile.tileType))))
                         } else {
                             tilesToRemove.add(tile)
-                            this.visual = CompoundVisual(ColorVisual(Color.GRAY))
-
+                            this.visual = CompoundVisual(ColorVisual(Color.TRANSPARENT))
 
                         }
 
-                        if (game.currentPlayer.personalSupply.size - tilesToRemove.size <= game.currentPlayer.tileCapacity) {
+                        if (game.currentPlayer.personalSupply.size - tilesToRemove.size
+                            <= game.currentPlayer.tileCapacity
+                        ) {
                             tilesToRemove.forEach { rootService.playerActionService.discardSupplyTile(it) }
                             updateSupply(game.currentPlayer)
-                            overlayPane.isVisible = false
+                            overlayPaneDiscard.isVisible = false
+                            playerPanes[getOrder(game.currentPlayer)].isVisible = true
+                            interactionText.text = "inform something here"
+
                         }
                     }
                 }
-                overlayPane.add(hexagonView)
+                overlayPaneDiscard.add(hexagonView)
             }
-
         }
     }
 
 
-
-    override fun refreshAfterDrawingHelperCard(playableTilesCopy1: MutableList<TileType>){
+    override fun refreshAfterDrawingHelperCard(playableTilesCopy1: MutableList<TileType>) {
 
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        val copy2 = playableTilesCopy1
-        println(copy2)
+        println(game.currentState)
         val playerIndex = getOrder(game.currentPlayer)
         val supplyTileMap = supplyTileMaps[playerIndex]
         updateSupply(game.currentPlayer)
-        game.currentPlayer.playableTilesCopy.clear()
-        println(copy2)
-        game.currentPlayer.playableTilesCopy.addAll(copy2)
-
+        // make the supply tiles draggable after cultivate start
         game.players[playerIndex].personalSupply.forEach { supplyTile ->
             supplyTileMap[supplyTile].apply {
                 isDraggable = true
@@ -1042,15 +1021,16 @@ class BonsaiGameScene(private val rootService: RootService) :
     override fun refreshAfterDiscardTile() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if(game.currentState != States.USING_HELPER){
+        if (game.currentState != States.USING_HELPER) {
             updateSupply(game.currentPlayer)
         }
 
     }
+
     override fun refreshAfterMeditate() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if(game.currentState != States.USING_HELPER){
+        if (game.currentState != States.USING_HELPER) {
             updateSupply(game.currentPlayer)
         }
     }
@@ -1182,7 +1162,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 interactionText.text = " no extra tiles "
                                 rootService.playerActionService.meditate(0, null)
                                 removeFromParent()
-                                if(game.currentState != States.USING_HELPER){
+                                // updateSupply(game.currentPlayer)
+                                if (game.currentState != States.USING_HELPER) {
                                     updateSupply(game.currentPlayer)
                                 }
 
@@ -1213,7 +1194,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                         .apply {
                                             onMouseClicked = {
                                                 rootService.playerActionService.meditate(1, TileType.LEAF)
-                                                if(game.currentState != States.USING_HELPER){
+                                                if (game.currentState != States.USING_HELPER) {
                                                     updateSupply(game.currentPlayer)
                                                 }
                                                 overlayPane.isVisible = false
@@ -1229,7 +1210,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                     ).apply {
                                         onMouseClicked = {
                                             rootService.playerActionService.meditate(1, TileType.WOOD)
-                                            if(game.currentState != States.USING_HELPER){
+                                            if (game.currentState != States.USING_HELPER) {
                                                 updateSupply(game.currentPlayer)
                                             }
                                             overlayPane.isVisible = false
@@ -1255,7 +1236,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 interactionText.text = "You have received a wood and a flower tile"
                                 rootService.playerActionService.meditate(2, null)
                                 removeFromParent()
-                                if(game.currentState != States.USING_HELPER){
+                                if (game.currentState != States.USING_HELPER) {
                                     updateSupply(game.currentPlayer)
                                 }
                                 updateZenBoard()
@@ -1275,7 +1256,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 interactionText.text = "You have received a leaf and a fruit tile"
                                 rootService.playerActionService.meditate(3, null)
                                 removeFromParent()
-                                if(game.currentState != States.USING_HELPER){
+                                if (game.currentState != States.USING_HELPER) {
                                     updateSupply(game.currentPlayer)
                                 }
                                 updateZenBoard()
