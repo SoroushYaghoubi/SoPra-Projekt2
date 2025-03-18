@@ -1,7 +1,6 @@
 package gui
 
 import entity.*
-import gui.BonsaiApplication
 import service.RootService
 import tools.aqua.bgw.components.ComponentView
 import tools.aqua.bgw.components.container.Area
@@ -322,7 +321,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                 isVisible = true
                 onMouseClicked = {
                     rootService.historyService.saveGame()
-                    //BonsaiApplication().showMainMenuScene()
+                    BonsaiApplication().showMainMenuScene()
+                    println("hallo")
                 }
             }
         }
