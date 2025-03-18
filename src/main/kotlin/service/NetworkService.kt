@@ -104,7 +104,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val playerNames = client?.otherPlayerNames
         checkNotNull(playerNames)
 
-        if (playerNames.size < 2 || playerNames.size > 4) {
+        if (playerOrder.size < 2 || playerOrder.size > 4) {
             throw IllegalStateException("there should be 2 to 4 players")
         }
 
