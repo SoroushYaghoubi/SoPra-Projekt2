@@ -13,7 +13,7 @@ import util.TERTIARY_COLOUR
 /**
  * The [WaitingScene] for network play
  */
-class WaitingScene: MenuScene(
+class WaitingScene (bonsaiApplication: BonsaiApplication,) : MenuScene(
     1920,1080, ImageVisual("Backgrounds/Hintergrund2.png",1920,1080)
 ) , Refreshable {
 
@@ -42,4 +42,7 @@ class WaitingScene: MenuScene(
         addComponents(textLabel, titleLabel)
     }
 
+    override fun refreshAfterPlayerJoined(playerName: String) {
+
+    }
 }
