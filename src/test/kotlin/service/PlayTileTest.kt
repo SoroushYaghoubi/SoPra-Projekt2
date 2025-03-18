@@ -244,7 +244,7 @@ class PlayTileTest {
             TileType.FRUIT
         )
         assertTrue(rootService.treeService.canPlayTile(tile, Pair (2,-4)))
-        assertTrue(rootService.treeService.canPlayTile(tile, Pair (1,-4)))
+        assertFalse(rootService.treeService.canPlayTile(tile, Pair (1,-4)))
     }
 
 }
