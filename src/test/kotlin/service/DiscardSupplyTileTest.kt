@@ -34,7 +34,7 @@ class DiscardSupplyTileTest {
                 Tile(1,6, TileType.LEAF),
                 )
         )
-        val tilesToDiscard = mutableListOf(player1.personalSupply[0])
+        val tileToDiscard = Tile(1,6, TileType.LEAF)
         val history = History()
         history.currentPosition = 1
         history.gameStates.add(gameState1)
@@ -42,10 +42,12 @@ class DiscardSupplyTileTest {
         game.history = history
         rootService.currentGame = game
         assertTrue(player1.personalSupply.size > player1.tileCapacity)
-        playerActionService.discardSupplyTile(tilesToDiscard)
+        playerActionService.discardSupplyTile(tileToDiscard)
         assertEquals(5, player1.personalSupply.size)
         // tests if selected tile to discard was deleted from players personal supply
-        assertFalse(player1.personalSupply.contains(tilesToDiscard[0]))
+        assertFalse(player1.personalSupply.contains(tileToDiscard))
+        assertEquals(States.END_TURN, gameState1.currentState)
+        assertTrue(player1.hasPlayed)
     }
 
     /**
@@ -69,7 +71,7 @@ class DiscardSupplyTileTest {
                 Tile(1,4, TileType.LEAF),
             )
         )
-        val tilesToDiscard = mutableListOf(player1.personalSupply[0])
+        val tileToDiscard = Tile(1,4, TileType.LEAF)
         val history = History()
         history.currentPosition = 1
         history.gameStates.add(gameState1)
@@ -78,7 +80,7 @@ class DiscardSupplyTileTest {
         rootService.currentGame = game
         assertTrue(player1.personalSupply.size < player1.tileCapacity)
         val exception =
-            assertThrows<IllegalStateException> { playerActionService.discardSupplyTile(tilesToDiscard) }
+            assertThrows<IllegalStateException> { playerActionService.discardSupplyTile(tileToDiscard) }
 
         assertEquals("The personal supply tiles hasn't reached the capacity.", exception.message)
     }

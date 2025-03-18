@@ -215,10 +215,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         checkNotNull(gameState) { "No active game state." }
         val actPlayer = gameState.currentPlayer
         gameState.currentPlayer.playableTilesCopy.clear()
-       // val tileTypeToPlay2 = drawnCard.tileTypes[1]
-        gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
+        // val tileTypeToPlay2 = drawnCard.tileTypes[1]
+       // gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
         // gameState.currentPlayer.playableTiles.toMutableList()
-        onAllRefreshables { refreshAfterDrawingHelperCard() }
+        onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
         // Check personal supply limit
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
@@ -343,11 +343,26 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
     }
 
-
-
-
-
-
+    /**
+     * create a deepcopy of the game state
+     * ToDo need to check if some of them need to be deep copies
+     * probably does not work correctly right now
+     */
+    fun BonsaiGameState.deepCopy(): BonsaiGameState {
+        return BonsaiGameState(
+            currentPlayer = currentPlayer.copy(),
+            //shallow copy, need to see if they need to be deep copies
+            players = players.map { it.copy() }.toMutableList(),
+            botSpeed = botSpeed,
+            currentState = currentState
+        ).also { copy ->
+            copy.endGameCounter = this.endGameCounter
+            //shallow copies, need to see if they need to be deep copies
+            copy.zenDeck = this.zenDeck.toMutableList()
+            copy.faceUpCards = this.faceUpCards.toMutableList()
+            copy.goalTiles = this.goalTiles.map { it.copy() }.toMutableList()
+        }
+    }
 
 
     /**
@@ -656,12 +671,21 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @throws IllegalStateException if personal supply is not over capacity limit.
      */
-    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+//    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+//        val player = getCurrentPlayer()
+//        check(player.personalSupply.size > player.tileCapacity)
+//        { "The personal supply tiles hasn't reached the capacity." }
+//        player.personalSupply.removeAll(tilesToDiscard)
+//        rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
+//    }
+
+    fun discardSupplyTile(tileToDiscard: Tile) {
         val player = getCurrentPlayer()
         check(player.personalSupply.size > player.tileCapacity)
         { "The personal supply tiles hasn't reached the capacity." }
-        player.personalSupply.removeAll(tilesToDiscard)
+        player.personalSupply.remove(tileToDiscard)
         rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
+        player.hasPlayed = true
     }
 
     // returns the current player
