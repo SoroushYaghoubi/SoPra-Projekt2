@@ -579,6 +579,11 @@ class HostScene(
                         guiPlayer, false,
                         selectedGoalTiles
                     )
+                    rootService.networkService
+                        .sendStartGameMessage(
+                            guiPlayer,
+                            selectedGoalTiles
+                        )
                     bonsaiApplication.hideMenuScene()
                     bonsaiApplication.showGameScene()
                 }
@@ -773,7 +778,6 @@ class HostScene(
     }
 
     override fun refreshAfterPlayerJoined(playerName: String) {
-        println("___")
         addPlayer(playerName)
     }
 }
