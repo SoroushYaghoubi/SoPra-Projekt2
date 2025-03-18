@@ -322,7 +322,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                 isVisible = true
                 onMouseClicked = {
                     rootService.historyService.saveGame()
-                    //BonsaiApplication().showMainMenuScene()
+                    BonsaiApplication().showMainMenuScene()
+                    println("hallo")
                 }
             }
         }
@@ -1014,17 +1015,12 @@ class BonsaiGameScene(private val rootService: RootService) :
     override fun refreshAfterDiscardTile() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if(game.currentState != States.USING_HELPER){
-            updateSupply(game.currentPlayer)
-        }
-
+        updateSupply(game.currentPlayer)
     }
     override fun refreshAfterMeditate() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if(game.currentState != States.USING_HELPER){
-            updateSupply(game.currentPlayer)
-        }
+        updateSupply(game.currentPlayer)
     }
 
     override fun refreshAfterEndTurn() {
