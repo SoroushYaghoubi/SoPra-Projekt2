@@ -1,7 +1,6 @@
 package gui
 
 import entity.*
-import gui.BonsaiApplication
 import service.RootService
 import tools.aqua.bgw.components.ComponentView
 import tools.aqua.bgw.components.container.Area
