@@ -19,10 +19,7 @@ import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.style.BorderRadius
 import tools.aqua.bgw.util.BidirectionalMap
 import tools.aqua.bgw.util.Font
-import tools.aqua.bgw.visual.ColorVisual
-import tools.aqua.bgw.visual.CompoundVisual
-import tools.aqua.bgw.visual.ImageVisual
-import tools.aqua.bgw.visual.TextVisual
+import tools.aqua.bgw.visual.*
 import util.*
 
 /**
@@ -509,26 +506,33 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         }
 
+    private val woodTileImageVisual = ImageVisual("./BonsaiTiles/wood.png")
+
+    private val leafTileImageVisual = ImageVisual("./BonsaiTiles/leaf.png")
+
+    private val flowerTileImageVisual = ImageVisual("./BonsaiTiles/flower.png")
+
+    private val fruitTileImageVisual = ImageVisual("./BonsaiTiles/fruit.png")
 
     private val leafTile = HexagonView(
         posY = 100,
         posX = 500,
-        visual = ColorVisual(Color(COLOUR_LEAF))
+        visual = leafTileImageVisual
     )
     private val woodTile = HexagonView(
         posY = 100,
         posX = 150,
-        visual = ColorVisual(Color(COLOUR_WOOD))
+        visual = woodTileImageVisual
     )
     private val fruitTile = HexagonView(
         posY = 350,
         posX = 150,
-        visual = ColorVisual(Color(COLOUR_FRUIT))
+        visual = fruitTileImageVisual
     )
     private val flowerTile = HexagonView(
         posY = 350,
         posX = 500,
-        visual = ColorVisual(Color(COLOUR_FLOWER))
+        visual = flowerTileImageVisual
     )
 
     // pane for claim or renounce goal tile
@@ -597,15 +601,18 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         POT.forEach {
             var color = getColorForPot(player.color)
+            val visual: SingleLayerVisual?
             if (it.second == 0) {
                 color = 0x000000
             }
             if (it.first == 0 && it.second == 0) {
-                color = COLOUR_WOOD
+                visual = woodTileImageVisual
+            } else {
+                visual = ColorVisual(Color(color))
             }
             val hexagon = HexagonView(
                 visual = CompoundVisual(
-                    ColorVisual(Color(color)),
+                    visual,
                     TextVisual(
                         text = "${it.first}, ${it.second}",
                         font = Font(10.0, Color(0x000000))
@@ -666,7 +673,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         player.personalSupply.forEachIndexed { index, it ->
             val supplyHex = HexagonView(
                 visual = CompoundVisual(
-                    ColorVisual(Color(getColorForTileType(it.tileType)))
+                    getTileImageVisualForTileType(it.tileType)
                 ),
                 size = 60
             ).apply {
@@ -718,7 +725,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         player.personalSupply.forEachIndexed { index, it ->
             val supplyHex = HexagonView(
                 visual = CompoundVisual(
-                    ColorVisual(Color(getColorForTileType(it.tileType)))
+                    getTileImageVisualForTileType(it.tileType)
                 ),
                 size = 60
             ).apply {
@@ -843,14 +850,14 @@ class BonsaiGameScene(private val rootService: RootService) :
                     posX = 585 + (index % 4) * 200,
                     posY = 500 + (index / 4) * 200,
                     visual = CompoundVisual(
-                        ColorVisual(Color(getColorForTileType(tile.tileType)))
+                        getTileImageVisualForTileType(tile.tileType)
                     ),
                     size = 60,
                 ).apply {
                     onMouseClicked = {
                         if (tilesToRemove.contains(tile)) {
                             tilesToRemove.remove(tile)
-                            this.visual = CompoundVisual(ColorVisual(Color(getColorForTileType(tile.tileType))))
+                            this.visual = CompoundVisual(getTileImageVisualForTileType(tile.tileType))
                         } else {
                             tilesToRemove.add(tile)
                             this.visual = CompoundVisual(ColorVisual(Color.TRANSPARENT))
@@ -1189,7 +1196,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                     HexagonView(
                                         posX = 1260, posY = 270,
                                         size = 40,
-                                        visual = ColorVisual(Color(COLOUR_LEAF))
+                                        visual = leafTileImageVisual
                                     )
                                         .apply {
                                             onMouseClicked = {
@@ -1206,7 +1213,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                     HexagonView(
                                         posX = 1380, posY = 270,
                                         size = 40,
-                                        visual = ColorVisual(Color(COLOUR_WOOD))
+                                        visual = woodTileImageVisual
                                     ).apply {
                                         onMouseClicked = {
                                             rootService.playerActionService.meditate(1, TileType.WOOD)
@@ -1325,7 +1332,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                     treeTileMap.remove(emptyTile to this)
                     treeTileMap.add(tile to this)
                     visual = CompoundVisual(
-                        ColorVisual(Color(getColorForTileType(tile.tileType))),
+                        getTileImageVisualForTileType(tile.tileType),
                         TextVisual(
                             text = "${it.first}, ${it.second}",
                             font = Font(10.0, Color(0x000000))
@@ -1342,7 +1349,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                         val supplyTileType = supplyTileMap.backward(lastHex).tileType
                         parentDeck.last().apply {
                             this.visual = CompoundVisual(
-                                ColorVisual(Color(getColorForTileType(supplyTileType))),
+                                getTileImageVisualForTileType(supplyTileType),
                                 TextVisual(
                                     "${parentDeck.components.size}",
                                     font = Font(30.0, Color(0x000000))
@@ -1363,7 +1370,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (woodSupplyDecks[getOrder(player)].components.isNotEmpty()) {
             woodSupplyDecks[getOrder(player)].components.last().apply {
                 this.visual = CompoundVisual(
-                    ColorVisual(Color(COLOUR_WOOD)),
+                    woodTileImageVisual,
                     TextVisual(
                         "${woodSupplyDecks[getOrder(player)].components.size}",
                         font = Font(30.0, Color(0x000000))
@@ -1375,7 +1382,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (leafSupplyDecks[getOrder(player)].components.isNotEmpty()) {
             leafSupplyDecks[getOrder(player)].components.last().apply {
                 this.visual = CompoundVisual(
-                    ColorVisual(Color(COLOUR_LEAF)),
+                    leafTileImageVisual,
                     TextVisual(
                         "${leafSupplyDecks[getOrder(player)].components.size}",
                         font = Font(30.0, Color(0x000000))
@@ -1387,7 +1394,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (flowerSupplyDecks[getOrder(player)].components.isNotEmpty()) {
             flowerSupplyDecks[getOrder(player)].components.last().apply {
                 this.visual = CompoundVisual(
-                    ColorVisual(Color(COLOUR_FLOWER)),
+                    flowerTileImageVisual,
                     TextVisual(
                         "${flowerSupplyDecks[getOrder(player)].components.size}",
                         font = Font(30.0, Color(0x000000))
@@ -1399,7 +1406,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (fruitSupplyDecks[getOrder(player)].components.isNotEmpty()) {
             fruitSupplyDecks[getOrder(player)].components.last().apply {
                 this.visual = CompoundVisual(
-                    ColorVisual(Color(COLOUR_FRUIT)),
+                    fruitTileImageVisual,
                     TextVisual(
                         "${fruitSupplyDecks[getOrder(player)].components.size}",
                         font = Font(30.0, Color(0x000000))
@@ -1433,12 +1440,12 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
     }
 
-    private fun getColorForTileType(tileType: TileType): Int {
+    private fun getTileImageVisualForTileType(tileType: TileType): ImageVisual {
         return when (tileType) {
-            TileType.WOOD -> COLOUR_WOOD
-            TileType.LEAF -> COLOUR_LEAF
-            TileType.FLOWER -> COLOUR_FLOWER
-            else -> COLOUR_FRUIT
+            TileType.WOOD -> woodTileImageVisual
+            TileType.LEAF -> leafTileImageVisual
+            TileType.FLOWER -> flowerTileImageVisual
+            else -> fruitTileImageVisual
         }
     }
 
