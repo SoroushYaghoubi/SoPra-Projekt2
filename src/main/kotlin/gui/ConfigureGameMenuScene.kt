@@ -227,6 +227,42 @@ class ConfigureGameMenuScene(
             text = "RANDOM"
         )
 
+    private val turnLabel = Label(
+        posX = 40,
+        posY = 220,
+        width = 100,
+        height = 40,
+        text = "TURN",
+        font = Font(30, Color(0x000000), "ARIAL BLACK")
+    )
+
+    private val playerLabel = Label(
+        posX = 380,
+        posY = 220,
+        width = 200,
+        height = 40,
+        text = "PLAYER",
+        font = Font(30, Color(0x000000), "ARIAL BLACK")
+    )
+
+    private val easyLabel = Label(
+        posX = 830,
+        posY = 220,
+        width = 100,
+        height = 40,
+        text = "EASY",
+        font = Font(28, Color(0x000000), "ARIAL BLACK")
+    )
+
+    private val hardLabel = Label(
+        posX = 980,
+        posY = 220,
+        width = 100,
+        height = 40,
+        text = "HARD",
+        font = Font(28, Color(0x000000), "ARIAL BLACK")
+    )
+
     /**
      * deselects all goal tiles and chooses and selects three goal tiles at random
      */
@@ -568,6 +604,10 @@ class ConfigureGameMenuScene(
             addPlayerButton,
             backButton,
             playerOrderButton,
+            turnLabel,
+            playerLabel,
+            easyLabel,
+            hardLabel,
             startButton.apply {
                 onMouseClicked = {
                     val guiPlayer = playerInputs.mapIndexed() { index, it ->
