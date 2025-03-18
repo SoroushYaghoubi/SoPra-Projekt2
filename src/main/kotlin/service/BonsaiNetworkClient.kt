@@ -98,14 +98,13 @@ class BonsaiNetworkClient(
      */
     @Suppress("UNUSED_PARAMETER", "unused")
     @GameActionReceiver
-    fun onStartGameMessageReceived(message: StartGameMessage) {
+    fun onStartGameMessageReceived(message: StartGameMessage, sender: String) {
         BoardGameApplication.run {
             networkService.receiveStartGameMessage(
                 message = message
             )
         }
     }
-
     override fun onGameActionResponse(response: GameActionResponse) {
         BoardGameApplication.runOnGUIThread {
             check(networkService.connectionState == ConnectionState.PLAYING_MY_TURN ||
