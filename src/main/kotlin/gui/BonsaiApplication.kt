@@ -21,7 +21,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
     private val mainMenuScene = MainMenuScene(this)
     private val gameScene = BonsaiGameScene(rootService)
     private val configureGameMenuScene = ConfigureGameMenuScene(this, rootService)
-    private val joinScene = JoinScene(this)
+    private val joinScene = JoinScene(this, rootService)
     private val hostScene = HostScene(this, rootService)
     private val waitingScene = WaitingScene()
     private val startSessionScene = StartSessionScene(this, rootService)
