@@ -338,6 +338,9 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             return neighbourTiles.contains(TileType.LEAF)
         }
         if (tile.tileType == TileType.FRUIT) {
+            if (neighbourTiles.contains(TileType.FRUIT)){
+                return false
+            }
             if (neighbourTiles.first() == TileType.LEAF && neighbourTiles.last() == TileType.LEAF) {
                 return true
             }
