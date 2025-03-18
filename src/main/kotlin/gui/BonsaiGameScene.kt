@@ -1015,12 +1015,17 @@ class BonsaiGameScene(private val rootService: RootService) :
     override fun refreshAfterDiscardTile() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        updateSupply(game.currentPlayer)
+        if(game.currentState != States.USING_HELPER){
+            updateSupply(game.currentPlayer)
+        }
+
     }
     override fun refreshAfterMeditate() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        updateSupply(game.currentPlayer)
+        if(game.currentState != States.USING_HELPER){
+            updateSupply(game.currentPlayer)
+        }
     }
 
     override fun refreshAfterEndTurn() {
