@@ -328,31 +328,59 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         require(neighbourTiles.isNotEmpty()) { "There are no adjacent cards" }
 
-        if (tile.tileType == TileType.WOOD) {
-            return neighbourTiles.contains(TileType.WOOD)
-        }
-        if (tile.tileType == TileType.LEAF) {
-            return neighbourTiles.contains(TileType.WOOD)
-        }
-        if (tile.tileType == TileType.FLOWER) {
-            return neighbourTiles.contains(TileType.LEAF)
-        }
-        if (tile.tileType == TileType.FRUIT) {
-            if (neighbourTiles.contains(TileType.FRUIT)){
+//        if (tile.tileType == TileType.WOOD) {
+//            return neighbourTiles.contains(TileType.WOOD)
+//        }
+//        if (tile.tileType == TileType.LEAF) {
+//            return neighbourTiles.contains(TileType.WOOD)
+//        }
+//        if (tile.tileType == TileType.FLOWER) {
+//            return neighbourTiles.contains(TileType.LEAF)
+//        }
+//        if (tile.tileType == TileType.FRUIT) {
+//            if (neighbourTiles.contains(TileType.FRUIT)){
+//                return false
+//            }
+//            if (neighbourTiles.first() == TileType.LEAF && neighbourTiles.last() == TileType.LEAF) {
+//                return true
+//            }
+//            for (i in 0..<neighbourTiles.size - 1) {
+//                val currentTile = neighbourTiles[i]
+//                val nextTile = neighbourTiles[i + 1]
+//                if (currentTile == TileType.LEAF && nextTile == TileType.LEAF) {
+//                    return true
+//                }
+//            }
+//        }
+//        return false
+        return when (tile.tileType) {
+            TileType.WOOD -> neighbourTiles.contains(TileType.WOOD)
+            TileType.LEAF -> neighbourTiles.contains(TileType.WOOD)
+            TileType.FLOWER -> neighbourTiles.contains(TileType.LEAF)
+            TileType.FRUIT -> {
+                val neighbours = listOf(
+                    Pair(q + 1, r), Pair(q, r + 1), Pair(q - 1, r + 1),
+                    Pair(q - 1, r), Pair(q, r - 1), Pair(q + 1, r - 1)
+                )
+                val leafPositions = neighbours.filter { tree[it]?.tileType == TileType.LEAF }
+
+                if (leafPositions.size < 2) return false
+
+                for (i in 0 until leafPositions.size - 1) {
+                    val firstLeaf = leafPositions[i]
+                    val secondLeaf = leafPositions[i + 1]
+                    if (neighbours.indexOf(firstLeaf) + 1 == neighbours.indexOf(secondLeaf)) {
+                        return !neighbourTiles.contains(TileType.FRUIT)
+                    }
+                }
+                false
+
+            }
+
+            else -> {
                 return false
             }
-            if (neighbourTiles.first() == TileType.LEAF && neighbourTiles.last() == TileType.LEAF) {
-                return true
-            }
-            for (i in 0..<neighbourTiles.size - 1) {
-                val currentTile = neighbourTiles[i]
-                val nextTile = neighbourTiles[i + 1]
-                if (currentTile == TileType.LEAF && nextTile == TileType.LEAF) {
-                    return true
-                }
-            }
         }
-        return false
     }
 
     /**
