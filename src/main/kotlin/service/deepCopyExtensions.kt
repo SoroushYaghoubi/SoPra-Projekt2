@@ -23,14 +23,12 @@ fun Player.deepCopy(): Player {
         isLocal = this.isLocal,
         color = this.color
     ).also { copy ->
-        //need deep copies
         copy.bonsaiTree = this.bonsaiTree.mapValues { it.value.deepCopy() }.toMutableMap()
         copy.personalSupply = this.personalSupply.map { it.deepCopy() }.toMutableList()
         copy.collectedCards = this.collectedCards.map { it.deepCopy() }.toMutableList()
         copy.claimedGoals = this.claimedGoals.map { it.deepCopy() }.toMutableList()
         copy.renouncedGoals = this.renouncedGoals.map { it.deepCopy() }.toMutableList()
 
-        // do not need deep copier i hope
         copy.playableTiles = this.playableTiles.toMutableList()
         copy.playableTilesCopy = this.playableTilesCopy.toMutableList()
         copy.tileCapacity = this.tileCapacity
@@ -50,11 +48,23 @@ fun GoalTile.deepCopy(): GoalTile {
 fun Card.deepCopy(): Card {
     return when (this) {
         is GrowthCard -> GrowthCard(this.tileType, this.id)
-        is HelperCard -> HelperCard(this.tileTypes[1], this.id)
-        is MasterCard -> MasterCard(this.tileTypes.toMutableList(), this.id)
+        is HelperCard -> this.deepCopy()
+        is MasterCard -> this.deepCopy()
         is ParchmentCard -> ParchmentCard(this.parchmentTileType, this.parchmentCardType, this.basePoints, this.id)
         is ToolCard -> ToolCard(this.id)
         else -> throw IllegalArgumentException("cardtype does not exist: ${this::class.simpleName}")
     }
 }
+
+fun HelperCard.deepCopy(): HelperCard {
+    return HelperCard(this.tileTypes[1], this.id).also { copy ->
+        copy.tileTypes.clear()
+        copy.tileTypes.addAll(this.tileTypes)
+    }
+}
+
+fun MasterCard.deepCopy(): MasterCard {
+    return MasterCard(this.tileTypes.toMutableList(), this.id)
+}
+
 
