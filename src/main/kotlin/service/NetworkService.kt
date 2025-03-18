@@ -31,7 +31,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         private set
 
     // our own name
-    val myName = client?.playerName
+    var myName : String = ""
 
     var toBeSentMeditateMessage = MutableMeditateMessage(
         mutableListOf(), 4, mutableListOf(),
@@ -125,6 +125,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
 
         val message = StartGameMessage(nameColorPair, chosenGoalTiles, zenDeckMessage)
+
+        myName = client?.playerName.toString()
 
         if (myName == playerOrder.first().name) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
@@ -223,6 +225,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             it.toGoalTileType()
         }
         val players = mutableListOf<Player>()
+        myName = client?.playerName.toString()
         orderedPair.forEach {
             val isLocal = (myName == it.first)
             // TODO(we need to decide if we use bot or not)

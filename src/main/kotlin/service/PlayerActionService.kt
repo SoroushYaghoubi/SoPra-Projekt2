@@ -166,8 +166,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
-        onAllRefreshables { refreshAfterMeditate() }
+        onAllRefreshables {refreshAfterMeditate() }
 
     }
 
@@ -344,6 +343,27 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         getCurrentPlayer().hasPlayed = false
         onAllRefreshables { refreshAfterEndTurn() }
 
+    }
+
+    /**
+     * create a deepcopy of the game state
+     * ToDo need to check if some of them need to be deep copies
+     * probably does not work correctly right now
+     */
+    fun BonsaiGameState.deepCopy(): BonsaiGameState {
+        return BonsaiGameState(
+            currentPlayer = currentPlayer.copy(),
+            //shallow copy, need to see if they need to be deep copies
+            players = players.map { it.copy() }.toMutableList(),
+            botSpeed = botSpeed,
+            currentState = currentState
+        ).also { copy ->
+            copy.endGameCounter = this.endGameCounter
+            //shallow copies, need to see if they need to be deep copies
+            copy.zenDeck = this.zenDeck.toMutableList()
+            copy.faceUpCards = this.faceUpCards.toMutableList()
+            copy.goalTiles = this.goalTiles.map { it.copy() }.toMutableList()
+        }
     }
 
 

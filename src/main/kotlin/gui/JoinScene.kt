@@ -35,7 +35,6 @@ class JoinScene(bonsaiApplication: BonsaiApplication, rootService: RootService) 
             TextFieldStyle2(
                 posX = 875,
                 posY = 275,
-                text = "",
                 prompt = "SESSION ID",
             )
 
@@ -44,7 +43,6 @@ class JoinScene(bonsaiApplication: BonsaiApplication, rootService: RootService) 
         TextFieldStyle2(
             posX = 875,
             posY = 410,
-            text = "",
             prompt = "NAME",
         )
 
@@ -115,5 +113,4 @@ class JoinScene(bonsaiApplication: BonsaiApplication, rootService: RootService) 
             backButton,
         )
     }
-
 }

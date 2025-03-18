@@ -348,7 +348,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         }
 
         if (gameState.faceUpCards.size < 4) {
-            val newCard = gameState.zenDeck.removeAt(0)
+            val newCard = gameState.zenDeck.removeLast()
             gameState.faceUpCards.add(0, newCard)
         }
 

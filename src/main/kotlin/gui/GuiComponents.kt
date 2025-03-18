@@ -101,13 +101,12 @@ class TextFieldStyle1(
  * Class design text
  */
 class TextFieldStyle2(
-    posX: Int = 0, posY: Int = 0, text: String = "Text Field", prompt: String = ""
+    posX: Int = 0, posY: Int = 0, prompt: String = ""
 ) : TextField(
     posX = posX,
     posY = posY,
     width = 600,
     height = 110,
-    text = text,
     prompt = prompt,
     font = Font(48.0, Color(TERTIARY_COLOUR), "Arial Black", Font.FontWeight.BOLD),
     visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
