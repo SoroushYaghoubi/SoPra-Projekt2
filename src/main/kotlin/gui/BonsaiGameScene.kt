@@ -1,6 +1,7 @@
 package gui
 
 import entity.*
+import gui.BonsaiApplication
 import service.RootService
 import tools.aqua.bgw.components.ComponentView
 import tools.aqua.bgw.components.container.Area
@@ -317,7 +318,13 @@ class BonsaiGameScene(private val rootService: RootService) :
             font = Font(36)
         ).apply {
             // hide the button in network game
-            isVisible = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true
+            if(rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true){
+                isVisible = true
+                onMouseClicked = {
+                    rootService.historyService.saveGame()
+                    //BonsaiApplication.showMenuScene()
+                }
+            }
         }
 
     // right side pane
@@ -436,11 +443,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             ).apply {
                 val game = rootService.currentGame?.currentBonsaiGameState
                 checkNotNull(game)
-                if (player != game.currentPlayer) {
-                    isVisible = false
-                } else {
-                    isVisible = true
-                }
+                isVisible = player == game.currentPlayer
             }
         playerPanes.add(playerPane)
         addComponents(playerPane)
@@ -820,22 +823,48 @@ class BonsaiGameScene(private val rootService: RootService) :
             interactionText.text = ""
             val game = rootService.currentGame?.currentBonsaiGameState
             checkNotNull(game)
-            // val playerIndex = getOrder(game.currentPlayer)
-            // val supplyTileMap = supplyTileMaps[playerIndex]
+            val playerIndex = getOrder(game.currentPlayer)
+            val supplyTileMap = supplyTileMaps[playerIndex]
             val tobeRemoved: MutableList<Tile> = mutableListOf()
             // make the supply tiles draggable after cultivate start
-            /*
-            game.players[playerIndex].personalSupply.forEach { supplyTile ->
-                checkNotNull(supplyTileMap[supplyTile])
-                supplyTileMap[supplyTile].apply {
-                    onMouseClicked = {
+            println("123")
 
+            game.currentPlayer.personalSupply.forEach { _ ->
+                val pane = Area<HexagonView>(
+                    posX = 585,
+                    posY = 240,
+                    width = 750,
+                    height = 600,
+                    visual = ColorVisual(Color(0xbebebe)).apply {
+                        style.borderRadius = BorderRadius(20.0)
+                    }
+                ).apply {
+                    //zIndex = 1
+                    isVisible = true
+
+                    this.dropAcceptor = {dragEvent ->
+                        when (dragEvent.draggedComponent) {
+                            is HexagonView -> {
+                                // If the card is valid, the card can be dropped and played
+                                // some condition
+                                val comp = dragEvent.draggedComponent as HexagonView
+                                val tile = supplyTileMap.backward(comp)
+                                true
+                            }
+                            else -> false
+                        }
 
                     }
-                } ?: println("Warning: supplyTileMap does not contain $supplyTile")
+
+                    this.onDragDropped = { dragEvent ->
+                        val comp = dragEvent.draggedComponent as HexagonView
+                        val tile = supplyTileMap.backward(comp)
+                        tobeRemoved.add(tile)
+                    }
+                    updateSupply(game.currentPlayer)
+                }
             }
             rootService.playerActionService.discardSupplyTile(tobeRemoved)
-            */
         }
 
 
@@ -948,7 +977,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                     goalTileList.forEach {
                         if (goalTileType == it.goalTileType && tier == it.tier) {
                             goalButtons[goalTileList.indexOf(it)].text =
-                                game.currentPlayer.name + ", Score:  ${goalTileScore}"
+                                game.currentPlayer.name + ", Score:  $goalTileScore"
                         }
                     }
                 }
