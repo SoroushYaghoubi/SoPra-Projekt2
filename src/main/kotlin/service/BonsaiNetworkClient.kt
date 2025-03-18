@@ -96,6 +96,7 @@ class BonsaiNetworkClient(
     /**
      * handle a [StartGameMessage] sent by the server
      */
+    @Suppress("UNUSED_PARAMETER", "unused")
     @GameActionReceiver
     fun onStartGameMessageReceived(message: StartGameMessage) {
         BoardGameApplication.run {
@@ -104,6 +105,7 @@ class BonsaiNetworkClient(
             )
         }
     }
+
     override fun onGameActionResponse(response: GameActionResponse) {
         BoardGameApplication.runOnGUIThread {
             check(networkService.connectionState == ConnectionState.PLAYING_MY_TURN ||
@@ -120,6 +122,7 @@ class BonsaiNetworkClient(
     /**
      * handle a [CultivateMessage] sent by the server
      */
+    @Suppress("UNUSED_PARAMETER", "unused")
     @GameActionReceiver
     fun onCultivateMessage(message: CultivateMessage, sender: String) {
         BoardGameApplication.run {
@@ -130,6 +133,7 @@ class BonsaiNetworkClient(
     /**
      * handle a [MeditateMessage] sent by the server
      */
+    @Suppress("UNUSED_PARAMETER", "unused")
     @GameActionReceiver
     fun onMeditateMessage(message: MeditateMessage, sender: String) {
         BoardGameApplication.run {
