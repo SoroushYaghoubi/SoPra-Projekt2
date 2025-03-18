@@ -44,7 +44,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         var zenDeck = mutableListOf<Card>()
         val faceUpCards = mutableListOf<Card>()
-        if (!networkGame) {
+        if (rootService.networkService.connectionState != ConnectionState.WAITING_FOR_INIT) {
             // create the zenDeck depending on the number of players
             zenDeck = ZenCardLoader().readAllZenCards(playerOrder.size).shuffled().toMutableList()
             // put the first 4 cards face up
