@@ -575,10 +575,6 @@ class HostScene(
                         entity.Player(name, playerType, true, color)
                     }.toMutableList()
 
-                    rootService.gameService.startNewGame(
-                        guiPlayer, false,
-                        selectedGoalTiles
-                    )
                     rootService.networkService
                         .sendStartGameMessage(
                             guiPlayer,
