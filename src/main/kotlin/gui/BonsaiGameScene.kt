@@ -882,7 +882,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     }
 
 
-    override fun refreshAfterDrawingHelperCard(playableTilesCopy1: MutableList<TileType>) {
+    override fun refreshAfterDrawingHelperCard(playableTilesCopy: MutableList<TileType>) {
 
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
