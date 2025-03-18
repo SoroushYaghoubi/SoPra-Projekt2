@@ -166,7 +166,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
         actPlayer.hasPlayed = true
-        onAllRefreshables {refreshAfterMeditate() }
+        onAllRefreshables { refreshAfterMeditate() }
+        onAllRefreshables { refreshAfterMeditate() }
 
     }
 
@@ -215,7 +216,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         checkNotNull(gameState) { "No active game state." }
         val actPlayer = gameState.currentPlayer
         gameState.currentPlayer.playableTilesCopy.clear()
-       // val tileTypeToPlay2 = drawnCard.tileTypes[1]
+        // val tileTypeToPlay2 = drawnCard.tileTypes[1]
         gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
         // gameState.currentPlayer.playableTiles.toMutableList()
         onAllRefreshables { refreshAfterDrawingHelperCard() }
@@ -344,12 +345,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         onAllRefreshables { refreshAfterEndTurn() }
 
     }
-
-
-
-
-
-
 
 
     /**
@@ -658,12 +653,21 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @throws IllegalStateException if personal supply is not over capacity limit.
      */
-    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+//    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+//        val player = getCurrentPlayer()
+//        check(player.personalSupply.size > player.tileCapacity)
+//        { "The personal supply tiles hasn't reached the capacity." }
+//        player.personalSupply.removeAll(tilesToDiscard)
+//        rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
+//    }
+
+    fun discardSupplyTile(tileToDiscard: Tile) {
         val player = getCurrentPlayer()
         check(player.personalSupply.size > player.tileCapacity)
         { "The personal supply tiles hasn't reached the capacity." }
-        player.personalSupply.removeAll(tilesToDiscard)
+        player.personalSupply.remove(tileToDiscard)
         rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
+        player.hasPlayed = true
     }
 
     // returns the current player
