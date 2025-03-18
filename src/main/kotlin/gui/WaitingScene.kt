@@ -44,5 +44,6 @@ class WaitingScene (val bonsaiApplication: BonsaiApplication,) : MenuScene(
 
     override fun refreshAfterGameStart() {
         bonsaiApplication.hideMenuScene()
+        bonsaiApplication.showGameScene()
     }
 }
