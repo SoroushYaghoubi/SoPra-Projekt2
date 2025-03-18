@@ -120,9 +120,13 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             it.toGoalTileTypeMessage()
         }
 
-        val zenDeckMessage = game.zenDeck.map {
+        val zenDeckList = game.zenDeck.map {
             Pair(it.cardType.toCardTypeMessage(), it.id)
         }
+        val faceUpCardsList = game.faceUpCards.map {
+            Pair(it.cardType.toCardTypeMessage(), it.id)
+        }
+        val zenDeckMessage = zenDeckList + faceUpCardsList
 
         val message = StartGameMessage(nameColorPair, chosenGoalTiles, zenDeckMessage)
 
