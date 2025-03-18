@@ -41,6 +41,30 @@ val POT = setOf(
 // --------------- AXIAL ARITHMETIC ---------------
 // ------------------------------------------------
 // ------------------------------------------------
+
+// --------------- sus feature (rethink later) ---------------
+
+/**
+ * for gui, read empty tiles to show in game scene.
+ *
+ * @return a list of playable positions
+ */
+fun MutableMap<Pair<Int, Int>, Tile>.getEmptyTiles(): Set<Pair<Int, Int>> {
+    val emptyTiles = mutableSetOf<Pair<Int, Int>>()
+
+    for (tileIndex in (this@getEmptyTiles traverseFrom ROOT)) {
+        for (neighbourIndex in circleAround(tileIndex)) {
+            if (this@getEmptyTiles[neighbourIndex] == null &&
+                neighbourIndex !in POT
+            ) {
+                emptyTiles += neighbourIndex
+            }
+        }
+    }
+
+    return emptyTiles
+}
+
 /**
  * BFS. First element in the queue is to be processed. New nodes added in the end. Change queue conditions
  * based on design.
@@ -49,7 +73,7 @@ val POT = setOf(
  *
  * @return tile position as a lazy sequence
  */
-infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
+private infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
     // args check
     checkNotNull(this@traverseFrom[bfsRoot]) { "Cannot start from non-existing tile." }
 
@@ -92,7 +116,7 @@ infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>)
  *
  * @see `Demo` in the same dir for example usage.
  */
-fun circleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
+private fun circleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
     val (q, r) = center
 
     for ((dq, dr) in SIDE_VECTORS)
@@ -102,7 +126,7 @@ fun circleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
 /**
  * Wrapper for the [circleAround] function to iterate infinitely around a coordinate
  */
-fun foreverCircleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
+private fun foreverCircleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
     while (true)
         for (tile in circleAround(center))
             yield(tile)
@@ -111,7 +135,7 @@ fun foreverCircleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequ
 /**
  * Single-step clockwise rotation around an adjacent center point
  */
-infix fun Pair<Int, Int>.rotateClockwiseAround(center: Pair<Int, Int>): Pair<Int, Int> =
+private infix fun Pair<Int, Int>.rotateClockwiseAround(center: Pair<Int, Int>): Pair<Int, Int> =
     when (this - center) {
         VECTOR_LEFT -> this + VECTOR_TOP_RIGHT
         VECTOR_TOP_LEFT -> this + VECTOR_RIGHT
@@ -125,7 +149,7 @@ infix fun Pair<Int, Int>.rotateClockwiseAround(center: Pair<Int, Int>): Pair<Int
 /**
  * Single-step counter-clockwise rotation around an adjacent center point
  */
-infix fun Pair<Int, Int>.rotateCounterClockwiseAround(center: Pair<Int, Int>): Pair<Int, Int> =
+private infix fun Pair<Int, Int>.rotateCounterClockwiseAround(center: Pair<Int, Int>): Pair<Int, Int> =
     when (this - center) {
         VECTOR_LEFT -> this + VECTOR_BOTTOM_RIGHT
         VECTOR_TOP_LEFT -> this + VECTOR_BOTTOM_LEFT
@@ -139,36 +163,13 @@ infix fun Pair<Int, Int>.rotateCounterClockwiseAround(center: Pair<Int, Int>): P
 /**
  * Override axial coordinates to act like they know vector arithmetic
  */
-operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> {
+private operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> {
     return Pair(this.first - other.first, this.second - other.second)
 }
 
 /**
  * Override axial coordinates to act like they know vector arithmetic
  */
-operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
+private operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
     return Pair(this.first + other.first, this.second + other.second)
-}
-
-// --------------- sus feature (rethink later) ---------------
-
-/**
- * for gui, read empty tiles to show in game scene.
- *
- * @return a list of playable positions
- */
-fun MutableMap<Pair<Int, Int>, Tile>.getEmptyTiles(): Set<Pair<Int, Int>> {
-    val emptyTiles = mutableSetOf<Pair<Int, Int>>()
-
-    for (tileIndex in (this@getEmptyTiles traverseFrom ROOT)) {
-        for (neighbourIndex in circleAround(tileIndex)) {
-            if (this@getEmptyTiles[neighbourIndex] == null &&
-                neighbourIndex !in POT
-            ) {
-                emptyTiles += neighbourIndex
-            }
-        }
-    }
-
-    return emptyTiles
 }
