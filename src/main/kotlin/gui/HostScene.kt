@@ -579,6 +579,11 @@ class HostScene(
                         guiPlayer, false,
                         selectedGoalTiles
                     )
+                    rootService.networkService
+                        .sendStartGameMessage(
+                            guiPlayer,
+                            selectedGoalTiles
+                        )
                     bonsaiApplication.hideMenuScene()
                     bonsaiApplication.showGameScene()
                 }

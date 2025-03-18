@@ -29,6 +29,7 @@ class RootService {
         playerActionService.addRefreshable(newRefreshable)
         historyService.addRefreshable(newRefreshable)
         treeService.addRefreshable(newRefreshable)
+        networkService.addRefreshable(newRefreshable)
     }
 
     /**

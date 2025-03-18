@@ -75,7 +75,6 @@ class BonsaiNetworkClient(
                 else -> disconnectAndError(response.status)
             }
         }
-
     }
 
     /**
