@@ -879,14 +879,9 @@ class BonsaiGameScene(private val rootService: RootService) :
         updateSupply(game.currentPlayer)
         // make the supply tiles draggable after cultivate start
         game.players[playerIndex].personalSupply.forEach { supplyTile ->
-            println("personal supply ${game.players[playerIndex].personalSupply}")
            supplyTileMap[supplyTile].apply {
-               println("supplyTileMap${supplyTileMap[supplyTile]}")
                 isDraggable = true
-                onMouseClicked ={
-                    rootService.treeService.playTile(supplyTile , Pair(0,-1))
-                    println("hello")
-                }
+
             }
             }
         interactionText.text = "You may now place your tiles or end turn"
