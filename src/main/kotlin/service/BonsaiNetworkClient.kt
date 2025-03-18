@@ -2,14 +2,11 @@ package service
 
 import tools.aqua.bgw.net.client.BoardGameClient
 import tools.aqua.bgw.net.common.notification.PlayerJoinedNotification
-import tools.aqua.bgw.net.common.response.CreateGameResponse
-import tools.aqua.bgw.net.common.response.JoinGameResponse
 import edu.udo.cs.sopra.ntf.*
 import tools.aqua.bgw.core.BoardGameApplication
 import tools.aqua.bgw.net.client.NetworkLogging
 import tools.aqua.bgw.net.common.annotations.GameActionReceiver
-import tools.aqua.bgw.net.common.response.CreateGameResponseStatus
-import tools.aqua.bgw.net.common.response.JoinGameResponseStatus
+import tools.aqua.bgw.net.common.response.*
 
 /**
  * [BoardGameClient] implementation for network communication.
@@ -105,6 +102,18 @@ class BonsaiNetworkClient(
             networkService.receiveStartGameMessage(
                 message = message
             )
+        }
+    }
+    override fun onGameActionResponse(response: GameActionResponse) {
+        BoardGameApplication.runOnGUIThread {
+            check(networkService.connectionState == ConnectionState.PLAYING_MY_TURN ||
+                    networkService.connectionState == ConnectionState.WAITING_FOR_OPPONENT)
+            { "not currently playing in a network game."}
+
+            when (response.status) {
+                GameActionResponseStatus.SUCCESS -> {} // do nothing in this case
+                else -> disconnectAndError(response.status)
+            }
         }
     }
 
