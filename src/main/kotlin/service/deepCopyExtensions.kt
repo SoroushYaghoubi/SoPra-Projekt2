@@ -31,6 +31,7 @@ fun Player.deepCopy(): Player {
 
         copy.playableTiles = this.playableTiles.toMutableList()
         copy.playableTilesCopy = this.playableTilesCopy.toMutableList()
+
         copy.tileCapacity = this.tileCapacity
         copy.score = this.score
         copy.hasPlayed = this.hasPlayed

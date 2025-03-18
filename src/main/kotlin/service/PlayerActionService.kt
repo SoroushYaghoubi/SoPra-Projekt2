@@ -297,13 +297,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         require(canEndTurn())
 
-        // save state in history
-        val copiedState = gameState.deepCopy()
-        println("Copied game state: ${copiedState.hashCode()}")
-        println("Original game state: ${gameState.hashCode()}")
-        game.history?.gameStates?.add(copiedState)
-        game.history?.currentPosition = game.history?.gameStates?.lastIndex ?: 0
-
         // Trigger end game by counting the turn of player
         if (gameState.zenDeck.isEmpty()) {
             gameState.endGameCounter++
@@ -341,6 +334,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         getCurrentPlayer().hasPlayed = false
+        // save history
+        val copiedState = gameState.deepCopy()
+        game.history?.gameStates?.add(copiedState)
+        game.history?.currentPosition = game.history?.gameStates?.lastIndex ?: 0
+
         onAllRefreshables { refreshAfterEndTurn() }
 
     }
