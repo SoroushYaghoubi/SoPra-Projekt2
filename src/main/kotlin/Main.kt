@@ -6,5 +6,4 @@ import util.ZenCardLoader
  */
 fun main() {
     BonsaiApplication().show()
-    BonsaiApplication().show()
 }

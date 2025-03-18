@@ -289,6 +289,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         // save state in history
         val copiedState = gameState.deepCopy()
+        println("Copied game state: ${copiedState.hashCode()}")
+        println("Original game state: ${gameState.hashCode()}")
         game.history?.gameStates?.add(copiedState)
         game.history?.currentPosition = game.history?.gameStates?.lastIndex ?: 0
 
@@ -333,26 +335,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
     }
 
-    /**
-     * create a deepcopy of the game state
-     * ToDo need to check if some of them need to be deep copies
-     * probably does not work correctly right now
-     */
-    fun BonsaiGameState.deepCopy(): BonsaiGameState {
-        return BonsaiGameState(
-            currentPlayer = currentPlayer.copy(),
-            //shallow copy, need to see if they need to be deep copies
-            players = players.map { it.copy() }.toMutableList(),
-            botSpeed = botSpeed,
-            currentState = currentState
-        ).also { copy ->
-            copy.endGameCounter = this.endGameCounter
-            //shallow copies, need to see if they need to be deep copies
-            copy.zenDeck = this.zenDeck.toMutableList()
-            copy.faceUpCards = this.faceUpCards.toMutableList()
-            copy.goalTiles = this.goalTiles.map { it.copy() }.toMutableList()
-        }
-    }
+
+
+
+
+
 
 
     /**
