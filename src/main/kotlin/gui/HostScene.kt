@@ -773,6 +773,7 @@ class HostScene(
     }
 
     override fun refreshAfterPlayerJoined(playerName: String) {
+        println("___")
         addPlayer(playerName)
     }
 }
