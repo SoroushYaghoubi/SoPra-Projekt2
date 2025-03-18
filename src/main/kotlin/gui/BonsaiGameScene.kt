@@ -322,7 +322,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 isVisible = true
                 onMouseClicked = {
                     rootService.historyService.saveGame()
-                    //BonsaiApplication.showMenuScene()
+                    //BonsaiApplication().showMainMenuScene()
                 }
             }
         }
