@@ -48,8 +48,10 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
             // create the zenDeck depending on the number of players
             zenDeck = ZenCardLoader().readAllZenCards(playerOrder.size).shuffled().toMutableList()
             // put the first 4 cards face up
-            repeat(4) {
-                faceUpCards.add(zenDeck.removeAt(0))
+            if(!networkGame){
+                repeat(4) {
+                    faceUpCards.add(zenDeck.removeAt(0))
+                }
             }
         }
 
