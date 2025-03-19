@@ -1101,7 +1101,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 return@schedule
             } else {
                 actPlayer.hasPlayed = true
-                refreshAfterMeditate()
+                refreshAfterMeditate(null)
             }
 
         }
@@ -1360,7 +1360,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         updatePlayableTiles(game.currentPlayer)
     }
 
-    override fun refreshAfterMeditate() {
+    override fun refreshAfterMeditate(position: Int?) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         if (game.currentState != States.USING_HELPER) {
@@ -1380,7 +1380,8 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
             !game.currentPlayer.isLocal) {
             updateZenBoard()
-            faceUpCards.remove(faceUpCards.last())
+            checkNotNull(position)
+            faceUpCards.components[position].removeFromParent()
         }
     }
 

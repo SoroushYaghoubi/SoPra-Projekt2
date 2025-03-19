@@ -308,7 +308,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         hasMeditated = false
         //TODO(refresh after meditate)
         game.currentPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
+        onAllRefreshables { refreshAfterMeditate(message.chosenCardPosition) }
         println(game.faceUpCards)
         rootService.playerActionService.endTurn()
     }

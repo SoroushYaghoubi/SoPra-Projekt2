@@ -222,7 +222,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
+        onAllRefreshables { refreshAfterMeditate(null) }
     }
 
     /**
