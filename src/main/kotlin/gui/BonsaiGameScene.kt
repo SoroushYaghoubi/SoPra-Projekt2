@@ -644,6 +644,8 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         }
 
+    private val anyTileImageVisual = ImageVisual("./BonsaiTiles/any.png")
+
     private val leafTile = HexagonView(
         posY = 100,
         posX = 500,
