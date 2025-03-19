@@ -269,14 +269,16 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 val r = position.second
                 println("Tile at ($q, $r) -> Type: ${tile.tileType}")
 
-                val neighbourTiles = listOf(
-                    Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
-                    Pair(Pair(q, r + 1), tree.getOrDefault(Pair(q, r + 1), null)),
-                    Pair(Pair(q - 1, r + 1), tree.getOrDefault(Pair(q - 1, r + 1), null)),
-                    Pair(Pair(q - 1, r), tree.getOrDefault(Pair(q - 1, r), null)),
-                    Pair(Pair(q, r - 1), tree.getOrDefault(Pair(q, r - 1), null)),
-                    Pair(Pair(q + 1, r - 1), tree.getOrDefault(Pair(q + 1, r - 1), null))
-                ).filter { it.first !in POT }
+//                val neighbourTiles = listOf(
+//                    Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
+//                    Pair(Pair(q, r + 1), tree.getOrDefault(Pair(q, r + 1), null)),
+//                    Pair(Pair(q - 1, r + 1), tree.getOrDefault(Pair(q - 1, r + 1), null)),
+//                    Pair(Pair(q - 1, r), tree.getOrDefault(Pair(q - 1, r), null)),
+//                    Pair(Pair(q, r - 1), tree.getOrDefault(Pair(q, r - 1), null)),
+//                    Pair(Pair(q + 1, r - 1), tree.getOrDefault(Pair(q + 1, r - 1), null))
+//                ).filter { it.first !in POT }
+                val neighbourTiles = getNeighbourTiles(position).filter { it.first !in POT }
+
                 val nullPositions = neighbourTiles.filter { it.second == null }.map { it.first }
 
                 println("Null:$nullPositions")
