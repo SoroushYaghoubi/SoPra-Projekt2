@@ -425,4 +425,11 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
     fun redoReceivedGoalTile() {
 
     }
+
+    /**
+     * used for network tests
+     */
+    fun setConnectionStateTest(newState: ConnectionState){
+        updateConnectionState(newState)
+    }
 }
