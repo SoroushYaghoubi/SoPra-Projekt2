@@ -339,9 +339,10 @@ class HostScene(
                         } else {
                             client.otherPlayerNames[index - 1]
                         }
+                        val isLocal = (index == 0)
 
 
-                        entity.Player(name, playerType, true, color)
+                        entity.Player(name, playerType, isLocal, color)
                     }.toMutableList()
 
                     rootService.networkService
