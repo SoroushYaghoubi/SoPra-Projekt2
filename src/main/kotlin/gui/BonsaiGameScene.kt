@@ -1031,6 +1031,8 @@ class BonsaiGameScene(private val rootService: RootService) :
         val playerIndex = getOrder(game.currentPlayer)
         val supplyTileMap = supplyTileMaps[playerIndex]
         updateSupply(game.currentPlayer)
+        game.currentPlayer.playableTilesCopy.clear()
+        game.currentPlayer.playableTilesCopy.addAll(playableTilesCopy)
         updatePlayableTiles(game.currentPlayer)
         // make the supply tiles draggable after cultivate start
         game.players[playerIndex].personalSupply.forEach { supplyTile ->
@@ -1043,11 +1045,34 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         // update tile capacity
         capacityLabel.text = "Cap: ${game.currentPlayer.tileCapacity}"
+
+        val confirmButton = Button(
+            width = 150,
+            height = 50,
+            posX = 850,
+            posY = 25,
+            text = "finished",
+            font = Font(size = 18),
+            visual = ColorVisual(Color(0xAAAAAA))
+        ).apply {
+            onMouseClicked = {
+                this.isVisible = false
+                rootService.playerActionService.checkSupply()
+                game.players[playerIndex].personalSupply.forEach { supplyTile ->
+                    supplyTileMap[supplyTile].apply {
+                        isDraggable = false
+                    }
+                }
+            }
+        }
+
+        // Button in infoPane hinzufügen
+        interactionPane.add(confirmButton)
+
     }
 
     override fun refreshAfterDrawingMasterCardAny() {
 
-        println("hello")
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
 
