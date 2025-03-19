@@ -203,7 +203,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         if (actPlayer.isLocal) {
             onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
         }
-
     }
     /**
      *

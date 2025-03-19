@@ -1379,9 +1379,9 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
             !game.currentPlayer.isLocal) {
-            updateZenBoard()
             checkNotNull(position)
             faceUpCards.components[position].removeFromParent()
+            updateZenBoard()
         }
     }
 
