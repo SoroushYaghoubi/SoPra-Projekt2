@@ -986,14 +986,15 @@ class BonsaiGameScene(private val rootService: RootService) :
                 val q = tile.q ?: throw IllegalStateException("Tile q coordinate is null.")
                 val r = tile.r ?: throw IllegalStateException("Tile r coordinate is null.")
 
-                //remove the empty views before adding the new one
-                player.bonsaiTree.getEmptyTiles().forEach {
-                    treePlayer[it.first, it.second]?.removeFromParent()
-                }
 
-                rootService.treeService.removeFromTree(q to r)
+                //if (rootService.treeService.isMinimalAndCorrect(q to r)){
+                    //player.bonsaiTree.getEmptyTiles().forEach {
+                    //    treePlayer[it.first, it.second]?.removeFromParent()
+                    //}
+                    rootService.treeService.removeFromTree(q to r)
 
-                interactionText.text = "Tile removed successfully."
+                    interactionText.text = "Tile removed successfully."
+                //}
 
                 // Check if more removals are needed
                 if (rootService.treeService.canPlayWood()) {

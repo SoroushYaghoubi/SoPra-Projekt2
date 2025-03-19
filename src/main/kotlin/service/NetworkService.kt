@@ -93,10 +93,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val playerNames = client?.otherPlayerNames
         checkNotNull(playerNames)
 
-        // TODO(CHECK)
-        if (playerOrder.size < 2 || playerOrder.size > 4) {
-            throw IllegalArgumentException("there should be 2 to 4 players")
-        }
+        check(playerOrder.size in 2..4) {"there should be 2 to 4 players"}
 
         rootService.gameService.startNewGame(playerOrder, true, goalTilesEntries)
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -141,8 +138,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         { "currently not expecting your turn." }
 
         // --------------- main functionality ---------------
-        client?.sendGameActionMessage(
-            MeditateMessage(
+        val message = MeditateMessage(
                 toBeSentMeditateMessage
                     .removedTilesAxialCoordinates.map { it },
                 toBeSentMeditateMessage
@@ -158,10 +154,10 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                 toBeSentMeditateMessage
                     .discardedTiles.map { it.toTileTypeMessage() },
             )
-        )
 
         // --------------- epilogue: state update ---------------
         toBeSentMeditateMessage.removedTilesAxialCoordinates.clear()
+        toBeSentCultivateMessage.removedTilesAxialCoordinates.clear()
         toBeSentMeditateMessage.playedTiles.clear()
         toBeSentMeditateMessage.claimedGoals.clear()
         toBeSentMeditateMessage.renouncedGoals.clear()
@@ -169,6 +165,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         toBeSentMeditateMessage.discardedTiles.clear()
         toBeSentMeditateMessage.chosenCardPosition = 4
         updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
+        client?.sendGameActionMessage(message)
     }
 
     /**
