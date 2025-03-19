@@ -171,7 +171,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         require(
             gameState.currentState == States.USING_MASTER
-        ) { "CurrentState should be Using_Master" }
+        )
 
         actPlayer.personalSupply.add(Tile(null, null, tileType))
 
@@ -191,7 +191,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         val actPlayer = gameState.currentPlayer
-        actPlayer.hasPlayed = true
         //gameState.currentPlayer.playableTilesCopy.clear()
         //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
         onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }

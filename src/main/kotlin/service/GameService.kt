@@ -166,64 +166,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         return winnerOrder.toList()
     }
 
-
-    /**
-     * Calculates the score of the current player.
-     */
-//    fun calculateScore(): Int {
-//        val game = rootService.currentGame
-//        checkNotNull(game) { "No game was started." }
-//        val gameState = game.currentBonsaiGameState
-//        checkNotNull(gameState) { "No active game state." }
-//
-//        val actPlayer = gameState.currentPlayer
-//        val playersBonsaiTree = actPlayer.bonsaiTree
-//        val playersCollectedCards = actPlayer.collectedCards
-//        val claimGoals = actPlayer.claimedGoals
-//
-//        // Calculate score for each tile
-//        val leaf = countTilesType(playersBonsaiTree, TileType.LEAF)
-//        //val flower = countTilesType(playersBonsaiTree, TileType.FLOWER)
-//        val fruit = countTilesType(playersBonsaiTree, TileType.FRUIT)
-//        //val wood = countTilesType(playersBonsaiTree, TileType.WOOD)
-//
-//        val scoreOfLeaf = leaf * 3
-//        val scoreOfFlower = calculateFlowerPoints(playersBonsaiTree)
-//        val scoreOfFruit = fruit * 7
-//
-//        val scoreTiles = scoreOfLeaf + scoreOfFlower + scoreOfFruit
-//
-//        // Calculate score for parchment
-//        var scoreParchment = 0
-//
-//        // Filter all parchment cards
-//        val parchmentCards = playersCollectedCards.filterIsInstance<ParchmentCard>()
-//
-//        for (parchment in parchmentCards) {
-//            val basePoints = parchment.basePoints
-//
-//            // If parchment is based on TileType
-//            parchment.parchmentTileType?.let { tileType ->
-//                val tileCount = countTilesType(playersBonsaiTree, tileType)
-//                val points = tileCount * basePoints
-//                scoreParchment += points
-//            }
-//
-//            // If parchment is based on CardType
-//            parchment.parchmentCardType?.let { cardType ->
-//                val cardCount = countZenCardType(playersCollectedCards, cardType)
-//                val points = cardCount * basePoints
-//                scoreParchment += points
-//            }
-//        }
-//
-//        // Calculate score for Goal
-//        val scoreOfGoal = claimGoals.sumOf { it.score }
-//
-//        // Total
-//        return scoreTiles + scoreParchment + scoreOfGoal
-//    }
-
     /**
      * Calculates the score of the current player.
      */

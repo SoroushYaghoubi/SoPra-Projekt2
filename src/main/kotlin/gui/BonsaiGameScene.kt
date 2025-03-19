@@ -1013,33 +1013,41 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         treePlayer.components.forEach { hexagonView ->
             hexagonView.onMouseClicked = {
-                val tile = treeTileMap.backward(hexagonView)
+                if (!rootService.treeService.canPlayWood()){
+                    val tile = treeTileMap.backward(hexagonView)
 
-                val q = tile.q ?: throw IllegalStateException("Tile q coordinate is null.")
-                val r = tile.r ?: throw IllegalStateException("Tile r coordinate is null.")
+                    val q = tile.q ?: throw IllegalStateException("Tile q coordinate is null.")
+                    val r = tile.r ?: throw IllegalStateException("Tile r coordinate is null.")
 
 
-                //if (rootService.treeService.isMinimalAndCorrect(q to r)){
+                    //if (rootService.treeService.isMinimalAndCorrect(q to r)){
                     //player.bonsaiTree.getEmptyTiles().forEach {
                     //    treePlayer[it.first, it.second]?.removeFromParent()
                     //}
-                    rootService.treeService.removeFromTree(q to r)
+                    if (rootService.treeService.isMinimalAndCorrect(q to r )){
+                        rootService.treeService.removeFromTree(q to r)
 
-                    interactionText.text = "Tile removed successfully."
-                //}
+                        interactionText.text = "Tile removed successfully."
+                        //}
 
-                // Check if more removals are needed
-                if (rootService.treeService.canPlayWood()) {
-                    removeButton.isVisible = false
-                    interactionText.text = "You may now Cultivate or Meditate."
+                        // Check if more removals are needed
+                        if (rootService.treeService.canPlayWood()) {
+                            removeButton.isVisible = false
+                            interactionText.text = "You may now Cultivate or Meditate."
+
+                        }
+
+
+                        hexagonView.removeFromParent()
+                        createEmptyHex(player)
+                        treeTileMap.removeForward(tile) // Remove the tile from the tile map
+                        treePlayer.isVisible = true
+                        playerPanes[getOrder(player)].isVisible = true
+                    }
                 }
 
 
-                hexagonView.removeFromParent()
-                createEmptyHex(player)
-                treeTileMap.removeForward(tile) // Remove the tile from the tile map
-                treePlayer.isVisible = true
-                playerPanes[getOrder(player)].isVisible = true
+
             }
 
         }
@@ -1222,6 +1230,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                 game.players[playerIndex].personalSupply.forEach { supplyTile ->
                     supplyTileMap[supplyTile].apply {
                         isDraggable = false
+                        game.currentPlayer.hasPlayed = true
                     }
                 }
             }

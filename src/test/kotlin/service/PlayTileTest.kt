@@ -247,6 +247,9 @@ class PlayTileTest {
         assertFalse(rootService.treeService.canPlayTile(tile, Pair(1, -4)))
     }
 
+    /**
+     * Test for network
+     */
     @Test
     fun testPlayTileMessagesIfConnected() {
         val rootService = setUpGame()
@@ -278,7 +281,9 @@ class PlayTileTest {
             )
         )
     }
-
+    /**
+     * Test for network
+     */
     @Test
     fun testPlayTileMessagesIfDisConnected() {
         val rootService = setUpGame()
@@ -311,6 +316,9 @@ class PlayTileTest {
         )
     }
 
+    /**
+     * Test for network
+     */
     @Test
     fun testCanPlayIfNoTilesInHand() {
         val rootService = setUpGame()
