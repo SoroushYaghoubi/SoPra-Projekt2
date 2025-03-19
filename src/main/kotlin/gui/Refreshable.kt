@@ -63,7 +63,7 @@ interface Refreshable {
     /**
      *  perform refreshes that are necessary after apply card effects
      */
-    fun refreshAfterApplyCardEffects(){}
+    fun refreshAfterApplyCardEffects(position: Int?){}
     /**
      * perform refreshes that are necessary after a player has received tiles
      */

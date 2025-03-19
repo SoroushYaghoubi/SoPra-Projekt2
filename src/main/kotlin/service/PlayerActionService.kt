@@ -102,27 +102,27 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
             is MasterCard -> {
                 gameState.currentState = States.USING_MASTER
-                playMasterCard(drawnCard)
+                playMasterCard(drawnCard, cardPosition)
                 //gameState.currentPlayer.hasPlayed = true
                 return
             }
 
             is HelperCard -> {
                 gameState.currentState = States.USING_HELPER
-                playHelperCard(drawnCard)
+                playHelperCard(drawnCard, cardPosition)
                 //gameState.currentPlayer.hasPlayed = true
                 return
             }
 
         }
-        onAllRefreshables { refreshAfterApplyCardEffects() }
+        onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
     }
 
     /**
      * apply MasterCard effects
      * @param drawnCard : the drawn MasterCard
      */
-    private fun playMasterCard(drawnCard: MasterCard) {
+    private fun playMasterCard(drawnCard: MasterCard, cardPosition: Int) {
         //val msg = rootService.networkService.toBeSentMeditateMessage
 
         val game = rootService.currentGame
@@ -137,7 +137,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 if (actPlayer.isLocal) {
                     onAllRefreshables { refreshAfterDrawingMasterCardAny() }
                 } else {
-                    onAllRefreshables { refreshAfterApplyCardEffects() }
+                    onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
                 }
                 return
             }
@@ -153,7 +153,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[2]))
             }
         }
-            onAllRefreshables { refreshAfterApplyCardEffects() }
+            onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
     }
 
     /**
@@ -175,7 +175,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         actPlayer.personalSupply.add(Tile(null, null, tileType))
 
-        onAllRefreshables { refreshAfterApplyCardEffects() }
+        onAllRefreshables { refreshAfterApplyCardEffects(null) }
 
     }
 
@@ -183,7 +183,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * apply HelperCard effects
      * @param drawnCard : the drawn MasterCard
      */
-    private fun playHelperCard(drawnCard: HelperCard) {
+    private fun playHelperCard(drawnCard: HelperCard, cardPosition: Int) {
         //val msg = rootService.networkService.toBeSentMeditateMessage
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
@@ -193,8 +193,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val actPlayer = gameState.currentPlayer
         //gameState.currentPlayer.playableTilesCopy.clear()
         //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
-        onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
-
+        if (!gameState.currentPlayer.isLocal) {
+            onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
+        } else {
+            onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
+        }
     }
     /**
      *
@@ -208,6 +211,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val actPlayer = gameState.currentPlayer
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
+
             onAllRefreshables { refreshAfterReceivedTile(true) }
             return
         }

@@ -1001,7 +1001,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             faceUpCards.addAll(oldCardViews)
             applyCardPosition()
             cardSumText.text = "${game.zenDeck.size}"
-            println("${game.faceUpCards}")
+            //println("${game.faceUpCards}")
         }
         // TODO(pane needs to be smaller when less than four)
     }
@@ -1045,9 +1045,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                         playerPanes[getOrder(player)].isVisible = true
                     }
                 }
-
-
-
             }
 
         }
@@ -1098,16 +1095,17 @@ class BonsaiGameScene(private val rootService: RootService) :
         updateCollectedCards(game.currentPlayer)
     }
 
-    override fun refreshAfterApplyCardEffects() {
+    override fun refreshAfterApplyCardEffects(position: Int?) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         val actPlayer = game.currentPlayer
-        Timer().schedule(1000) {
+        //TODO(timer?)
+        //Timer().schedule(1000) {
             if (actPlayer.personalSupply.size > actPlayer.tileCapacity &&
                 game.currentPlayer.isLocal) {
                 game.currentState = States.DISCARDING
                 refreshAfterReceivedTile(true)
-                return@schedule
+                return //@schedule
             } else {
                 actPlayer.hasPlayed = true
                 if (game.currentState != States.USING_HELPER) {
@@ -1126,11 +1124,12 @@ class BonsaiGameScene(private val rootService: RootService) :
 
                 if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
                     !game.currentPlayer.isLocal) {
-                    //checkNotNull(position)
+                    checkNotNull(position)
+                    faceUpCards.components[position].removeFromParent()
                     updateZenBoard()
                 }
             }
-        }
+        //}
     }
 
     override fun refreshAfterReceivedTile(discard: Boolean) {
