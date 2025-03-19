@@ -115,12 +115,12 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     // text for how many cards there are
     private val cardSumText = Label(
-        posX = 50, posY = 50,
+        posX = 90, posY = 90,
+        width = 50, height = 50,
         visual = ColorVisual(Color(0, 0, 0, 0)),
         text = "",
-        font = Font(30, Color.BLACK)
+        font = Font(30, Color.WHITE)
     )
-
     // pane for the cards
     private val zenCardPane =
         Pane<ComponentView>(
@@ -594,7 +594,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         addComponents(
             zenCardPane, infoPane, interactionPane, collectedCardPane,
             removeButton, cultivateButton, endTurnButton,
-            zenDeckView, faceUpCards,
+            zenDeckView, faceUpCards, cardSumText,
             overlayPane, goalTilePane, choseAnyTilePane,
             overlayPaneDiscard
         )
