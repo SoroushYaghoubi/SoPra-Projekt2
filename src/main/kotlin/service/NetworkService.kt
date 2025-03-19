@@ -139,6 +139,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
             client?.sendGameActionMessage(message)
         }
+
+        onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
