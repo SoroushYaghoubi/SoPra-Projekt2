@@ -2,6 +2,14 @@ package service
 
 import entity.*
 
+/**
+ * create recursive deep copies of the game state
+ */
+
+
+/**
+ * create deepcopy of BonsaiGameState
+ */
 fun BonsaiGameState.deepCopy(): BonsaiGameState {
     return BonsaiGameState(
         currentPlayer = currentPlayer.deepCopy(),
@@ -14,37 +22,59 @@ fun BonsaiGameState.deepCopy(): BonsaiGameState {
         copy.faceUpCards = this.faceUpCards.map { it.deepCopy() }.toMutableList()
         copy.goalTiles = this.goalTiles.map { it.deepCopy() }.toMutableList()
     }
+
 }
 
+/**
+ * create deepcopy of Player
+ */
 fun Player.deepCopy(): Player {
-    return Player(
+
+    val copiedPersonalSupply = this.personalSupply.map {
+        it.deepCopy()
+    }.toMutableList()
+
+
+    val copiedPlayer = Player(
         name = this.name,
         playerType = this.playerType,
         isLocal = this.isLocal,
         color = this.color
     ).also { copy ->
         copy.bonsaiTree = this.bonsaiTree.mapValues { it.value.deepCopy() }.toMutableMap()
-        copy.personalSupply = this.personalSupply.map { it.deepCopy() }.toMutableList()
+        copy.personalSupply = copiedPersonalSupply
         copy.collectedCards = this.collectedCards.map { it.deepCopy() }.toMutableList()
         copy.claimedGoals = this.claimedGoals.map { it.deepCopy() }.toMutableList()
         copy.renouncedGoals = this.renouncedGoals.map { it.deepCopy() }.toMutableList()
 
         copy.playableTiles = this.playableTiles.toMutableList()
         copy.playableTilesCopy = this.playableTilesCopy.toMutableList()
+
         copy.tileCapacity = this.tileCapacity
         copy.score = this.score
         copy.hasPlayed = this.hasPlayed
     }
+
+    return copiedPlayer
 }
+
+/**
+ * create deepcopy of Tile
+ */
 
 fun Tile.deepCopy(): Tile {
     return Tile(this.q, this.r, this.tileType)
 }
 
+/**
+ * create deepcopy of GoalTile
+ */
 fun GoalTile.deepCopy(): GoalTile {
     return GoalTile(this.goalTileType, this.tier, this.score)
 }
-
+/**
+ * create deepcopy of Card
+ */
 fun Card.deepCopy(): Card {
     return when (this) {
         is GrowthCard -> GrowthCard(this.tileType, this.id)
@@ -56,6 +86,9 @@ fun Card.deepCopy(): Card {
     }
 }
 
+/**
+ * create deepcopy of HelperCard
+ */
 fun HelperCard.deepCopy(): HelperCard {
     return HelperCard(this.tileTypes[1], this.id).also { copy ->
         copy.tileTypes.clear()
@@ -63,6 +96,9 @@ fun HelperCard.deepCopy(): HelperCard {
     }
 }
 
+/**
+ * create deepcopy of MasterCard
+ */
 fun MasterCard.deepCopy(): MasterCard {
     return MasterCard(this.tileTypes.toMutableList(), this.id)
 }

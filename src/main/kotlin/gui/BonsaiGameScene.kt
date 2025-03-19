@@ -259,6 +259,25 @@ class BonsaiGameScene(private val rootService: RootService) :
         nameText.text = "Player: ${gameState.currentPlayer.name}"
         updateSupplyAmount(gameState.currentPlayer)
 
+        // Update player pane visibility
+        val currentPlayerIndex = getOrder(gameState.currentPlayer)
+        val lastPlayerIndex = when (currentPlayerIndex) {
+            0 -> gameState.players.size - 1
+            else -> currentPlayerIndex - 1
+        }
+
+        // Hide the last player's pane and supply tiles
+        playerPanes[lastPlayerIndex].apply {
+            isVisible = false
+        }
+        hideSupply(lastPlayerIndex)
+
+        // Show the current player's pane and supply tiles
+        playerPanes[currentPlayerIndex].apply {
+            isVisible = true
+        }
+        showSupply(currentPlayerIndex)
+
         // Refresh the zen board
         faceUpCards.clear()
         zenDeckView.clear()
@@ -298,6 +317,21 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         // Refresh interaction text
         interactionText.text = "Undo/Redo performed. Current player: ${gameState.currentPlayer.name}"
+
+        // Update remove button visibility
+        if (!rootService.treeService.canPlayWood()) {
+            removeButton.isVisible = true
+            interactionText.text = "Please select Cultivate/ Meditate/ Remove"
+        } else {
+            removeButton.isVisible = false
+            interactionText.text = "Please select Cultivate/ Meditate"
+        }
+
+        // Reapply event handlers for face-up cards
+        applyCardPosition()
+
+        // Debugging: Print the current player's personal supply after refresh
+        println("Current player's personal supply after refresh: ${gameState.currentPlayer.personalSupply}")
     }
 
 
