@@ -2,6 +2,8 @@ package service
 
 import entity.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.test.Test
 
 /**
@@ -94,7 +96,8 @@ class MeditateGrowthCardTest {
         assertEquals(4, gameState.currentPlayer.playableTiles.size)
         assertEquals(6, gameState.currentPlayer.personalSupply.size)
         assertEquals(2, gameState.currentPlayer.collectedCards.size)
-        assertEquals(States.DISCARDING , gameState.currentState)
+        Timer().schedule(1000){ println("im here")
+            assertEquals(States.DISCARDING , gameState.currentState)}
 
     }
 

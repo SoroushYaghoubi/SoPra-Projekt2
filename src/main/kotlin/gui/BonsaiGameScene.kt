@@ -21,6 +21,8 @@ import tools.aqua.bgw.util.BidirectionalMap
 import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.*
 import util.*
+import java.util.*
+import kotlin.concurrent.schedule
 
 /**
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
@@ -683,6 +685,11 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         }
 
+    private val titleText = Label(
+        text = "Choose a Tile",
+        posX = 300,
+        posY = 50
+    )
     private val leafTile = HexagonView(
         posY = 100,
         posX = 500,
@@ -722,8 +729,9 @@ class BonsaiGameScene(private val rootService: RootService) :
             this.add(woodTile)
             this.add(fruitTile)
             this.add(flowerTile)
-
+            this.add(titleText)
         }
+
 
     init {
         addComponents(
@@ -1012,6 +1020,23 @@ class BonsaiGameScene(private val rootService: RootService) :
         updateCollectedCards(game.currentPlayer)
     }
 
+    override fun refreshAfterApplyCardEffects() {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        val actPlayer = game.currentPlayer
+        Timer().schedule(1000) {
+            if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
+                game.currentState = States.DISCARDING
+                 refreshAfterReceivedTile(true)
+                return@schedule
+            }
+            else{
+                actPlayer.hasPlayed = true
+                 refreshAfterMeditate()
+            }
+
+        }
+    }
     override fun refreshAfterReceivedTile(discard: Boolean) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)

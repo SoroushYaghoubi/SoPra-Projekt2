@@ -115,19 +115,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         onAllRefreshables { refreshAfterApplyCardEffects() }
-        // Check personal supply limit
-        Timer().schedule(1000) {
-            if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-                gameState.currentState = States.DISCARDING
-                onAllRefreshables { refreshAfterReceivedTile(true) }
-                return@schedule
-            }
-            else{
-                actPlayer.hasPlayed = true
-                onAllRefreshables { refreshAfterMeditate() }
-            }
 
-        }
     }
 
     /**
@@ -147,7 +135,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         when (drawnCard.tileTypes.size) {
             1 -> {
-                //actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 onAllRefreshables { refreshAfterDrawingMasterCardAny() }
                 return
             }
@@ -165,18 +152,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 msg.drawnTiles += drawnCard.tileTypes
             }
         }
-        Timer().schedule(1000) {
-            if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-                gameState.currentState = States.DISCARDING
-                onAllRefreshables { refreshAfterReceivedTile(true) }
-                return@schedule
-            }
-            else{
-                actPlayer.hasPlayed = true
-                onAllRefreshables { refreshAfterMeditate() }
-            }
-
-        }
+        onAllRefreshables { refreshAfterApplyCardEffects() }
 
     }
 
@@ -199,16 +175,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         actPlayer.personalSupply.add(Tile(null, null, tileType))
 
-        Timer().schedule(1000) {
-            if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-                gameState.currentState = States.DISCARDING
-                onAllRefreshables { refreshAfterReceivedTile(true) }
-                return@schedule
-            }
-
-            actPlayer.hasPlayed = true
-            onAllRefreshables { refreshAfterMeditate() }
-        }
+        onAllRefreshables { refreshAfterApplyCardEffects() }
 
 
     }
