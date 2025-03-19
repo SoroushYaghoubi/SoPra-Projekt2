@@ -517,7 +517,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 // find adjacent tiles
                 for ((dq, dr) in directions) {
                     val neighbor = Pair(q + dq, r + dr)
-                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType == TileType.LEAF && neighbor !in visited) {
+                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType ==
+                        TileType.LEAF && neighbor !in visited) {
                         stack.add(neighbor)
                     }
                 }
