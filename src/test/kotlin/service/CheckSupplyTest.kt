@@ -4,8 +4,16 @@ import entity.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import kotlin.test.Test
 
+/**
+ * Provides tests for the [PlayerActionService.checkSupply] function in the [PlayerActionService] class.
+ */
 class CheckSupplyTest {
 
+    /**
+     * Initialises a new game for to do some tests with
+     *
+     * @return A [RootService] with initialised game
+     */
     private fun setUpGame(): RootService {
         val rootService = RootService()
 
@@ -38,6 +46,11 @@ class CheckSupplyTest {
 
         return rootService
     }
+
+    /**
+     * Tests if the game state is set correctly in [PlayerActionService.checkSupply]
+     * when a player has more tiles than their supply capacity.
+     */
     @Test
     fun `checkSupply should set state to DISCARDING when player has more tiles than capacity`() {
         val rootService = setUpGame()
@@ -50,7 +63,10 @@ class CheckSupplyTest {
         rootService.playerActionService.checkSupply()
         assertEquals(States.DISCARDING, gameState.currentState)
     }
-
+    /**
+     * Tests if the hasPlayed property is set correctly for a player
+     * when their tile count is within the allowed supply capacity.
+     */
     @Test
     fun `checkSupply should mark player as played when player has tiles within capacity`() {
         val rootService = setUpGame()
