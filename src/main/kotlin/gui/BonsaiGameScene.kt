@@ -265,28 +265,6 @@ class BonsaiGameScene(private val rootService: RootService) :
         spacing = -20
     )
 
-    private fun updateCollectedCards(player: Player) {
-        collected.clear()
-        val currentPlayer = rootService.currentGame?.currentBonsaiGameState?.currentPlayer
-
-        player.collectedCards.forEach { card ->
-            val cardView = CardView(
-                height = 160,
-                width = 110,
-                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.cardType}\nID: ${card.id}")),
-                back = zenCardsBack,
-            ).apply {
-                showBack()
-                onMouseClicked = {
-                    if (player.isLocal && player == currentPlayer) {
-                        showFront()
-                    }
-                }
-            }
-            collected.add(cardView)
-        }
-    }
-
     //TODO
     // pane for collected card
     private val collectedCardPane =
@@ -401,113 +379,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             //hide the button in network games
             isVisible = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true
         }
-
-    override fun refreshAfterRedoOrUndo() {
-        val gameState = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(gameState) { "Game state is not initialized." }
-
-        // Refresh player name and supply amount
-        nameText.text = "Player: ${gameState.currentPlayer.name}"
-        updateSupplyAmount(gameState.currentPlayer)
-
-        // Update player pane visibility
-        val currentPlayerIndex = getOrder(gameState.currentPlayer)
-        val lastPlayerIndex = when (currentPlayerIndex) {
-            0 -> gameState.players.size - 1
-            else -> currentPlayerIndex - 1
-        }
-
-        // Hide the last player's pane and supply tiles
-        playerPanes[lastPlayerIndex].isVisible = false
-        hideSupply(lastPlayerIndex)
-
-        // Show the current player's pane and supply tiles
-        playerPanes[currentPlayerIndex].isVisible = true
-        showSupply(currentPlayerIndex)
-
-        // Refresh the zen board
-        faceUpCards.clear()
-        zenDeckView.clear()
-        zenCardMap.clear()
-
-        gameState.faceUpCards.forEach { card ->
-            val cardView = CardView(
-                height = 160,
-                width = 110,
-                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
-                back = ColorVisual.BLACK,
-            )
-            cardFrontSetter(card, cardView)
-            cardView.showFront()
-            faceUpCards.add(cardView)
-            zenCardMap.add(card to cardView)
-        }
-
-        gameState.zenDeck.forEach { card ->
-            val cardView = CardView(
-                height = 160,
-                width = 110,
-                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
-                back = ColorVisual.BLACK,
-            )
-            cardFrontSetter(card, cardView)
-            cardView.showBack()
-            zenDeckView.add(cardView)
-            zenCardMap.add(card to cardView)
-        }
-
-        // Refresh supply tiles
-        updateSupply(gameState.currentPlayer)
-
-        // Refresh playable tiles
-        updatePlayableTiles(gameState.currentPlayer)
-
-        // Refresh collected cards
-        updateCollectedCards(gameState.currentPlayer)
-
-        // Refresh tree tiles
-        createEmptyHex(gameState.currentPlayer)
-
-        // Refresh interaction text
-        interactionText.text = "Undo/Redo performed. Current player: ${gameState.currentPlayer.name}"
-
-        // Update tile capacity label
-        capacityLabel.text = "Cap: ${gameState.currentPlayer.tileCapacity}"
-
-        // Update remove button visibility
-        removeButton.isVisible = !rootService.treeService.canPlayWood()
-        interactionText.text = if (removeButton.isVisible) {
-            "Please select Cultivate/ Meditate/ Remove"
-        } else {
-            "Please select Cultivate/ Meditate"
-        }
-
-        // Refresh goal tile buttons
-        goalButtons.forEachIndexed { index, button ->
-            val goalTile = goalTileList[index % goalTileList.size]
-            button.text = "Tier: ${goalTile.tier} Score: ${goalTile.score}"
-        }
-
-        // Refresh player buttons
-        playerButtons.forEachIndexed { index, button ->
-            button.text = gameState.players[index].name
-        }
-
-        // Hide overlay panes if they are visible
-        overlayPane.isVisible = false
-        overlayPaneDiscard.isVisible = false
-        goalTilePane.isVisible = false
-        choseAnyTilePane.isVisible = false
-
-        // Reapply event handlers for face-up cards
-        applyCardPosition()
-
-        // Update undo/redo button visibility
-        undoButton.isVisible = gameState.currentPlayer.isLocal
-        redoButton.isVisible = gameState.currentPlayer.isLocal
-        saveButton.isVisible = gameState.currentPlayer.isLocal
-    }
-
 
     private val saveButton =
         Button(
@@ -644,22 +515,6 @@ class BonsaiGameScene(private val rootService: RootService) :
         addComponents(buttonPane)
     }
 
-    private fun createPlayerPane(player: Player) {
-        val playerPane =
-            Pane<ComponentView>(
-                posY = 380,
-                width = 1920,
-                height = 1080,
-                visual = ColorVisual(Color(0, 0, 0, 0)),
-            ).apply {
-                val game = rootService.currentGame?.currentBonsaiGameState
-                checkNotNull(game)
-                isVisible = player == game.currentPlayer
-            }
-        playerPanes.add(playerPane)
-        addComponents(playerPane)
-    }
-
     // Overlay the game scene to prompt the player to choose tile
     private val overlayPane = Pane<ComponentView>(
         posX = 0, posY = 0,
@@ -779,6 +634,112 @@ class BonsaiGameScene(private val rootService: RootService) :
             overlayPane, goalTilePane, choseAnyTilePane,
             overlayPaneDiscard, collectedCardPane
         )
+    }
+
+    override fun refreshAfterRedoOrUndo() {
+        val gameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(gameState) { "Game state is not initialized." }
+
+        // Refresh player name and supply amount
+        nameText.text = "Player: ${gameState.currentPlayer.name}"
+        updateSupplyAmount(gameState.currentPlayer)
+
+        // Update player pane visibility
+        val currentPlayerIndex = getOrder(gameState.currentPlayer)
+        val lastPlayerIndex = when (currentPlayerIndex) {
+            0 -> gameState.players.size - 1
+            else -> currentPlayerIndex - 1
+        }
+
+        // Hide the last player's pane and supply tiles
+        playerPanes[lastPlayerIndex].isVisible = false
+        hideSupply(lastPlayerIndex)
+
+        // Show the current player's pane and supply tiles
+        playerPanes[currentPlayerIndex].isVisible = true
+        showSupply(currentPlayerIndex)
+
+        // Refresh the zen board
+        faceUpCards.clear()
+        zenDeckView.clear()
+        zenCardMap.clear()
+
+        gameState.faceUpCards.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showFront()
+            faceUpCards.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+
+        gameState.zenDeck.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showBack()
+            zenDeckView.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+
+        // Refresh supply tiles
+        updateSupply(gameState.currentPlayer)
+
+        // Refresh playable tiles
+        updatePlayableTiles(gameState.currentPlayer)
+
+        // Refresh collected cards
+        updateCollectedCards(gameState.currentPlayer)
+
+        // Refresh tree tiles
+        createEmptyHex(gameState.currentPlayer)
+
+        // Refresh interaction text
+        interactionText.text = "Undo/Redo performed. Current player: ${gameState.currentPlayer.name}"
+
+        // Update tile capacity label
+        capacityLabel.text = "Cap: ${gameState.currentPlayer.tileCapacity}"
+
+        // Update remove button visibility
+        removeButton.isVisible = !rootService.treeService.canPlayWood()
+        interactionText.text = if (removeButton.isVisible) {
+            "Please select Cultivate/ Meditate/ Remove"
+        } else {
+            "Please select Cultivate/ Meditate"
+        }
+
+        // Refresh goal tile buttons
+        goalButtons.forEachIndexed { index, button ->
+            val goalTile = goalTileList[index % goalTileList.size]
+            button.text = "Tier: ${goalTile.tier} Score: ${goalTile.score}"
+        }
+
+        // Refresh player buttons
+        playerButtons.forEachIndexed { index, button ->
+            button.text = gameState.players[index].name
+        }
+
+        // Hide overlay panes if they are visible
+        overlayPane.isVisible = false
+        overlayPaneDiscard.isVisible = false
+        goalTilePane.isVisible = false
+        choseAnyTilePane.isVisible = false
+
+        // Reapply event handlers for face-up cards
+        applyCardPosition()
+
+        // Update undo/redo button visibility
+        undoButton.isVisible = gameState.currentPlayer.isLocal
+        redoButton.isVisible = gameState.currentPlayer.isLocal
+        saveButton.isVisible = gameState.currentPlayer.isLocal
     }
 
     //components for the tree boards
@@ -1854,5 +1815,43 @@ class BonsaiGameScene(private val rootService: RootService) :
                 font = Font(20, Color.BLACK)
             )
         )
+    }
+
+    private fun updateCollectedCards(player: Player) {
+        collected.clear()
+        val currentPlayer = rootService.currentGame?.currentBonsaiGameState?.currentPlayer
+
+        player.collectedCards.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.cardType}\nID: ${card.id}")),
+                back = zenCardsBack,
+            ).apply {
+                showBack()
+                onMouseClicked = {
+                    if (player.isLocal && player == currentPlayer) {
+                        showFront()
+                    }
+                }
+            }
+            collected.add(cardView)
+        }
+    }
+
+    private fun createPlayerPane(player: Player) {
+        val playerPane =
+            Pane<ComponentView>(
+                posY = 380,
+                width = 1920,
+                height = 1080,
+                visual = ColorVisual(Color(0, 0, 0, 0)),
+            ).apply {
+                val game = rootService.currentGame?.currentBonsaiGameState
+                checkNotNull(game)
+                isVisible = player == game.currentPlayer
+            }
+        playerPanes.add(playerPane)
+        addComponents(playerPane)
     }
 }
