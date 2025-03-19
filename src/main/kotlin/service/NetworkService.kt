@@ -237,10 +237,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             message.orderedCards.map {
                 standardZenDeck[it.second]
             }.toMutableList()
-        repeat(4) {
-            game.faceUpCards.add(game.zenDeck.removeLast())
-        }
-
+        game.faceUpCards.addAll(game.zenDeck.takeLast(4))
+        repeat(4) {game.zenDeck.removeLast()}
 
         if (myName == orderedPair.first().first) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
