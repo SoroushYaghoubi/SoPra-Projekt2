@@ -300,7 +300,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             isVisible = true
         }
 
-    val collectedPane = CameraPane(
+    private val collectedPane = CameraPane(
         posX = 1154,
         posY = 20,
         width = 400,

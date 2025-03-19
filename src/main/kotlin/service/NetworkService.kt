@@ -115,7 +115,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             Pair(it.name, it.color.toColorMessage())
         }
 
-        val chosenGoalTiles = goalTilesEntries.map { it ->
+        val chosenGoalTiles = goalTilesEntries.map {
             it.toGoalTileTypeMessage()
         }
 
