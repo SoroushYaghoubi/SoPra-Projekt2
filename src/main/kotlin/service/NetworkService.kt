@@ -265,6 +265,13 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         // --------------- main functionality ---------------
         message.removedTilesAxialCoordinates
             .forEach { rootService.treeService.removeFromTree(it) }
+        val chosenCard = game.faceUpCards[message.chosenCardPosition]
+
+        if (chosenCard is HelperCard) {
+            //val helperCard = chosenCard as HelperCard
+            //check(chosenCard is HelperCard)
+            game.currentPlayer.playableTilesCopy.addAll(chosenCard.tileTypes)
+        }
 
             // processing `chosenCardPosition` in message
         when (message.chosenCardPosition) {
@@ -280,23 +287,29 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                 )
         }
 
-        message.playedTiles
-            .forEach {
-                val tile = Tile(null, null, it.first.toTileType())
-                rootService.treeService.playTile(tile, it.second)
-            }
-        message.claimedGoals
-            .forEach { rootService.playerActionService
-                .claimOrRenounceGoal(true, it.first.toGoalTileType(), it.second) }
-        message.renouncedGoals
-            .forEach { rootService.playerActionService
-                .claimOrRenounceGoal(false, it.first.toGoalTileType(), it.second) }
+        if (chosenCard is HelperCard){
+            message.playedTiles
+                .forEach {
+                    val tile = Tile(null, null, it.first.toTileType())
+                    rootService.treeService.playTile(tile, it.second)
+                }
+            message.claimedGoals
+                .forEach { rootService.playerActionService
+                    .claimOrRenounceGoal(true, it.first.toGoalTileType(), it.second) }
+            message.renouncedGoals
+                .forEach { rootService.playerActionService
+                    .claimOrRenounceGoal(false, it.first.toGoalTileType(), it.second) }
+        }
 
         // --------------- epilogue: state update ---------------
         val currentIndex = game.players.indexOf(game.currentPlayer)
         val nextIndex = (currentIndex + 1) % game.players.size
         if (game.players[nextIndex].name == myName) updateConnectionState(ConnectionState.PLAYING_MY_TURN)
+        hasMeditated = false
         //TODO(refresh after meditate)
+        game.currentPlayer.hasPlayed = true
+        onAllRefreshables { refreshAfterMeditate() }
+        println(game.faceUpCards)
         rootService.playerActionService.endTurn()
     }
 

@@ -1,6 +1,7 @@
 package gui
 
 import entity.*
+import service.ConnectionState
 import service.RootService
 import tools.aqua.bgw.components.ComponentView
 import tools.aqua.bgw.components.container.Area
@@ -1344,6 +1345,12 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         // update collected cards
         updateCollectedCards(game.currentPlayer)
+
+        if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
+            !game.currentPlayer.isLocal) {
+            updateZenBoard()
+            faceUpCards.remove(faceUpCards.last())
+        }
     }
 
     override fun refreshAfterEndTurn() {

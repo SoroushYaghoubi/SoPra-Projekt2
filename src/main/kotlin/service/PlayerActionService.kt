@@ -39,15 +39,22 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      */
     fun meditate(cardPosition: Int, chosenTile: TileType?) {
         require(cardPosition in 0..3)
-        rootService.networkService.hasMeditated = true
-        val msg = rootService.networkService.toBeSentMeditateMessage
-        msg.chosenCardPosition = cardPosition
-
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
+        val net = rootService.networkService
+        val msg = net.toBeSentMeditateMessage
+
+        // net stuff
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            gameState.currentPlayer.isLocal){
+            rootService.networkService.hasMeditated = true
+            msg.chosenCardPosition = cardPosition
+        }
+
+
 
         gameState.currentState = States.MEDITATE
         val actPlayer = gameState.currentPlayer
@@ -59,6 +66,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // Refill the board
         rootService.gameService.refillBoard()
 
+
         onAllRefreshables { refreshAfterChooseCard() }
 
         when (cardPosition) {
@@ -67,7 +75,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 checkNotNull(chosenTile)
                 require(chosenTile == TileType.WOOD || chosenTile == TileType.LEAF) { "Please choose WOOD or LEAF" }
                 actPlayer.personalSupply.add(Tile(null, null, chosenTile))
-                msg.drawnTiles += chosenTile
+                if (net.connectionState != ConnectionState.DISCONNECTED &&
+                    gameState.currentPlayer.isLocal) {
+                    msg.drawnTiles += chosenTile
+                }
             }
 
             2 -> {
@@ -107,7 +118,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         }
 
-        onAllRefreshables { refreshAfterApplyCardEffects() }
+        if (gameState.currentPlayer.isLocal) {
+            onAllRefreshables { refreshAfterApplyCardEffects() }
+        }
 
     }
 
@@ -127,7 +140,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         when (drawnCard.tileTypes.size) {
             1 -> {
-                onAllRefreshables { refreshAfterDrawingMasterCardAny() }
+                if (actPlayer.isLocal) {
+                    onAllRefreshables { refreshAfterDrawingMasterCardAny() }
+                }
                 return
             }
 
@@ -142,8 +157,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[2]))
             }
         }
-        onAllRefreshables { refreshAfterApplyCardEffects() }
-
+        if (actPlayer.isLocal) {
+            onAllRefreshables { refreshAfterApplyCardEffects() }
+        }
     }
 
     /**
@@ -174,7 +190,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param drawnCard : the drawn MasterCard
      */
     private fun playHelperCard(drawnCard: HelperCard) {
-        val msg = rootService.networkService.toBeSentMeditateMessage
+        //val msg = rootService.networkService.toBeSentMeditateMessage
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -184,7 +200,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         actPlayer.hasPlayed = true
         //gameState.currentPlayer.playableTilesCopy.clear()
         //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
-        onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
+        if (actPlayer.isLocal) {
+            onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
+        }
 
     }
     /**
