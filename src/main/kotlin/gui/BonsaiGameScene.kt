@@ -53,6 +53,8 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     private val fruitTileImageVisual = ImageVisual("./BonsaiTiles/fruit.png")
 
+    private val anyTileImageVisual = ImageVisual("./BonsaiTiles/any.png")
+
 
     // button for cultivate
     private val cultivateButton =
@@ -644,7 +646,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         }
 
-    private val anyTileImageVisual = ImageVisual("./BonsaiTiles/any.png")
+
 
     private val leafTile = HexagonView(
         posY = 100,
