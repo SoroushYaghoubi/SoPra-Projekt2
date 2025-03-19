@@ -297,9 +297,27 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         require(canEndTurn())
 
+
         // Trigger end game by counting the turn of player
         if (gameState.zenDeck.isEmpty()) {
             gameState.endGameCounter++
+        }
+
+        val net = rootService.networkService
+        // if it's online and we're the local player
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            getCurrentPlayer().isLocal
+        ) {
+            // if we cultivated then send cultivateMessage
+            if (net.hasCultivated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
+                net.sendCultivateMessage()
+                net.hasCultivated = false
+            } else if (net.hasMeditated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
+                net.sendMeditateMessage()
+                net.hasCultivated = false
+            }
         }
 
         // When the counter = the number of players -> all players finish their last turn
@@ -318,22 +336,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         gameState.currentState = States.START_TURN
         gameState.currentPlayer.hasPlayed = false
 
-        val net = rootService.networkService
-        // if it's online and we're the local player
-        if (net.connectionState != ConnectionState.DISCONNECTED &&
-            getCurrentPlayer().isLocal
-        ) {
-            // if we cultivated then send cultivateMessage
-            if (net.hasCultivated &&
-                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
-                net.sendCultivateMessage()
-                net.hasCultivated = false
-            } else if (net.hasMeditated &&
-                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
-                net.sendMeditateMessage()
-                net.hasCultivated = false
-            }
-        }
 
         getCurrentPlayer().hasPlayed = false
         // save history
