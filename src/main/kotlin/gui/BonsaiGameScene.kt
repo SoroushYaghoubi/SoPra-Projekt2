@@ -182,7 +182,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         posY = 75,
         size = 30,
         visual = CompoundVisual(
-            ColorVisual(color = Color(0xD61818)),
+            anyTileImageVisual,
             TextVisual(
                 text = "0",
                 font = Font(20, Color.BLACK)
@@ -645,8 +645,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             this.add(goalTileText)
 
         }
-
-
 
     private val leafTile = HexagonView(
         posY = 100,
@@ -1659,7 +1657,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         )
 
         anyPlayable.visual = CompoundVisual(
-            ColorVisual(color = Color(0xD61818)),
+            anyTileImageVisual,
             TextVisual(
                 text = "$anyCount",
                 font = Font(20, Color.BLACK)
