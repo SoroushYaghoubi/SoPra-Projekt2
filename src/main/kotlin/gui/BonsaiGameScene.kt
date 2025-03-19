@@ -431,7 +431,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                 onMouseClicked = {
                     rootService.historyService.saveGame()
                     BonsaiApplication().showMainMenuScene()
-                    println("hallo")
                 }
             }
         }
@@ -813,10 +812,10 @@ class BonsaiGameScene(private val rootService: RootService) :
             if (it.second == 0) {
                 color = 0x000000
             }
-            if (it.first == 0 && it.second == 0) {
-                visual = woodTileImageVisual
+            visual = if (it.first == 0 && it.second == 0) {
+                woodTileImageVisual
             } else {
-                visual = ColorVisual(Color(color))
+                ColorVisual(Color(color))
             }
             val hexagon = HexagonView(
                 visual = CompoundVisual(
@@ -1002,6 +1001,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             faceUpCards.addAll(oldCardViews)
             applyCardPosition()
             cardSumText.text = "${game.zenDeck.size}"
+            println("${game.faceUpCards}")
         }
         // TODO(pane needs to be smaller when less than four)
     }
@@ -1095,15 +1095,33 @@ class BonsaiGameScene(private val rootService: RootService) :
         checkNotNull(game)
         val actPlayer = game.currentPlayer
         Timer().schedule(1000) {
-            if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
+            if (actPlayer.personalSupply.size > actPlayer.tileCapacity &&
+                game.currentPlayer.isLocal) {
                 game.currentState = States.DISCARDING
                 refreshAfterReceivedTile(true)
                 return@schedule
             } else {
                 actPlayer.hasPlayed = true
-                refreshAfterMeditate(null)
-            }
+                if (game.currentState != States.USING_HELPER) {
+                    updateSupply(game.currentPlayer)
+                    updatePlayableTiles(game.currentPlayer)
+                }
 
+                // update tile capacity
+                capacityLabel.text = "Cap: ${game.currentPlayer.tileCapacity}"
+
+                // update playable tiles
+                updatePlayableTiles(game.currentPlayer)
+
+                // update collected cards
+                updateCollectedCards(game.currentPlayer)
+
+                if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
+                    !game.currentPlayer.isLocal) {
+                    //checkNotNull(position)
+                    updateZenBoard()
+                }
+            }
         }
     }
 
@@ -1171,7 +1189,6 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        println(game.currentState)
         val playerIndex = getOrder(game.currentPlayer)
         val supplyTileMap = supplyTileMaps[playerIndex]
         updateSupply(game.currentPlayer)
@@ -1209,15 +1226,12 @@ class BonsaiGameScene(private val rootService: RootService) :
                 }
             }
         }
-
         // Button in infoPane hinzufügen
         interactionPane.add(confirmButton)
-
     }
 
     override fun refreshAfterDrawingMasterCardAny() {
 
-        println("hello")
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
 
@@ -1287,9 +1301,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if (goalTileType == null) {
-            println(leafSupplyDecks[0].components.size)
-        }
+//        if (goalTileType == null) {
+//            println(leafSupplyDecks[0].components.size)
+//        }
         // update tile capacity
         capacityLabel.text = "Cap: ${game.currentPlayer.tileCapacity}"
 
@@ -1363,33 +1377,6 @@ class BonsaiGameScene(private val rootService: RootService) :
     override fun refreshAfterMeditate(position: Int?) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if (game.currentState != States.USING_HELPER) {
-            updateSupply(game.currentPlayer)
-            updatePlayableTiles(game.currentPlayer)
-        }
-
-        // update tile capacity
-        capacityLabel.text = "Cap: ${game.currentPlayer.tileCapacity}"
-
-        // update playable tiles
-        updatePlayableTiles(game.currentPlayer)
-
-        // update collected cards
-        updateCollectedCards(game.currentPlayer)
-
-        if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
-            !game.currentPlayer.isLocal) {
-            checkNotNull(position)
-            faceUpCards.clear()
-            zenDeckView.pop()
-            val newCardView = game.faceUpCards.map { card->
-                zenCardMap.forward(card).apply {
-                    showFront()
-                }
-            }
-            faceUpCards.addAll(newCardView)
-            cardSumText.text = "${game.zenDeck.size}"
-        }
     }
 
     override fun refreshAfterEndTurn() {
@@ -1410,7 +1397,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         playerPanes[lastPlayerIndex].isVisible = false
 
 
-        updateSupply(game.currentPlayer)
+        //updateSupply(game.currentPlayer)
         updatePlayableTiles(game.currentPlayer)
 
         if (!rootService.treeService.canPlayWood()) {
@@ -1522,7 +1509,6 @@ class BonsaiGameScene(private val rootService: RootService) :
                                     updateSupply(game.currentPlayer)
                                     updatePlayableTiles(game.currentPlayer)
                                 }
-
                                 updateZenBoard()
                             }
                         }
@@ -1574,10 +1560,8 @@ class BonsaiGameScene(private val rootService: RootService) :
                                             }
                                             overlayPane.isVisible = false
                                             interactionText.text = "You have received a wood tile"
-
                                         }
                                     })
-
                                 removeFromParent()
                                 updateZenBoard()
                             }
@@ -1630,10 +1614,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             }
         }
     }
-
-//    private fun switchPlayerPane(playerIndex: Int, hasEndTurn: Boolean) {
-//
-//    }
 
     /**
      * really important function for play tile

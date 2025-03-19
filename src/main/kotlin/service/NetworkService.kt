@@ -113,6 +113,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val faceUpCardsList = game.faceUpCards.map {
             Pair(it.cardType.toCardTypeMessage(), it.id)
         }
+
         val zenDeckMessage = zenDeckList + faceUpCardsList
 
         val message = StartGameMessage(nameColorPair, chosenGoalTiles, zenDeckMessage)
@@ -268,8 +269,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val chosenCard = game.faceUpCards[message.chosenCardPosition]
 
         if (chosenCard is HelperCard) {
-            //val helperCard = chosenCard as HelperCard
-            //check(chosenCard is HelperCard)
             game.currentPlayer.playableTilesCopy.addAll(chosenCard.tileTypes)
         }
 
@@ -287,7 +286,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                 )
         }
 
-        if (chosenCard is HelperCard){
+        if (chosenCard is HelperCard && message.playedTiles.isNotEmpty()){
             message.playedTiles
                 .forEach {
                     val tile = Tile(null, null, it.first.toTileType())
@@ -308,7 +307,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         hasMeditated = false
         //TODO(refresh after meditate)
         game.currentPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate(message.chosenCardPosition) }
+        //onAllRefreshables { refreshAfterMeditate(message.chosenCardPosition) }
         println(game.faceUpCards)
         rootService.playerActionService.endTurn()
     }
@@ -420,13 +419,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
         client = null
         updateConnectionState(ConnectionState.DISCONNECTED)
-    }
-
-    /**
-     * Redo the goal tile handling after a goal tile action.
-     */
-    fun redoReceivedGoalTile() {
-
     }
 
     /**

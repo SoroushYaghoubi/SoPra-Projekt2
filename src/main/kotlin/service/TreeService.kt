@@ -269,7 +269,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             .forEach { (position, tile) ->
                 val q = position.first
                 val r = position.second
-                println("Tile at ($q, $r) -> Type: ${tile.tileType}")
 
 //                val neighbourTiles = listOf(
 //                    Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
@@ -283,7 +282,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
                 val nullPositions = neighbourTiles.filter { it.second == null }.map { it.first }
 
-                println("Null:$nullPositions")
                 if (nullPositions.isNotEmpty()) {
                     gameState.currentState = States.CHOOSE_ACTION
                     return true

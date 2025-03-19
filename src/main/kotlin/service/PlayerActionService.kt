@@ -115,11 +115,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             }
 
         }
-
-        if (gameState.currentPlayer.isLocal) {
-            onAllRefreshables { refreshAfterApplyCardEffects() }
-        }
-
+        onAllRefreshables { refreshAfterApplyCardEffects() }
     }
 
     /**
@@ -127,7 +123,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param drawnCard : the drawn MasterCard
      */
     private fun playMasterCard(drawnCard: MasterCard) {
-        val msg = rootService.networkService.toBeSentMeditateMessage
+        //val msg = rootService.networkService.toBeSentMeditateMessage
 
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
@@ -140,6 +136,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             1 -> {
                 if (actPlayer.isLocal) {
                     onAllRefreshables { refreshAfterDrawingMasterCardAny() }
+                } else {
+                    onAllRefreshables { refreshAfterApplyCardEffects() }
                 }
                 return
             }
@@ -155,9 +153,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[2]))
             }
         }
-        if (actPlayer.isLocal) {
             onAllRefreshables { refreshAfterApplyCardEffects() }
-        }
     }
 
     /**
@@ -198,9 +194,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         actPlayer.hasPlayed = true
         //gameState.currentPlayer.playableTilesCopy.clear()
         //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
-        if (actPlayer.isLocal) {
-            onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
-        }
+        onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
+
     }
     /**
      *

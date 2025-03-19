@@ -407,7 +407,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                 }
             }
         }
-        println("Goal Tiles$goalTiles")
 
         return goalTiles.flatten().toMutableList()
     }
