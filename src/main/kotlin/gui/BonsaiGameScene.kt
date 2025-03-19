@@ -1379,9 +1379,16 @@ class BonsaiGameScene(private val rootService: RootService) :
 
         if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
             !game.currentPlayer.isLocal) {
-            updateZenBoard()
             checkNotNull(position)
-            faceUpCards.components[position].removeFromParent()
+            faceUpCards.clear()
+            zenDeckView.pop()
+            val newCardView = game.faceUpCards.map { card->
+                zenCardMap.forward(card).apply {
+                    showFront()
+                }
+            }
+            faceUpCards.addAll(newCardView)
+            cardSumText.text = "${game.zenDeck.size}"
         }
     }
 
@@ -1624,9 +1631,9 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
     }
 
-    private fun switchPlayerPane(playerIndex: Int, hasEndTurn: Boolean) {
-
-    }
+//    private fun switchPlayerPane(playerIndex: Int, hasEndTurn: Boolean) {
+//
+//    }
 
     /**
      * really important function for play tile
@@ -1856,7 +1863,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             )
         )
     }
-
 
 
     private fun createPlayerPane(player: Player) {

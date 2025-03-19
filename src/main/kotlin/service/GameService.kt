@@ -341,13 +341,15 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         checkNotNull(gameState) { "No active game state." }
 
         if (gameState.zenDeck.isEmpty()) {
-            throw IllegalStateException("Zen deck is empty.")
+            //throw IllegalStateException("Zen deck is empty.")
+            return
         }
 
         if (gameState.faceUpCards.size < 4) {
             val newCard = gameState.zenDeck.removeLast()
             gameState.faceUpCards.add(0, newCard)
         }
+
 
         onAllRefreshables { refreshAfterChooseCard() }
     }

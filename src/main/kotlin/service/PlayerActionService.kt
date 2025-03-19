@@ -54,8 +54,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             msg.chosenCardPosition = cardPosition
         }
 
-
-
         gameState.currentState = States.MEDITATE
         val actPlayer = gameState.currentPlayer
 
@@ -203,7 +201,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         if (actPlayer.isLocal) {
             onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
         }
-
     }
     /**
      *

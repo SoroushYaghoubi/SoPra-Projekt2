@@ -1,5 +1,6 @@
 package gui
 
+import entity.Player
 import service.RootService
 import tools.aqua.bgw.core.BoardGameApplication
 import tools.aqua.bgw.util.Font
@@ -84,4 +85,8 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
      * Function [showGameScene] shows the GameScene
      */
     fun showGameScene() = this.showGameScene(gameScene)
+
+    override fun refreshAfterShowWinner(players: List<Player>) {
+        this.showMenuScene(showResultScene)
+    }
 }
