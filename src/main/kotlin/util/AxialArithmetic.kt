@@ -123,8 +123,8 @@ private fun circleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = seq
     for ((dq, dr) in SIDE_VECTORS)
         yield((q + dq) to (r + dr))
 }
-
-/**
+/*
+ /**
  * Wrapper for the [circleAround] function to iterate infinitely around a coordinate
  */
 private fun foreverCircleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
@@ -160,6 +160,7 @@ private infix fun Pair<Int, Int>.rotateCounterClockwiseAround(center: Pair<Int, 
         VECTOR_BOTTOM_LEFT -> this + VECTOR_RIGHT
         else -> throw IllegalArgumentException("Invalid radius. Implement non-adjacent ones yourself >:)")
     }
+*/
 
 /**
  * Override axial coordinates to act like they know vector arithmetic
