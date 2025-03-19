@@ -11,7 +11,7 @@ import gui.Refreshable
 class RootService {
 
     val playerActionService = PlayerActionService(this)
-    val gameService = GameService(this)
+    var gameService = GameService(this)
     val networkService = NetworkService(this)
     val historyService = HistoryService(this)
     val treeService = TreeService(this)

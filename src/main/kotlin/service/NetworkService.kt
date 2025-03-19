@@ -24,7 +24,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
 
     /** Network client. Nullable for offline games. */
     var client: BonsaiNetworkClient? = null
-        private set
 
     /** current state of the connection in a network game. */
     var connectionState: ConnectionState = ConnectionState.DISCONNECTED
