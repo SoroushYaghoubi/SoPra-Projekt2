@@ -609,16 +609,16 @@ class ConfigureGameMenuScene(
             hardLabel,
             startButton.apply {
                 onMouseClicked = {
-                    val guiPlayer = playerInputs.mapIndexed { index, it ->
+                    val guiPlayer = playerInputs.mapIndexed { index, playerInput ->
                         val color = playerColors[index]
                         val playerType = when {
                             playerEasyBots[index].isChecked -> PlayerType.EASYBOT
                             playerHardBots[index].isChecked -> PlayerType.HARDBOT
                             else -> PlayerType.HUMAN
                         }
-                        println(it.text.trim())
+                        println(playerInput.text.trim())
                         val name =
-                            if (it.text.trim() == "") {
+                            if (playerInput.text.trim() == "") {
                                 when (index) {
                                     3 -> "Alice"
                                     2 -> "Bob"
@@ -626,7 +626,7 @@ class ConfigureGameMenuScene(
                                     else -> "Dirk"
                                 }
                             } else {
-                                it.text.trim()
+                                playerInput.text.trim()
 
                             }
                         entity.Player(name, playerType, true, color)

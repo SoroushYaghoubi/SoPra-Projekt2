@@ -885,10 +885,10 @@ class BonsaiGameScene(private val rootService: RootService) :
         fruitSupplyDecks.add(fruitSupplyDeck)
         playerPane.add(fruitSupplyDeck)
 
-        player.personalSupply.forEachIndexed { index, it ->
+        player.personalSupply.forEachIndexed { index, tile ->
             val supplyHex = HexagonView(
                 visual = CompoundVisual(
-                    getTileImageVisualForTileType(it.tileType)
+                    getTileImageVisualForTileType(tile.tileType)
                 ),
                 size = 60
             ).apply {
@@ -900,13 +900,13 @@ class BonsaiGameScene(private val rootService: RootService) :
                 }
             }
 
-            it.q = index
-            if (supplyTileMap.containsForward(it)) {
-                supplyTileMap.removeForward(it)
+            tile.q = index
+            if (supplyTileMap.containsForward(tile)) {
+                supplyTileMap.removeForward(tile)
             }
-            supplyTileMap.add(it to supplyHex)
+            supplyTileMap.add(tile to supplyHex)
 
-            when (it.tileType) {
+            when (tile.tileType) {
                 TileType.WOOD -> {
                     woodSupplyDeck.add(supplyHex)
                 }
@@ -937,10 +937,10 @@ class BonsaiGameScene(private val rootService: RootService) :
         flowerSupplyDeck.clear()
         fruitSupplyDeck.clear()
 
-        player.personalSupply.forEachIndexed { index, it ->
+        player.personalSupply.forEachIndexed { index, tile ->
             val supplyHex = HexagonView(
                 visual = CompoundVisual(
-                    getTileImageVisualForTileType(it.tileType)
+                    getTileImageVisualForTileType(tile.tileType)
                 ),
                 size = 60
             ).apply {
@@ -952,10 +952,10 @@ class BonsaiGameScene(private val rootService: RootService) :
                 }
             }
 
-            it.q = index
-            supplyTileMap.add(it to supplyHex)
+            tile.q = index
+            supplyTileMap.add(tile to supplyHex)
 
-            when (it.tileType) {
+            when (tile.tileType) {
                 TileType.WOOD -> woodSupplyDeck.add(supplyHex)
                 TileType.LEAF -> leafSupplyDeck.add(supplyHex)
                 TileType.FLOWER -> flowerSupplyDeck.add(supplyHex)

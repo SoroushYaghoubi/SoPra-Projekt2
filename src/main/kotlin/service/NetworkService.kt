@@ -12,16 +12,6 @@ import util.ZenCardLoader
  */
 class NetworkService(private val rootService: RootService) : AbstractRefreshingService() {
 
-    /** URL of the BGW net server hosted for SoPra participants
-     * Name of the game as registered with the server
-     * */
-    companion object {
-
-        const val SERVER_ADDRESS = "sopra.cs.tu-dortmund.de:80/bgw-net/connect"
-
-        const val GAME_ID = "Bonsai"
-    }
-
     /** Network client. Nullable for offline games. */
     var client: BonsaiNetworkClient? = null
 
@@ -433,5 +423,15 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      */
     fun setConnectionStateTest(newState: ConnectionState){
         updateConnectionState(newState)
+    }
+
+    /** URL of the BGW net server hosted for SoPra participants
+     * Name of the game as registered with the server
+     * */
+    companion object {
+
+        const val SERVER_ADDRESS = "sopra.cs.tu-dortmund.de:80/bgw-net/connect"
+
+        const val GAME_ID = "Bonsai"
     }
 }
