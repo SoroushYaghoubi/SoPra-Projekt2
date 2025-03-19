@@ -1125,6 +1125,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         val supplyTileMap = supplyTileMaps[playerIndex]
         updateSupply(game.currentPlayer)
         updatePlayableTiles(game.currentPlayer)
+        game.currentPlayer.playableTilesCopy.addAll(playableTilesCopy)
         // make the supply tiles draggable after cultivate start
         game.players[playerIndex].personalSupply.forEach { supplyTile ->
             supplyTileMap[supplyTile].apply {
