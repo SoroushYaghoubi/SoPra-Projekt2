@@ -2,6 +2,8 @@ package service
 
 
 import entity.*
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.math.max
 
 
@@ -113,15 +115,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         onAllRefreshables { refreshAfterApplyCardEffects() }
-        // Check personal supply limit
-        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-            gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterReceivedTile(true) }
-            return
-        }
 
-        actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
     }
 
     /**
@@ -141,7 +135,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         when (drawnCard.tileTypes.size) {
             1 -> {
-                //actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 onAllRefreshables { refreshAfterDrawingMasterCardAny() }
                 return
             }
@@ -159,14 +152,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 msg.drawnTiles += drawnCard.tileTypes
             }
         }
-        // Check personal supply limit
-        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-            gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterReceivedTile(true) }
-            return
-        }
-        actPlayer.hasPlayed = true
-        onAllRefreshables {refreshAfterMeditate() }
+        onAllRefreshables { refreshAfterApplyCardEffects() }
 
     }
 
@@ -189,15 +175,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         actPlayer.personalSupply.add(Tile(null, null, tileType))
 
-        // Check personal supply limit
-        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-            gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterReceivedTile(true) }
-            return
-        }
+        onAllRefreshables { refreshAfterApplyCardEffects() }
 
-        actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
 
     }
 
@@ -215,11 +194,20 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         checkNotNull(gameState) { "No active game state." }
         val actPlayer = gameState.currentPlayer
         gameState.currentPlayer.playableTilesCopy.clear()
-        // val tileTypeToPlay2 = drawnCard.tileTypes[1]
-       // gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
-        // gameState.currentPlayer.playableTiles.toMutableList()
+        //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
         onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
-        // Check personal supply limit
+
+    }
+    /**
+     *
+     */
+    fun checkSupply(){
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+        val actPlayer = gameState.currentPlayer
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
             onAllRefreshables { refreshAfterReceivedTile(true) }
@@ -228,8 +216,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         actPlayer.hasPlayed = true
         onAllRefreshables { refreshAfterMeditate() }
-
-
     }
 
     /**
@@ -297,9 +283,27 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         require(canEndTurn())
 
+
         // Trigger end game by counting the turn of player
         if (gameState.zenDeck.isEmpty()) {
             gameState.endGameCounter++
+        }
+
+        val net = rootService.networkService
+        // if it's online and we're the local player
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            getCurrentPlayer().isLocal
+        ) {
+            // if we cultivated then send cultivateMessage
+            if (net.hasCultivated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
+                net.sendCultivateMessage()
+                net.hasCultivated = false
+            } else if (net.hasMeditated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
+                net.sendMeditateMessage()
+                net.hasCultivated = false
+            }
         }
 
         // When the counter = the number of players -> all players finish their last turn
@@ -318,20 +322,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         gameState.currentState = States.START_TURN
         gameState.currentPlayer.hasPlayed = false
 
-        val net = rootService.networkService
-        // if it's online and we're the local player
-        if (net.connectionState != ConnectionState.DISCONNECTED &&
-            getCurrentPlayer().isLocal
-        ) {
-            // if we cultivated then send cultivateMessage
-            if (net.hasCultivated) {
-                net.sendCultivateMessage()
-                net.hasCultivated = false
-            } else {
-                net.sendMeditateMessage()
-                net.hasCultivated = false
-            }
-        }
 
         getCurrentPlayer().hasPlayed = false
         // save history

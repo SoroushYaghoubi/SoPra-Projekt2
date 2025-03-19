@@ -139,6 +139,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
             client?.sendGameActionMessage(message)
         }
+        onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
@@ -309,6 +310,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val currentIndex = game.players.indexOf(game.currentPlayer)
         val nextIndex = (currentIndex + 1) % game.players.size
         if (game.players[nextIndex].name == myName) updateConnectionState(ConnectionState.PLAYING_MY_TURN)
+        //TODO(refresh after meditate)
         rootService.playerActionService.endTurn()
     }
 
@@ -326,15 +328,19 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         //val otherPlayer = game.currentPlayer
-
+        rootService.playerActionService.cultivate()
 
         message.removedTilesAxialCoordinates.forEach {
             rootService.treeService.removeFromTree(it)
         }
-        message.playedTiles.forEach {
-            val tile = Tile(null, null, it.first.toTileType())
-            rootService.treeService.playTile(tile, it.second)
+
+        if (message.playedTiles.isNotEmpty()){
+            message.playedTiles.forEach {
+                val tile = Tile(null, null, it.first.toTileType())
+                rootService.treeService.playTile(tile, it.second)
+            }
         }
+
         message.claimedGoals.forEach {
             rootService.playerActionService.claimOrRenounceGoal(true, it.first.toGoalTileType(), it.second)
         }
@@ -349,6 +355,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         if (game.players[nextIndex].name == myName) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
         }
+        hasCultivated = false
         rootService.playerActionService.endTurn()
     }
 
@@ -417,5 +424,12 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      */
     fun redoReceivedGoalTile() {
 
+    }
+
+    /**
+     * used for network tests
+     */
+    fun setConnectionStateTest(newState: ConnectionState){
+        updateConnectionState(newState)
     }
 }
