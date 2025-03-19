@@ -5,8 +5,18 @@ import entity.*
 import util.ZenCardLoader
 import kotlin.test.*
 
+/**
+ * Provides tests for the Network class in the Service layer.
+ *
+ * Includes game creation, joining a game and message handling.
+ */
 class NetworkServiceTest {
 
+    /**
+     * Initialises a new game for to do some tests with
+     *
+     * @return A [RootService] with initialised game
+     */
     private fun setUpGame(): RootService {
         val rootService = RootService()
         val players = mutableListOf(
@@ -33,6 +43,9 @@ class NetworkServiceTest {
         return rootService
     }
 
+    /**
+     * Tests the connection state is set correctly after a host has created a game.
+     */
     @Test
     fun testCreateGame() {
         val rootService = setUpGame()
@@ -41,6 +54,9 @@ class NetworkServiceTest {
         assertEquals(ConnectionState.WAITING_FOR_HOST_CONFIRMATION, networkService.connectionState)
     }
 
+    /**
+     * Tests the connection state is set correctly after a guest has joined a game.
+     */
     @Test
     fun testJoinGame() {
         val rootService = setUpGame()
@@ -72,7 +88,11 @@ class NetworkServiceTest {
 
      */
 
-
+    /**
+     * Tests sending a meditate message.
+     * Ensures that the connection state is set to `WAITING_FOR_OPPONENT`
+     * and that the list of played tiles is cleared.
+     */
     @Test
     fun testSendMeditateMessage() {
         val rootService = setUpGame()
@@ -84,6 +104,11 @@ class NetworkServiceTest {
         assertTrue(networkService.toBeSentMeditateMessage.playedTiles.isEmpty())
     }
 
+    /**
+     * Tests sending a cultivate message.
+     * Ensures that the connection state is set to `WAITING_FOR_OPPONENT`
+     * and that the list of played tiles is cleared.
+     */
     @Test
     fun testSendCultivateMessage() {
         val rootService = setUpGame()
@@ -94,7 +119,11 @@ class NetworkServiceTest {
         assertEquals(ConnectionState.WAITING_FOR_OPPONENT, networkService.connectionState)
         assertTrue(networkService.toBeSentCultivateMessage.playedTiles.isEmpty())
     }
-
+    /**
+     * Tests receiving a message after a game has started.
+     * Verifies that the game is correctly initialized and that
+     * the connection state is set correctly.
+     */
     @Test
     fun testReceiveStartGameMessage() {
         val rootService = RootService()
@@ -134,7 +163,11 @@ class NetworkServiceTest {
         assertEquals(checkStateForHost, networkService.connectionState)
     }
 
-
+    /**
+     * Tests receiving a meditate message.
+     * Ensures that the game state is updated correctly and that
+     * the connection state remains unchanged after processing.
+     */
     @Test
     fun testReceiveMeditateMessage() {
         val rootService = setUpGame()
@@ -161,7 +194,11 @@ class NetworkServiceTest {
         //networkService.receiveMeditateMessage(message, "Tom")
         assertEquals(ConnectionState.WAITING_FOR_OPPONENT, networkService.connectionState)
     }
-
+    /**
+     * Tests receiving a cultivate message.
+     * Verifies that the game is updated correctly after receiving the message
+     * and that the connection state is set properly.
+     */
     @Test
     fun testReceiveCultivateMessage() {
         val rootService = setUpGame()
@@ -181,7 +218,10 @@ class NetworkServiceTest {
         networkService.receiveCultivateMessage(message, "Tom")
         assertEquals(ConnectionState.WAITING_FOR_OPPONENT, networkService.connectionState)
     }
-
+    /**
+     * Tests updating the connection state.
+     * Ensures that the state is correctly changed.
+     */
     @Test
     fun testUpdateConnectionState() {
         val rootService = setUpGame()
@@ -189,7 +229,10 @@ class NetworkServiceTest {
         networkService.updateConnectionState(ConnectionState.WAITING_FOR_GUEST)
         assertEquals(ConnectionState.WAITING_FOR_GUEST, networkService.connectionState)
     }
-
+    /**
+     * Tests disconnecting from the network.
+     * Verifies that the connection state is set to `DISCONNECTED`.
+     */
     @Test
     fun testDisconnect() {
         val rootService = setUpGame()
