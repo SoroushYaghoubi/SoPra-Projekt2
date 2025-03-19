@@ -440,8 +440,11 @@ class BonsaiGameScene(private val rootService: RootService) :
         // Refresh supply tiles
         updateSupply(gameState.currentPlayer)
 
-        // refresh tiles info pane
+        // Refresh playable tiles
         updatePlayableTiles(gameState.currentPlayer)
+
+        // Refresh collected cards
+        updateCollectedCards(gameState.currentPlayer)
 
         // Refresh tree tiles
         createEmptyHex(gameState.currentPlayer)
@@ -449,20 +452,41 @@ class BonsaiGameScene(private val rootService: RootService) :
         // Refresh interaction text
         interactionText.text = "Undo/Redo performed. Current player: ${gameState.currentPlayer.name}"
 
-        capacityLabel.text = "Cap: ${rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.tileCapacity}"
+        // Update tile capacity label
+        capacityLabel.text = "Cap: ${gameState.currentPlayer.tileCapacity}"
 
         // Update remove button visibility
-        if (!rootService.treeService.canPlayWood()) {
-            removeButton.isVisible = true
-            interactionText.text = "Please select Cultivate/ Meditate/ Remove"
+        removeButton.isVisible = !rootService.treeService.canPlayWood()
+        interactionText.text = if (removeButton.isVisible) {
+            "Please select Cultivate/ Meditate/ Remove"
         } else {
-            removeButton.isVisible = false
-            interactionText.text = "Please select Cultivate/ Meditate"
+            "Please select Cultivate/ Meditate"
         }
+
+        // Refresh goal tile buttons
+        goalButtons.forEachIndexed { index, button ->
+            val goalTile = goalTileList[index % goalTileList.size]
+            button.text = "Tier: ${goalTile.tier} Score: ${goalTile.score}"
+        }
+
+        // Refresh player buttons
+        playerButtons.forEachIndexed { index, button ->
+            button.text = gameState.players[index].name
+        }
+
+        // Hide overlay panes if they are visible
+        overlayPane.isVisible = false
+        overlayPaneDiscard.isVisible = false
+        goalTilePane.isVisible = false
+        choseAnyTilePane.isVisible = false
 
         // Reapply event handlers for face-up cards
         applyCardPosition()
 
+        // Update undo/redo button visibility
+        undoButton.isVisible = gameState.currentPlayer.isLocal
+        redoButton.isVisible = gameState.currentPlayer.isLocal
+        saveButton.isVisible = gameState.currentPlayer.isLocal
     }
 
 

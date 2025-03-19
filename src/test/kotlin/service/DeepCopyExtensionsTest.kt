@@ -229,6 +229,49 @@ class DeepCopyExtensionsTest {
 
         assertNotEquals(originalGameState.faceUpCards.size, copiedGameState.faceUpCards.size)
     }
+    @Test
+    fun testMasterCardDeepCopy() {
+
+        val tileTypes = mutableListOf(TileType.LEAF, TileType.FLOWER)
+        val masterCard = MasterCard(tileTypes, id = 1)
+
+        // Act
+        val copiedMasterCard = masterCard.deepCopy()
+
+        // Assert
+        assertEquals(masterCard.id, copiedMasterCard.id)
+        assertEquals(masterCard.tileTypes, copiedMasterCard.tileTypes)
+        assert(copiedMasterCard.tileTypes !== masterCard.tileTypes)
+    }
+
+    @Test
+    fun testToolCardDeepCopy() {
+        // Arrange
+        val toolCard = ToolCard(id = 3)
+
+        // Act
+        val copiedToolCard = toolCard.deepCopy()
+
+        // Assert
+        assertEquals(toolCard.id, copiedToolCard.id, "IDs should match")
+    }
+
+    @Test
+    fun testParchmentCardDeepCopy() {
+        // Arrange
+        val parchmentCard = ParchmentCard(
+            TileType.LEAF,
+             null,
+             2,
+             2
+        )
+
+        // Act
+        val copiedParchmentCard = parchmentCard.deepCopy()
+
+        // Assert
+        assertEquals(parchmentCard.id, copiedParchmentCard.id, "IDs should match")
+    }
 
 }
 

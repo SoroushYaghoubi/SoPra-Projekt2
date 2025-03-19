@@ -219,6 +219,9 @@ class CheckBoxButton2(
 ) {
     var isChecked: Boolean = false
 
+    /**
+     * function for design
+     */
     fun change() {
         if (isChecked) {
             visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
