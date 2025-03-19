@@ -53,7 +53,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 (tile.tileType to (tilePosition))
             )
         }
-        // TODO: check if player has achieved a goal tile
 
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)

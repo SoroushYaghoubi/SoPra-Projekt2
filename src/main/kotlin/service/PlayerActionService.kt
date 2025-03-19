@@ -340,8 +340,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @param claim true if player accepts goal tile, otherwise false.
      *
-     * TODO: this class claims or renounces two goals at the same time if possible. this might be bad
-     *
      */
     fun claimOrRenounceGoal(claim: Boolean, goalTileType: GoalTileType, tier: Int) {
         val game = checkNotNull(rootService.currentGame) { "No game was started." }
