@@ -44,12 +44,13 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         var zenDeck = mutableListOf<Card>()
         val faceUpCards = mutableListOf<Card>()
-        if (!networkGame) {
+        if (rootService.networkService.connectionState != ConnectionState.WAITING_FOR_INIT) {
             // create the zenDeck depending on the number of players
             zenDeck = ZenCardLoader().readAllZenCards(playerOrder.size).shuffled().toMutableList()
             // put the first 4 cards face up
-            repeat(4) {
-                faceUpCards.add(zenDeck.removeAt(0))
+                repeat(4) {
+                    faceUpCards.add(zenDeck.removeLast())
+
             }
         }
 
@@ -107,7 +108,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         rootService.currentGame = game
 
-        onAllRefreshables { refreshAfterGameStart() }
+        if (!networkGame) onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
@@ -346,7 +347,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         }
 
         if (gameState.faceUpCards.size < 4) {
-            val newCard = gameState.zenDeck.removeAt(0)
+            val newCard = gameState.zenDeck.removeLast()
             gameState.faceUpCards.add(0, newCard)
         }
 

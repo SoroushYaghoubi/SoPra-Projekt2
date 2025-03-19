@@ -28,7 +28,6 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication, rootService: RootS
         TextFieldStyle2(
             posX = 875,
             posY = 275,
-            text = "",
             prompt = "SESSION ID",
         )
 
@@ -36,7 +35,6 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication, rootService: RootS
         TextFieldStyle2(
             posX = 875,
             posY = 150,
-            text = "",
             prompt = "PLAYER NAME",
         )
 

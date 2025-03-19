@@ -559,26 +559,24 @@ class HostScene(
                             playerHardBots[index].isChecked -> PlayerType.HARDBOT
                             else -> PlayerType.HUMAN
                         }
-                        println(it.text.trim())
-                        val name =
-                            if (it.text.trim() == "") {
-                                when (index) {
-                                    3 -> "Alice"
-                                    2 -> "Bob"
-                                    1 -> "Cody"
-                                    else -> "Dirk"
-                                }
-                            } else {
-                                it.text.trim()
+                        val client = rootService.networkService.client
+                        checkNotNull(client)
+                        val name : String
+                        if (index == 0) {
+                            name = client.playerName
+                        } else {
+                            name = client.otherPlayerNames[index - 1]
+                        }
 
-                            }
+
                         entity.Player(name, playerType, true, color)
                     }.toMutableList()
 
-                    rootService.gameService.startNewGame(
-                        guiPlayer, false,
-                        selectedGoalTiles
-                    )
+                    rootService.networkService
+                        .sendStartGameMessage(
+                            guiPlayer,
+                            selectedGoalTiles
+                        )
                     bonsaiApplication.hideMenuScene()
                     bonsaiApplication.showGameScene()
                 }

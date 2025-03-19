@@ -166,8 +166,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             return
         }
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
-        gameState.currentState = States.END_TURN
+        onAllRefreshables {refreshAfterMeditate() }
+
     }
 
     /**
@@ -198,7 +198,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         actPlayer.hasPlayed = true
         onAllRefreshables { refreshAfterMeditate() }
-        gameState.currentState = States.END_TURN
 
     }
 
@@ -214,11 +213,22 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
+        val actPlayer = gameState.currentPlayer
+        gameState.currentPlayer.playableTilesCopy.clear()
+        // val tileTypeToPlay2 = drawnCard.tileTypes[1]
+       // gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
+        // gameState.currentPlayer.playableTiles.toMutableList()
+        onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
+        // Check personal supply limit
+        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
+            gameState.currentState = States.DISCARDING
+            onAllRefreshables { refreshAfterReceivedTile(true) }
+            return
+        }
 
-        val tileTypeToPlay2 = drawnCard.tileTypes[1]
-        gameState.currentPlayer.playableTilesCopy = gameState.currentPlayer.playableTiles.toMutableList()
-        onAllRefreshables { refreshAfterDrawingHelperCard(tileTypeToPlay2) }
-        gameState.currentPlayer.hasPlayed = true
+        actPlayer.hasPlayed = true
+        onAllRefreshables { refreshAfterMeditate() }
+
 
     }
 
@@ -289,6 +299,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         // save state in history
         val copiedState = gameState.deepCopy()
+        println("Copied game state: ${copiedState.hashCode()}")
+        println("Original game state: ${gameState.hashCode()}")
         game.history?.gameStates?.add(copiedState)
         game.history?.currentPosition = game.history?.gameStates?.lastIndex ?: 0
 
@@ -661,12 +673,21 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @throws IllegalStateException if personal supply is not over capacity limit.
      */
-    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+//    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
+//        val player = getCurrentPlayer()
+//        check(player.personalSupply.size > player.tileCapacity)
+//        { "The personal supply tiles hasn't reached the capacity." }
+//        player.personalSupply.removeAll(tilesToDiscard)
+//        rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
+//    }
+
+    fun discardSupplyTile(tileToDiscard: Tile) {
         val player = getCurrentPlayer()
         check(player.personalSupply.size > player.tileCapacity)
         { "The personal supply tiles hasn't reached the capacity." }
-        player.personalSupply.removeAll(tilesToDiscard)
+        player.personalSupply.remove(tileToDiscard)
         rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
+        player.hasPlayed = true
     }
 
     // returns the current player

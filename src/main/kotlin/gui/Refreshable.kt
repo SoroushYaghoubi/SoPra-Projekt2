@@ -54,7 +54,7 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player has chosen a HelperCard
      */
-    fun refreshAfterDrawingHelperCard(secondTileTypeToPlace : TileType ){}
+    fun refreshAfterDrawingHelperCard(playableTilesCopy: MutableList<TileType>){}
     /**
      * perform refreshes that are necessary after a player has received tiles
      */

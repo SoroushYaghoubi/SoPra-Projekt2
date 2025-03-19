@@ -31,7 +31,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         private set
 
     // our own name
-    val myName = client?.playerName
+    var myName : String = ""
 
     var toBeSentMeditateMessage = MutableMeditateMessage(
         mutableListOf(), 4, mutableListOf(),
@@ -104,7 +104,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val playerNames = client?.otherPlayerNames
         checkNotNull(playerNames)
 
-        if (playerNames.size < 2 || playerNames.size > 4) {
+        if (playerOrder.size < 2 || playerOrder.size > 4) {
             throw IllegalStateException("there should be 2 to 4 players")
         }
 
@@ -120,11 +120,17 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             it.toGoalTileTypeMessage()
         }
 
-        val zenDeckMessage = game.zenDeck.map {
+        val zenDeckList = game.zenDeck.map {
             Pair(it.cardType.toCardTypeMessage(), it.id)
         }
+        val faceUpCardsList = game.faceUpCards.map {
+            Pair(it.cardType.toCardTypeMessage(), it.id)
+        }
+        val zenDeckMessage = zenDeckList + faceUpCardsList
 
         val message = StartGameMessage(nameColorPair, chosenGoalTiles, zenDeckMessage)
+
+        myName = client?.playerName.toString()
 
         if (myName == playerOrder.first().name) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
@@ -223,6 +229,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             it.toGoalTileType()
         }
         val players = mutableListOf<Player>()
+        myName = client?.playerName.toString()
         orderedPair.forEach {
             val isLocal = (myName == it.first)
             // TODO(we need to decide if we use bot or not)
@@ -234,11 +241,16 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         rootService.gameService.startNewGame(players, true, goalTileTypes.toMutableList())
 
         //construct game
-        val standardZenDeck = ZenCardLoader().readAllZenCards(message.orderedPlayerNames.size)
-        rootService.currentGame?.currentBonsaiGameState?.zenDeck =
+        val standardZenDeck = ZenCardLoader().readAllZenCards(4)
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        game.zenDeck =
             message.orderedCards.map {
                 standardZenDeck[it.second]
             }.toMutableList()
+        repeat(4) {
+            game.faceUpCards.add(game.zenDeck.removeLast())
+        }
 
 
         if (myName == orderedPair.first().first) {
@@ -246,6 +258,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         } else {
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
         }
+
+        onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
