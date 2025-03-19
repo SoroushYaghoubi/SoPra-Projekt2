@@ -326,11 +326,12 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         //val otherPlayer = game.currentPlayer
-
+        rootService.playerActionService.cultivate()
 
         message.removedTilesAxialCoordinates.forEach {
             rootService.treeService.removeFromTree(it)
         }
+
         message.playedTiles.forEach {
             val tile = Tile(null, null, it.first.toTileType())
             rootService.treeService.playTile(tile, it.second)

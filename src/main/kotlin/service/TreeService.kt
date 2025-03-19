@@ -231,7 +231,10 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      */
     fun canPlayTile(tile: Tile): Boolean {
         val currentPlayer = getCurrentPlayer()
-        require(currentPlayer.personalSupply.contains(tile))
+        require(currentPlayer.personalSupply.any{
+            it.typeEqual(tile)
+        }
+        )
         { "Player does not have this bonsai tile in hand" }
 
         return currentPlayer.playableTilesCopy.contains(tile.tileType)

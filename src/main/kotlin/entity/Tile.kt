@@ -20,4 +20,8 @@ data class Tile(var q: Int? = null, var r: Int? = null, val tileType: TileType) 
     override fun toString(): String {
         return "Tile Type: ${this.tileType}"
     }
+
+    fun typeEqual(other: Tile): Boolean {
+        return this.tileType == other.tileType
+    }
 }
