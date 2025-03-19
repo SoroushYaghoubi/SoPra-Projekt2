@@ -116,7 +116,7 @@ class MeditateTest {
         assertEquals(CardType.HELPERCARD, gameState.currentPlayer.collectedCards[1].cardType)
         assertEquals(States.USING_HELPER, gameState.currentState)
         assert(gameState.currentPlayer.hasPlayed)
-        rootService.treeService.playTile(Tile(null, null, TileType.WOOD), Pair(0, -1))
+        //rootService.treeService.playTile(Tile(null, null, TileType.WOOD), Pair(0, -1))
         assertFails { rootService.playerActionService.meditate(1, null) }
         assertFails { rootService.playerActionService.meditate(1, TileType.FLOWER) }
 
