@@ -72,33 +72,69 @@ class NetworkServiceTest {
     }
 
 
-    /*
+
     @Test
-    fun testStartGameMessage(){
+    fun testSendStartGameMessage() {
         val rootService = RootService()
         val networkService = NetworkService(rootService)
+
         val players = mutableListOf(
             Player("Tom", PlayerType.HUMAN, true, ColorType.RED),
             Player("Tomy", PlayerType.HUMAN, true, ColorType.BLUE),
             Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
         )
         val goalTiles = mutableListOf(GoalTileType.BROWN, GoalTileType.PINK, GoalTileType.GREEN)
+
         networkService.myName = "Tom"
-        networkService.client = BonsaiNetworkClient("Tom", "1234", "321", networkService)
-        networkService.createGame("321", "Tom", "1234")
-        //networkService.setConnectionStateTest(ConnectionState.WAITING_FOR_GUEST)
+
+        // should not be connected already
+        if (networkService.connectionState != ConnectionState.DISCONNECTED) {
+            networkService.disconnect()
+            Thread.sleep(100)
+        }
+        assertEquals(ConnectionState.DISCONNECTED, networkService.connectionState)
+
+        // create the game
+        networkService.createGame("baum25", "Tom", "1234")
+        assertEquals(ConnectionState.WAITING_FOR_HOST_CONFIRMATION, networkService.connectionState)
+
+        // simulate host confirmation
+        networkService.updateConnectionState(ConnectionState.CONNECTED)
+        assertEquals(ConnectionState.CONNECTED, networkService.connectionState, "timeout")
+
+        // set the connection state back to WAITING_FOR_GUEST before sending the start game message
+        networkService.setConnectionStateTest(ConnectionState.WAITING_FOR_GUEST)
+        assertEquals(ConnectionState.WAITING_FOR_GUEST, networkService.connectionState)
+
+        // send the start message
         networkService.sendStartGameMessage(players, goalTiles)
+
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState)
-        val checkStateForHost = if (networkService.myName == gameState.players.first().name) {
+
+        // check connection state
+        val expectedConnectionState = if (networkService.myName == gameState.players.first().name) {
             ConnectionState.PLAYING_MY_TURN
         } else {
             ConnectionState.WAITING_FOR_OPPONENT
         }
-        assertEquals(checkStateForHost, networkService.connectionState)
+        assertEquals(expectedConnectionState, networkService.connectionState)
+
+        // check game state at the end
+        assertEquals(players.size, gameState.players.size)
+        assertEquals("Tom", gameState.players.first().name)
+        assertEquals("Tomi", gameState.players.last().name)
+        assertEquals(goalTiles.size * 3, gameState.goalTiles.size)
+        assertTrue(gameState.zenDeck.isNotEmpty())
+        assertTrue(gameState.faceUpCards.isNotEmpty())
+
+        // clean up
+        networkService.disconnect()
+        Thread.sleep(100)
+        assertEquals(ConnectionState.DISCONNECTED, networkService.connectionState)
     }
 
-     */
+
 
 
 
