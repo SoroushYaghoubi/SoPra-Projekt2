@@ -241,11 +241,16 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         rootService.gameService.startNewGame(players, true, goalTileTypes.toMutableList())
 
         //construct game
-        val standardZenDeck = ZenCardLoader().readAllZenCards(message.orderedPlayerNames.size)
-        rootService.currentGame?.currentBonsaiGameState?.zenDeck =
+        val standardZenDeck = ZenCardLoader().readAllZenCards(4)
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        game.zenDeck =
             message.orderedCards.map {
                 standardZenDeck[it.second]
             }.toMutableList()
+        repeat(4) {
+            game.faceUpCards.add(game.zenDeck.removeLast())
+        }
 
 
         if (myName == orderedPair.first().first) {

@@ -18,7 +18,6 @@ import util.SECONDARY_COLOUR
 import util.TERTIARY_COLOUR
 import util.*
 
-
 /**
  * The [ConfigureGameMenuScene] is a [MenuScene] to configure the starting parameters
  * of a game of bonsai in hot seat mode

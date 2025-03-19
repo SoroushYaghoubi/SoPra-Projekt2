@@ -108,7 +108,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
         rootService.currentGame = game
 
-        onAllRefreshables { refreshAfterGameStart() }
+        if (!networkGame) onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
