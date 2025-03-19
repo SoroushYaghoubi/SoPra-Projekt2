@@ -14,10 +14,11 @@ class NetworkExtensionTest {
      */
     @Test
     fun testColorTypeMessageToColor(){
-        assertEquals(ColorTypeMessage.BLUE.toColor(), ColorType.BLUE)
-        assertEquals(ColorTypeMessage.PURPLE.toColor(), ColorType.PURPLE)
-        assertEquals(ColorTypeMessage.BLACK.toColor(), ColorType.BLACK)
-        assertEquals(ColorTypeMessage.RED.toColor(), ColorType.RED)
+        assertEquals(ColorType.BLUE, ColorTypeMessage.BLUE.toColor())
+        assertEquals(ColorType.PURPLE, ColorTypeMessage.PURPLE.toColor())
+        assertEquals(ColorType.BLACK, ColorTypeMessage.BLACK.toColor())
+        assertEquals(ColorType.RED, ColorTypeMessage.RED.toColor())
+
     }
 
     /**
@@ -25,10 +26,10 @@ class NetworkExtensionTest {
      */
     @Test
     fun testColorToColorTypeMessage(){
-        assertEquals(ColorType.BLUE, ColorTypeMessage.BLUE.toColor())
-        assertEquals(ColorType.PURPLE, ColorTypeMessage.PURPLE.toColor())
-        assertEquals(ColorType.BLACK, ColorTypeMessage.BLACK.toColor())
-        assertEquals(ColorType.RED, ColorTypeMessage.RED.toColor())
+        assertEquals(ColorTypeMessage.BLUE, ColorType.BLUE.toColorMessage())
+        assertEquals(ColorTypeMessage.PURPLE, ColorType.PURPLE.toColorMessage())
+        assertEquals(ColorTypeMessage.BLACK, ColorType.BLACK.toColorMessage())
+        assertEquals(ColorTypeMessage.RED, ColorType.RED.toColorMessage())
     }
 
     /**
@@ -36,10 +37,10 @@ class NetworkExtensionTest {
      */
     @Test
     fun testTileTypeMessageToTile(){
-        assertEquals(TileTypeMessage.WOOD.toTileType(), TileType.WOOD)
-        assertEquals(TileTypeMessage.LEAF.toTileType(), TileType.LEAF)
-        assertEquals(TileTypeMessage.FLOWER.toTileType(), TileType.FLOWER)
-        assertEquals(TileTypeMessage.FRUIT.toTileType(), TileType.FRUIT)
+        assertEquals(TileTypeMessage.WOOD, TileType.WOOD.toTileTypeMessage())
+        assertEquals(TileTypeMessage.LEAF, TileType.LEAF.toTileTypeMessage())
+        assertEquals(TileTypeMessage.FLOWER, TileType.FLOWER.toTileTypeMessage())
+        assertEquals(TileTypeMessage.FRUIT, TileType.FRUIT.toTileTypeMessage())
     }
 
     /**
@@ -58,11 +59,11 @@ class NetworkExtensionTest {
      */
     @Test
     fun testCardTypeMessageToCard(){
-        assertEquals(CardTypeMessage.TOOL.toCardType(), CardType.TOOLCARD)
-        assertEquals(CardTypeMessage.GROWTH.toCardType(), CardType.GROWTHCARD)
-        assertEquals(CardTypeMessage.PARCHMENT.toCardType(), CardType.PARCHMENTCARD)
-        assertEquals(CardTypeMessage.HELPER.toCardType(), CardType.HELPERCARD)
-        assertEquals(CardTypeMessage.MASTER.toCardType(), CardType.MASTERCARD)
+        assertEquals(CardTypeMessage.TOOL, CardType.TOOLCARD.toCardTypeMessage())
+        assertEquals(CardTypeMessage.GROWTH, CardType.GROWTHCARD.toCardTypeMessage())
+        assertEquals(CardTypeMessage.PARCHMENT, CardType.PARCHMENTCARD.toCardTypeMessage())
+        assertEquals(CardTypeMessage.HELPER, CardType.HELPERCARD.toCardTypeMessage())
+        assertEquals(CardTypeMessage.MASTER, CardType.MASTERCARD.toCardTypeMessage())
     }
 
     /**
@@ -82,11 +83,11 @@ class NetworkExtensionTest {
      */
     @Test
     fun testGoalTileTypeMessageToGoal(){
-        assertEquals(GoalTileTypeMessage.BLUE.toGoalTileType(), GoalTileType.BLUE)
-        assertEquals(GoalTileTypeMessage.GREEN.toGoalTileType(), GoalTileType.GREEN)
-        assertEquals(GoalTileTypeMessage.BROWN.toGoalTileType(), GoalTileType.BROWN)
-        assertEquals(GoalTileTypeMessage.PINK.toGoalTileType(), GoalTileType.PINK)
-        assertEquals(GoalTileTypeMessage.ORANGE.toGoalTileType(), GoalTileType.ORANGE)
+        assertEquals(GoalTileTypeMessage.BLUE, GoalTileType.BLUE.toGoalTileTypeMessage())
+        assertEquals(GoalTileTypeMessage.GREEN, GoalTileType.GREEN.toGoalTileTypeMessage())
+        assertEquals(GoalTileTypeMessage.BROWN, GoalTileType.BROWN.toGoalTileTypeMessage())
+        assertEquals(GoalTileTypeMessage.PINK, GoalTileType.PINK.toGoalTileTypeMessage())
+        assertEquals(GoalTileTypeMessage.ORANGE, GoalTileType.ORANGE.toGoalTileTypeMessage())
     }
 
     /**
