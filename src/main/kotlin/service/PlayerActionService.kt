@@ -186,7 +186,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         val actPlayer = gameState.currentPlayer
-        gameState.currentPlayer.playableTilesCopy.clear()
+        actPlayer.hasPlayed = true
+        //gameState.currentPlayer.playableTilesCopy.clear()
         //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
         onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
 

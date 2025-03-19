@@ -31,12 +31,18 @@ class NetworkServiceTest {
             currentState = States.CULTIVATE
         )
         gameState.zenDeck = mutableListOf(
-            HelperCard(TileType.LEAF, 1),
+            HelperCard(TileType.WOOD, 1),
             HelperCard(TileType.WOOD, 2),
-            HelperCard(TileType.FRUIT, 3),
-            HelperCard(TileType.FRUIT, 4),
-            HelperCard(TileType.FRUIT, 5)
+            HelperCard(TileType.WOOD, 3),
+            HelperCard(TileType.WOOD, 4),
+            HelperCard(TileType.WOOD, 5)
         )
+        gameState.currentPlayer.bonsaiTree[Pair(0,0)] = Tile(0,0, TileType.WOOD)
+        repeat(4){
+            if (gameState.zenDeck.isNotEmpty()){
+                gameState.faceUpCards.add(gameState.zenDeck.removeLast())
+            }
+        }
         val game = BonsaiGame()
         game.currentBonsaiGameState = gameState
         rootService.currentGame = game
@@ -65,16 +71,22 @@ class NetworkServiceTest {
         assertEquals(ConnectionState.WAITING_FOR_JOIN_CONFIRMATION, networkService.connectionState)
     }
 
+
     /*
     @Test
     fun testStartGameMessage(){
-        val rootService = setUpGame()
+        val rootService = RootService()
         val networkService = NetworkService(rootService)
-        val players = rootService.currentGame?.currentBonsaiGameState?.players
-        checkNotNull(players)
+        val players = mutableListOf(
+            Player("Tom", PlayerType.HUMAN, true, ColorType.RED),
+            Player("Tomy", PlayerType.HUMAN, true, ColorType.BLUE),
+            Player("Tomi", PlayerType.HUMAN, true, ColorType.BLACK)
+        )
         val goalTiles = mutableListOf(GoalTileType.BROWN, GoalTileType.PINK, GoalTileType.GREEN)
         networkService.myName = "Tom"
-        networkService.setConnectionStateTest(ConnectionState.WAITING_FOR_GUEST)
+        networkService.client = BonsaiNetworkClient("Tom", "1234", "321", networkService)
+        networkService.createGame("321", "Tom", "1234")
+        //networkService.setConnectionStateTest(ConnectionState.WAITING_FOR_GUEST)
         networkService.sendStartGameMessage(players, goalTiles)
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState)
@@ -87,6 +99,8 @@ class NetworkServiceTest {
     }
 
      */
+
+
 
     /**
      * Tests sending a meditate message.
@@ -172,27 +186,25 @@ class NetworkServiceTest {
     fun testReceiveMeditateMessage() {
         val rootService = setUpGame()
         val networkService = NetworkService(rootService)
+        networkService.myName = "Tomy"
         networkService.setConnectionStateTest(ConnectionState.WAITING_FOR_OPPONENT)
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState)
-        println("Zen deck: ${gameState.zenDeck.map { it.id }}")
-        val tile = Tile(null, null, TileType.LEAF)
+        val tile = Tile(0, -1, TileType.WOOD)
         gameState.currentPlayer.personalSupply.add(tile)
-        gameState.currentPlayer.playableTilesCopy.add(TileType.LEAF)
-        gameState.currentPlayer.bonsaiTree[Pair(0, -1)] = Tile(null, null, TileType.WOOD)
+        gameState.currentPlayer.playableTilesCopy.add(TileType.WOOD)
+        gameState.currentPlayer.bonsaiTree[Pair(0, 0)] = Tile(0, 0, TileType.WOOD)
         val message = MeditateMessage(
             removedTilesAxialCoordinates = listOf(),
             chosenCardPosition = 2,
-            playedTiles = listOf(TileTypeMessage.LEAF to Pair(1, -1)),
+            playedTiles = listOf(Pair(TileTypeMessage.WOOD,Pair(0, -1))),
             drawnTiles = listOf(TileTypeMessage.WOOD),
             claimedGoals = listOf(),
             renouncedGoals = listOf(),
             discardedTiles = listOf()
         )
-        println("Zen Deck Size: ${gameState.zenDeck.size}")
-        println("Chosen Card Position: ${message.chosenCardPosition}")
-        //networkService.receiveMeditateMessage(message, "Tom")
-        assertEquals(ConnectionState.WAITING_FOR_OPPONENT, networkService.connectionState)
+        networkService.receiveMeditateMessage(message, "Tom")
+        assertEquals(ConnectionState.PLAYING_MY_TURN, networkService.connectionState)
     }
     /**
      * Tests receiving a cultivate message.
