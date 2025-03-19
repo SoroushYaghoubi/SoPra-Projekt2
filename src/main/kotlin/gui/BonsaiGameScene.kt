@@ -257,30 +257,61 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
 
     //faceup cards
-    private val collected = LinearLayout<CardView>(
-        posX = 0,
-        posY = 30,
-        width = 400,
-        height = 160,
-        spacing = -20
+    private val collectedCardPane = Pane<ComponentView>(
+        posX = 1154,
+        posY = 20,
+        width = 403,
+        height = 220,
+        visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+            style.borderRadius = BorderRadius(20.0)
+        }
     )
 
-    //TODO
-    // pane for collected card
-    private val collectedCardPane =
-        Pane<ComponentView>(
-            posX = 1154,
-            posY = 20,
-            width = 400,
-            height = 220,
-            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
-                style.borderRadius = BorderRadius(20.0)
+    // update the updateCollectedCards method
+    private fun updateCollectedCards(player: Player) {
+        val currentPlayer = rootService.currentGame?.currentBonsaiGameState?.currentPlayer
+        collectedCardPane.clear()
+
+        val columns = 8
+        val spacing = -3
+        val cardWidth = 53
+        val cardHeight = 75
+
+        player.collectedCards.forEachIndexed { index, card ->
+            val row = index / columns
+            val col = index % columns
+
+            val cardView = CardView(
+                height = cardHeight,
+                width = cardWidth,
+                front = CompoundVisual(
+                    ColorVisual.WHITE,
+                    TextVisual(
+                        text = "${card.cardType.toString().take(4)}\nID: ${card.id}",
+                        font = Font(13, Color.BLACK)
+                    )
+                ),
+                back = zenCardsBack
+            ).apply {
+                showBack()
+                onMouseClicked = {
+                    if (player.isLocal && player == currentPlayer) {
+                        showFront()
+                    }
+                }
             }
-        ).apply {
-            zIndex = 1
-            this.add(collected)
-            isVisible = true
+
+            // calculate the of cards
+            val xPosition = col * (cardWidth + spacing)
+            val yPosition = row * (cardHeight + spacing)
+
+            // manually set posX and posY
+            cardView.posX = xPosition.toDouble()
+            cardView.posY = yPosition.toDouble()
+
+            collectedCardPane.add(cardView)
         }
+    }
 
    // private val collectedPane = CameraPane(
     //    posX = 1154,
@@ -1818,27 +1849,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         )
     }
 
-    private fun updateCollectedCards(player: Player) {
-        collected.clear()
-        val currentPlayer = rootService.currentGame?.currentBonsaiGameState?.currentPlayer
 
-        player.collectedCards.forEach { card ->
-            val cardView = CardView(
-                height = 160,
-                width = 110,
-                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.cardType}\nID: ${card.id}")),
-                back = zenCardsBack,
-            ).apply {
-                showBack()
-                onMouseClicked = {
-                    if (player.isLocal && player == currentPlayer) {
-                        showFront()
-                    }
-                }
-            }
-            collected.add(cardView)
-        }
-    }
 
     private fun createPlayerPane(player: Player) {
         val playerPane =
