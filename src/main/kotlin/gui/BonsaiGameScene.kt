@@ -1380,8 +1380,15 @@ class BonsaiGameScene(private val rootService: RootService) :
         if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
             !game.currentPlayer.isLocal) {
             checkNotNull(position)
-            faceUpCards.components[position].removeFromParent()
-            updateZenBoard()
+            faceUpCards.clear()
+            zenDeckView.pop()
+            val newCardView = game.faceUpCards.map { card->
+                zenCardMap.forward(card).apply {
+                    showFront()
+                }
+            }
+            faceUpCards.addAll(newCardView)
+            cardSumText.text = "${game.zenDeck.size}"
         }
     }
 
