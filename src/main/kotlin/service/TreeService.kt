@@ -45,15 +45,16 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val net = rootService.networkService
         if (net.connectionState != ConnectionState.DISCONNECTED &&
             currentPlayer.isLocal
-        ) {
-            net.toBeSentCultivateMessage.playedTiles.add(
-                (tile.tileType to (tilePosition))
-            )
-            net.toBeSentMeditateMessage.playedTiles.add(
-                (tile.tileType to (tilePosition))
-            )
-        }
-        // TODO: check if player has achieved a goal tile
+        )
+            if (net.hasCultivated) {
+                net.toBeSentCultivateMessage.playedTiles.add(
+                    (tile.tileType to (tilePosition))
+                )
+            } else if (net.hasMeditated) {
+                net.toBeSentMeditateMessage.playedTiles.add(
+                    (tile.tileType to (tilePosition))
+                )
+            }
 
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)

@@ -39,6 +39,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      */
     fun meditate(cardPosition: Int, chosenTile: TileType?) {
         require(cardPosition in 0..3)
+        rootService.networkService.hasMeditated = true
         val msg = rootService.networkService.toBeSentMeditateMessage
         msg.chosenCardPosition = cardPosition
 
@@ -72,13 +73,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             2 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.WOOD))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FLOWER))
-                msg.drawnTiles += mutableListOf(TileType.WOOD, TileType.FLOWER)
             }
 
             3 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.LEAF))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FRUIT))
-                msg.drawnTiles += mutableListOf(TileType.LEAF, TileType.FRUIT)
             }
         }
 
@@ -90,7 +89,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
             is GrowthCard -> {
                 actPlayer.playableTiles.add(drawnCard.tileType)
-                msg.drawnTiles += drawnCard.tileType
             }
 
             is MasterCard -> {
@@ -136,14 +134,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             2 -> {
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[1]))
-                msg.drawnTiles += drawnCard.tileTypes
             }
 
             3 -> {
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[1]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[2]))
-                msg.drawnTiles += drawnCard.tileTypes
             }
         }
         onAllRefreshables { refreshAfterApplyCardEffects() }
@@ -170,7 +166,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         actPlayer.personalSupply.add(Tile(null, null, tileType))
 
         onAllRefreshables { refreshAfterApplyCardEffects() }
-
 
     }
 
@@ -341,8 +336,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @param claim true if player accepts goal tile, otherwise false.
      *
-     * TODO: this class claims or renounces two goals at the same time if possible. this might be bad
-     *
      */
     fun claimOrRenounceGoal(claim: Boolean, goalTileType: GoalTileType, tier: Int) {
         val game = checkNotNull(rootService.currentGame) { "No game was started." }
@@ -368,8 +361,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             if (net.connectionState != ConnectionState.DISCONNECTED &&
                 player.isLocal
             ) {
-                net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
-                net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
+                if (net.hasCultivated) {
+                    net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
+                } else if (net.hasMeditated) {
+                    net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
+                }
             }
         } else {
             gameState.goalTiles.removeIf { tile ->
@@ -382,8 +378,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             if (net.connectionState != ConnectionState.DISCONNECTED &&
                 player.isLocal
             ) {
-                net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
-                net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
+                if (net.hasCultivated) {
+                    net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
+
+                } else if (net.hasMeditated) {
+                    net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
+                }
             }
         }
 
@@ -518,7 +518,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 // find adjacent tiles
                 for ((dq, dr) in directions) {
                     val neighbor = Pair(q + dq, r + dr)
-                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType == TileType.LEAF && neighbor !in visited) {
+                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType ==
+                        TileType.LEAF && neighbor !in visited) {
                         stack.add(neighbor)
                     }
                 }
@@ -644,10 +645,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 //    }
 
     fun discardSupplyTile(tileToDiscard: Tile) {
+        val msg = rootService.networkService.toBeSentMeditateMessage
         val player = getCurrentPlayer()
         check(player.personalSupply.size > player.tileCapacity)
         { "The personal supply tiles hasn't reached the capacity." }
         player.personalSupply.remove(tileToDiscard)
+        msg.discardedTiles.add(tileToDiscard.tileType)
         rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
         player.hasPlayed = true
     }
