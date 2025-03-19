@@ -73,7 +73,8 @@ fun MutableMap<Pair<Int, Int>, Tile>.getEmptyTiles(): Set<Pair<Int, Int>> {
  *
  * @return tile position as a lazy sequence
  */
-private infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
+private infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>) :
+        Sequence<Pair<Int, Int>> = sequence {
     // args check
     checkNotNull(this@traverseFrom[bfsRoot]) { "Cannot start from non-existing tile." }
 
