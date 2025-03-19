@@ -323,7 +323,6 @@ class PlayTileTest {
         gameState.currentPlayer.personalSupply.clear()
         assertFails { treeService.canPlayTile(tile) }
     }
-
 }
 
 
