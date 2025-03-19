@@ -13,7 +13,7 @@ import util.TERTIARY_COLOUR
 /**
  * The [WaitingScene] for network play
  */
-class WaitingScene (val bonsaiApplication: BonsaiApplication,) : MenuScene(
+class WaitingScene (private val bonsaiApplication: BonsaiApplication) : MenuScene(
     1920,1080, ImageVisual("Backgrounds/Hintergrund2.png",1920,1080)
 ) , Refreshable {
 

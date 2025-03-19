@@ -217,7 +217,7 @@ class CheckBoxButton2(
         style.borderRadius = BorderRadius(20.0)
     }
 ) {
-    var isChecked: Boolean = false
+    private var isChecked: Boolean = false
 
     /**
      * function for design

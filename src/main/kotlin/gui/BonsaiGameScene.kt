@@ -76,8 +76,10 @@ class BonsaiGameScene(private val rootService: RootService) :
                 val game = rootService.currentGame?.currentBonsaiGameState
                 checkNotNull(game)
                 if (game.currentState == States.START_TURN ||
-                    game.currentState == States.CHOOSE_ACTION
+                    game.currentState == States.CHOOSE_ACTION ||
+                    game.currentState == States.REMOVE_TILES
                 ) {
+                    removeButton.isVisible = false
                     rootService.playerActionService.cultivate()
                 }
             }
@@ -117,12 +119,13 @@ class BonsaiGameScene(private val rootService: RootService) :
             text = "remove",
             font = Font(36)
         ).apply {
-            // Testing to skip a player's turn
             onMouseClicked = {
+                // Testing to skip a player's turn
                 val game = rootService.currentGame?.currentBonsaiGameState
                 checkNotNull(game)
-                rootService.playerActionService.cultivate()
-                rootService.playerActionService.endTurn()
+                interactionText.text = "Click on a tile to remove it from the tree."
+                game.currentState = States.REMOVE_TILES
+                makeRemoval(game.currentPlayer)
             }
         }
 
@@ -135,6 +138,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         text = "",
         font = Font(30, Color.WHITE)
     )
+
     // pane for the cards
     private val zenCardPane =
         Pane<ComponentView>(
@@ -168,7 +172,7 @@ class BonsaiGameScene(private val rootService: RootService) :
         posX = 235,
         posY = 75,
         size = 30,
-        visual =  CompoundVisual(
+        visual = CompoundVisual(
             woodTileImageVisual,
             TextVisual(
                 text = "0",
@@ -295,9 +299,24 @@ class BonsaiGameScene(private val rootService: RootService) :
                 style.borderRadius = BorderRadius(20.0)
             }
         ).apply {
+            zIndex = 1
             this.add(collected)
+            isVisible = true
         }
 
+   // private val collectedPane = CameraPane(
+    //    posX = 1154,
+    //    posY = 20,
+   //     width = 400,
+   //     height = 220,
+    //    target = collectedCardPane,
+    //    limitBounds = true
+   // ).apply {
+    //    zIndex = 1
+    //    this.interactive = true
+    //    isVisible = true
+
+   // }
 
 
     private val interactionText = Label(
@@ -754,11 +773,11 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     init {
         addComponents(
-            zenCardPane, infoPane, interactionPane, collectedCardPane,
+            zenCardPane, infoPane, interactionPane,
             removeButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards, cardSumText,
             overlayPane, goalTilePane, choseAnyTilePane,
-            overlayPaneDiscard
+            overlayPaneDiscard, collectedCardPane
         )
     }
 
@@ -994,6 +1013,44 @@ class BonsaiGameScene(private val rootService: RootService) :
         // TODO(pane needs to be smaller when less than four)
     }
 
+    // Remove tiles from tree
+    private fun makeRemoval(player: Player) {
+        val treeTileMap = treeTileMaps[getOrder(player)]
+        val treePlayer = treeHexagonGrids[getOrder(player)]
+
+        treePlayer.components.forEach { hexagonView ->
+            hexagonView.onMouseClicked = {
+                val tile = treeTileMap.backward(hexagonView)
+
+                val q = tile.q ?: throw IllegalStateException("Tile q coordinate is null.")
+                val r = tile.r ?: throw IllegalStateException("Tile r coordinate is null.")
+
+                //remove the empty views before adding the new one
+                player.bonsaiTree.getEmptyTiles().forEach {
+                    treePlayer[it.first, it.second]?.removeFromParent()
+                }
+
+                rootService.treeService.removeFromTree(q to r)
+
+                interactionText.text = "Tile removed successfully."
+
+                // Check if more removals are needed
+                if (rootService.treeService.canPlayWood()) {
+                    removeButton.isVisible = false
+                    interactionText.text = "You may now Cultivate or Meditate."
+                }
+
+
+                hexagonView.removeFromParent()
+                createEmptyHex(player)
+                treeTileMap.removeForward(tile) // Remove the tile from the tile map
+                treePlayer.isVisible = true
+                playerPanes[getOrder(player)].isVisible = true
+            }
+
+        }
+    }
+
     //refresher do something
     override fun refreshAfterGameStart() {
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -1046,16 +1103,16 @@ class BonsaiGameScene(private val rootService: RootService) :
         Timer().schedule(1000) {
             if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
                 game.currentState = States.DISCARDING
-                 refreshAfterReceivedTile(true)
+                refreshAfterReceivedTile(true)
                 return@schedule
-            }
-            else{
+            } else {
                 actPlayer.hasPlayed = true
-                 refreshAfterMeditate()
+                refreshAfterMeditate()
             }
 
         }
     }
+
     override fun refreshAfterReceivedTile(discard: Boolean) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
@@ -1479,6 +1536,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 game.currentState == States.REMOVE_TILES
                             ) {
                                 interactionText.text = " no extra tiles "
+                                removeButton.isVisible = false
                                 rootService.playerActionService.meditate(0, null)
                                 removeFromParent()
                                 // updateSupply(game.currentPlayer)
@@ -1500,6 +1558,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 game.currentState == States.CHOOSE_ACTION ||
                                 game.currentState == States.REMOVE_TILES
                             ) {
+                                removeButton.isVisible = false
                                 interactionText.text = "Choose tile to claim: "
 
                                 overlayPane.clear()
@@ -1555,6 +1614,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 game.currentState == States.CHOOSE_ACTION ||
                                 game.currentState == States.REMOVE_TILES
                             ) {
+                                removeButton.isVisible = false
                                 interactionText.text = "You have received a wood and a flower tile"
                                 rootService.playerActionService.meditate(2, null)
                                 removeFromParent()
@@ -1576,6 +1636,7 @@ class BonsaiGameScene(private val rootService: RootService) :
                                 game.currentState == States.CHOOSE_ACTION ||
                                 game.currentState == States.REMOVE_TILES
                             ) {
+                                removeButton.isVisible = false
                                 interactionText.text = "You have received a leaf and a fruit tile"
                                 rootService.playerActionService.meditate(3, null)
                                 removeFromParent()

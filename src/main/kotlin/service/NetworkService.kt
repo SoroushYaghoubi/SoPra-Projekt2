@@ -103,8 +103,9 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val playerNames = client?.otherPlayerNames
         checkNotNull(playerNames)
 
+        // TODO(CHECK)
         if (playerOrder.size < 2 || playerOrder.size > 4) {
-            throw IllegalStateException("there should be 2 to 4 players")
+            throw IllegalArgumentException("there should be 2 to 4 players")
         }
 
         rootService.gameService.startNewGame(playerOrder, true, goalTilesEntries)
@@ -115,7 +116,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             Pair(it.name, it.color.toColorMessage())
         }
 
-        val chosenGoalTiles = goalTilesEntries.map { it ->
+        val chosenGoalTiles = goalTilesEntries.map {
             it.toGoalTileTypeMessage()
         }
 
@@ -230,6 +231,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         }
         val players = mutableListOf<Player>()
         myName = client?.playerName.toString()
+
         orderedPair.forEach {
             val isLocal = (myName == it.first)
             // TODO(we need to decide if we use bot or not)
@@ -327,11 +329,12 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         //val otherPlayer = game.currentPlayer
-        rootService.playerActionService.cultivate()
-
         message.removedTilesAxialCoordinates.forEach {
             rootService.treeService.removeFromTree(it)
         }
+
+        rootService.playerActionService.cultivate()
+
 
         if (message.playedTiles.isNotEmpty()){
             message.playedTiles.forEach {

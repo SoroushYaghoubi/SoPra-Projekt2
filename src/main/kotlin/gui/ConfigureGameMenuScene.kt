@@ -359,7 +359,7 @@ class ConfigureGameMenuScene(
             }
         }
 
-    val startButton = ButtonStyle2(
+    private val startButton = ButtonStyle2(
         posX = 715,
         posY = 830,
         text = "START"
@@ -609,7 +609,7 @@ class ConfigureGameMenuScene(
             hardLabel,
             startButton.apply {
                 onMouseClicked = {
-                    val guiPlayer = playerInputs.mapIndexed() { index, it ->
+                    val guiPlayer = playerInputs.mapIndexed { index, it ->
                         val color = playerColors[index]
                         val playerType = when {
                             playerEasyBots[index].isChecked -> PlayerType.EASYBOT

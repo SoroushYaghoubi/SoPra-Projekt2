@@ -3,7 +3,7 @@ package gui
 import service.RootService
 import tools.aqua.bgw.core.BoardGameApplication
 import tools.aqua.bgw.util.Font
-import util.DEFAULT_NAME
+
 
 /**
  * The [BonsaiApplication] is a [BoardGameApplication] that is the main class of the application
@@ -66,7 +66,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
      * Funktion [showHostScene] shows the hostScene
      */
     fun showHostScene() {
-        hostScene.playerInput.prompt = rootService.networkService.myName ?: DEFAULT_NAME
+        hostScene.playerInput.prompt = rootService.networkService.myName
         this.showMenuScene(hostScene)
     }
 

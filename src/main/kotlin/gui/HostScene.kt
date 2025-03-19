@@ -11,8 +11,8 @@ import tools.aqua.bgw.core.MenuScene
 import tools.aqua.bgw.style.BorderRadius
 import tools.aqua.bgw.visual.ColorVisual
 import tools.aqua.bgw.util.Font
-import tools.aqua.bgw.visual.CompoundVisual
-import tools.aqua.bgw.visual.ImageVisual
+//import tools.aqua.bgw.visual.CompoundVisual
+//import tools.aqua.bgw.visual.ImageVisual
 import util.PRIMARY_COLOUR
 import util.SECONDARY_COLOUR
 import util.TERTIARY_COLOUR
@@ -304,7 +304,7 @@ class HostScene(
         }
     }
 
-    val startButton = ButtonStyle2(
+    private val startButton = ButtonStyle2(
         posX = 715,
         posY = 830,
         text = "START"
@@ -552,7 +552,7 @@ class HostScene(
             playerOrderButton,
             startButton.apply {
                 onMouseClicked = {
-                    val guiPlayer = playerInputs.mapIndexed() { index, it ->
+                    val guiPlayer = playerInputs.mapIndexed { index, _ ->
                         val color = playerColors[index]
                         val playerType = when {
                             playerEasyBots[index].isChecked -> PlayerType.EASYBOT
@@ -561,11 +561,10 @@ class HostScene(
                         }
                         val client = rootService.networkService.client
                         checkNotNull(client)
-                        val name : String
-                        if (index == 0) {
-                            name = client.playerName
+                        val name : String = if (index == 0) {
+                            client.playerName
                         } else {
-                            name = client.otherPlayerNames[index - 1]
+                            client.otherPlayerNames[index - 1]
                         }
 
 
