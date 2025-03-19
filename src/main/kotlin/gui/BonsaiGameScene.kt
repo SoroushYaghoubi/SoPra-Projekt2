@@ -268,14 +268,18 @@ class BonsaiGameScene(private val rootService: RootService) :
             0 -> gameState.players.size - 1
             else -> currentPlayerIndex - 1
         }
-        showSupply(currentPlayerIndex)
-        playerPanes[currentPlayerIndex].apply {
-            isVisible = true
-        }
-        hideSupply(lastPlayerIndex)
+
+        // Hide the last player's pane and supply tiles
         playerPanes[lastPlayerIndex].apply {
             isVisible = false
         }
+        hideSupply(lastPlayerIndex)
+
+        // Show the current player's pane and supply tiles
+        playerPanes[currentPlayerIndex].apply {
+            isVisible = true
+        }
+        showSupply(currentPlayerIndex)
 
         // Refresh the zen board
         faceUpCards.clear()
@@ -325,6 +329,12 @@ class BonsaiGameScene(private val rootService: RootService) :
             removeButton.isVisible = false
             interactionText.text = "Please select Cultivate/ Meditate"
         }
+
+        // Reapply event handlers for face-up cards
+        applyCardPosition()
+
+        // Debugging: Print the current player's personal supply after refresh
+        println("Current player's personal supply after refresh: ${gameState.currentPlayer.personalSupply}")
     }
 
 

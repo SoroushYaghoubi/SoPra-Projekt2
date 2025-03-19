@@ -3,7 +3,17 @@ package service
 import entity.*
 import kotlin.test.*
 
+/**
+ * Tests the deep copies in deepCopyExtensions
+ */
+
 class DeepCopyExtensionsTest {
+
+    /**
+     * Tests deep copy functionality of BonsaiGameState
+     *
+     * tests if copied state is not the same instance as the original and checks the score
+     */
 
     @Test
     fun testBonsaiGameStateDeepCopy() {
@@ -29,6 +39,12 @@ class DeepCopyExtensionsTest {
         assertNotEquals(originalGameState.currentPlayer.score, copiedGameState.currentPlayer.score)
     }
 
+    /**
+     * Tests deep copy functionality of Player
+     *
+     * tests if copied state is not the same instance as the original and checks the score
+     */
+
     @Test
     fun testPlayerDeepCopy() {
         val originalPlayer = Player("Alice", PlayerType.HUMAN, isLocal = true, ColorType.RED).apply {
@@ -49,6 +65,12 @@ class DeepCopyExtensionsTest {
         assertNotEquals(originalPlayer.score, copiedPlayer.score)
     }
 
+    /**
+     * Tests deep copy functionality of a players bonsai tree
+     *
+     * tests if copied state is not the same instance as the original
+     */
+
     @Test
     fun testPlayerBonsaiTreeDeepCopy() {
         val originalPlayer = Player("Alice", PlayerType.HUMAN, isLocal = true, ColorType.RED).apply {
@@ -57,12 +79,16 @@ class DeepCopyExtensionsTest {
 
         val copiedPlayer = originalPlayer.deepCopy()
 
-        // Modify the original player's bonsaiTree
         originalPlayer.bonsaiTree[0 to 0] = Tile(0, 0, TileType.LEAF)
 
-        // Check that the copied player's bonsaiTree is unaffected
         assertNotEquals(originalPlayer.bonsaiTree[0 to 0], copiedPlayer.bonsaiTree[0 to 0])
     }
+
+    /**
+     * Tests deep copy functionality of a players personal supply
+     *
+     * tests if copied state is not the same instance as the original
+     */
 
     @Test
     fun testPlayerPersonalSupplyDeepCopy() {
@@ -72,13 +98,16 @@ class DeepCopyExtensionsTest {
 
         val copiedPlayer = originalPlayer.deepCopy()
 
-        // Modify the original player's personalSupply
         originalPlayer.personalSupply[0] = Tile(1, 1, TileType.FLOWER)
 
-        // Check that the copied player's personalSupply is unaffected
         assertNotEquals(originalPlayer.personalSupply[0], copiedPlayer.personalSupply[0])
     }
 
+    /**
+     * Tests deep copy functionality of a players collected cards
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testPlayerCollectedCardsDeepCopy() {
         val originalPlayer = Player("Alice", PlayerType.HUMAN, isLocal = true, ColorType.RED).apply {
@@ -87,13 +116,17 @@ class DeepCopyExtensionsTest {
 
         val copiedPlayer = originalPlayer.deepCopy()
 
-        // Modify the original player's collectedCards
         originalPlayer.collectedCards[0] = GrowthCard(TileType.LEAF, 1)
 
-        // Check that the copied player's collectedCards is unaffected
         assertNotEquals(originalPlayer.collectedCards[0], copiedPlayer.collectedCards[0])
     }
 
+
+    /**
+     * Tests deep copy functionality of a players claimed goals
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testPlayerClaimedGoalsDeepCopy() {
         val originalPlayer = Player("Alice", PlayerType.HUMAN, isLocal = true, ColorType.RED).apply {
@@ -102,13 +135,16 @@ class DeepCopyExtensionsTest {
 
         val copiedPlayer = originalPlayer.deepCopy()
 
-        // Modify the original player's claimedGoals
         originalPlayer.claimedGoals[0] = GoalTile(GoalTileType.PINK, 1, 10)
 
-        // Check that the copied player's claimedGoals is unaffected
         assertNotEquals(originalPlayer.claimedGoals[0], copiedPlayer.claimedGoals[0])
     }
 
+    /**
+     * Tests deep copy functionality of a players renounced goals
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testPlayerRenouncedGoalsDeepCopy() {
         val originalPlayer = Player("Alice", PlayerType.HUMAN, isLocal = true, ColorType.RED).apply {
@@ -117,13 +153,17 @@ class DeepCopyExtensionsTest {
 
         val copiedPlayer = originalPlayer.deepCopy()
 
-        // Modify the original player's renouncedGoals
         originalPlayer.renouncedGoals[0] = GoalTile(GoalTileType.PINK, 1, 10)
 
-        // Check that the copied player's renouncedGoals is unaffected
         assertNotEquals(originalPlayer.renouncedGoals[0], copiedPlayer.renouncedGoals[0])
     }
 
+
+    /**
+     * Tests deep copy functionality of a players playable tiles and its copy
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testPlayerPlayableTilesShallowCopy() {
         val originalPlayer = Player("Alice", PlayerType.HUMAN, isLocal = true, ColorType.RED).apply {
@@ -133,19 +173,20 @@ class DeepCopyExtensionsTest {
 
         val copiedPlayer = originalPlayer.deepCopy()
 
-        // Modify the original player's playableTiles
         originalPlayer.playableTiles[0] = TileType.FLOWER
 
-        // Check that the copied player's playableTiles is unaffected
         assertNotEquals(originalPlayer.playableTiles[0], copiedPlayer.playableTiles[0])
 
-        // Modify the original player's playableTilesCopy
         originalPlayer.playableTilesCopy[0] = TileType.ANY
 
-        // Check that the copied player's playableTilesCopy is unaffected
         assertNotEquals(originalPlayer.playableTilesCopy[0], copiedPlayer.playableTilesCopy[0])
     }
 
+    /**
+     * Tests deep copy functionality of a games zen deck
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testBonsaiGameStateZenDeckDeepCopy() {
         val originalGameState = BonsaiGameState(
@@ -159,14 +200,18 @@ class DeepCopyExtensionsTest {
 
         val copiedGameState = originalGameState.deepCopy()
 
-        // Modify the original zenDeck
         originalGameState.zenDeck.add(GrowthCard(TileType.LEAF, 2))
 
-        // Check that the copied zenDeck is unaffected
         assertNotEquals(originalGameState.zenDeck.size, copiedGameState.zenDeck.size)
 
     }
 
+
+    /**
+     * Tests deep copy functionality of a games zen deck
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testBonsaiGameStateFaceUpCardsDeepCopy() {
         val originalGameState = BonsaiGameState(
@@ -180,10 +225,8 @@ class DeepCopyExtensionsTest {
 
         val copiedGameState = originalGameState.deepCopy()
 
-        // Modify the original faceUpCards
         originalGameState.faceUpCards.add(HelperCard(TileType.LEAF, 3))
 
-        // Check that the copied faceUpCards is unaffected
         assertNotEquals(originalGameState.faceUpCards.size, copiedGameState.faceUpCards.size)
     }
 

@@ -119,6 +119,7 @@ class EndTurnTest {
         val game = checkNotNull(rootService.currentGame)
         val gameState = checkNotNull(game.currentBonsaiGameState)
 
+
         assertEquals(1, game.history?.gameStates?.size)
         assertEquals(0, game.history?.currentPosition)
 
@@ -128,7 +129,6 @@ class EndTurnTest {
          assertEquals(2, game.history?.gameStates?.size)
          assertEquals(1, game.history?.currentPosition)
 
-         val originalState = game.history?.gameStates?.get(0)
          val newState = game.history?.gameStates?.get(1)
          assertNotSame(gameState, newState)
          assertEquals(gameState, newState)
