@@ -36,9 +36,6 @@ class CheckSupplyTest {
         gameState.zenDeck.isEmpty()
         gameState.faceUpCards.addAll(faceUpCards)
 
-
-
-
         val game = BonsaiGame()
         game.currentBonsaiGameState = gameState
 
