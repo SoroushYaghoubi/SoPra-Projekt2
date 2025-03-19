@@ -139,6 +139,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
             client?.sendGameActionMessage(message)
         }
+        onAllRefreshables { refreshAfterGameStart() }
     }
 
     /**
@@ -309,6 +310,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val currentIndex = game.players.indexOf(game.currentPlayer)
         val nextIndex = (currentIndex + 1) % game.players.size
         if (game.players[nextIndex].name == myName) updateConnectionState(ConnectionState.PLAYING_MY_TURN)
+        //TODO(refresh after meditate)
         rootService.playerActionService.endTurn()
     }
 
@@ -350,6 +352,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         if (game.players[nextIndex].name == myName) {
             updateConnectionState(ConnectionState.PLAYING_MY_TURN)
         }
+        hasCultivated = false
         rootService.playerActionService.endTurn()
     }
 

@@ -324,10 +324,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             getCurrentPlayer().isLocal
         ) {
             // if we cultivated then send cultivateMessage
-            if (net.hasCultivated) {
+            if (net.hasCultivated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
                 net.sendCultivateMessage()
                 net.hasCultivated = false
-            } else {
+            } else if (net.hasMeditated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
                 net.sendMeditateMessage()
                 net.hasCultivated = false
             }
