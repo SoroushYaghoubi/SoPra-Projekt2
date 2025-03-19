@@ -2,14 +2,12 @@ package gui
 
 import entity.Player
 import service.RootService
-import tools.aqua.bgw.components.layoutviews.Pane
 import tools.aqua.bgw.components.uicomponents.*
 import tools.aqua.bgw.core.Alignment
 import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.core.MenuScene
 import tools.aqua.bgw.style.BorderRadius
 import tools.aqua.bgw.util.Font
-import tools.aqua.bgw.visual.ColorVisual
 import tools.aqua.bgw.visual.ImageVisual
 
 /**
@@ -42,22 +40,18 @@ class ResultScene(
     )
 
     // Button to quit the game
-    private val quitButton = Button(
+    private val quitButton = ButtonStyle2(
         posX = 80,
         posY = 900,
-        width = 280,
-        height = 110,
         text = "QUIT",
     ).apply {
         bonsaiApplication.exit()
     }
 
     // Button to back to menu scene
-    private val backToMenuButton = Button(
+    private val backToMenuButton = ButtonStyle2(
         posX = 460,
         posY = 900,
-        width = 280,
-        height = 110,
         text = "MENU",
     ).apply {
         onMouseClicked = {
@@ -65,86 +59,77 @@ class ResultScene(
         }
     }
 
-    // Show score board
-    private val scoreImg =
-        Pane<UIComponent>(
-            posX = 990,
-            posY = 190,
-            width = 870,
-            height = 630,
-            visual = ImageVisual("ScoreBoard.png").apply {
-                style.borderRadius = BorderRadius(20.0)
-            }
-        )
-
+    // Table Score
     private val scoreBoard = TableView<PlayerScore>(
         posX = 990,
-        posY = 260,
+        posY = 180,
         width = 870,
-        height = 558,
+        height = 630,
         columns = listOf(
             // Column for Player Names
             TableColumn(
-                title = "Name",
+                title = "",
                 width = 124,
                 font = Font(20, Color(0x000000), "Arial", Font.FontWeight.BOLD),
-                formatFunction = { player -> player.name } // Just show the player's name as is
+                formatFunction = { player -> player.name }
             ),
             // Column for leaf scores
             TableColumn(
-                title = "Leaf",
+                title = "",
                 width = 124,
-                font = Font(20, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
+                font = Font(40, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
                 formatFunction = { player -> player.eachScore[0].toString() }
             ),
             // Column for leaf scores
             TableColumn(
-                title = "Fruit",
+                title = "",
                 width = 124,
-                font = Font(20, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
+                font = Font(40, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
                 formatFunction = { player -> player.eachScore[1].toString() }
 
             ),
             // Column for leaf scores
             TableColumn(
-                title = "Flower",
+                title = "",
                 width = 124,
-                font = Font(20, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
+                font = Font(40, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
                 formatFunction = { player -> player.eachScore[2].toString() }
             ),
             // Column for goal scores
             TableColumn(
-                title = "Goals",
+                title = "",
                 width = 124,
-                font = Font(20, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
+                font = Font(40, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
                 formatFunction = { player -> player.eachScore[3].toString() }
 
             ),
 
             // Column for parchment scores
             TableColumn(
-                title = "Parchment",
+                title = "",
                 width = 124,
-                font = Font(20, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
+                font = Font(40, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
                 formatFunction = { player -> player.eachScore[4].toString() }
 
             ),
             // Column for parchment scores
             TableColumn(
-                title = "SUM",
+                title = "",
                 width = 124,
-                font = Font(20, Color(0x000000), "Arial", Font.FontWeight.NORMAL),
+                font = Font(40, Color(0x000000), "Arial", Font.FontWeight.BOLD),
                 formatFunction = { player -> player.eachScore[5].toString() }
             )
         ),
         items = listOf(),
-        visual = ColorVisual.BLACK.apply { transparency = 0.5 },
+        visual = ImageVisual("ScoreBoard.png").apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
         selectionMode = SelectionMode.SINGLE
     )
 
     // Initialize the scene
     init {
-        addComponents(titleLabel, resultLabel, backToMenuButton, quitButton, scoreBoard, scoreImg)
+        addComponents(titleLabel, resultLabel, backToMenuButton, quitButton, scoreBoard)
     }
 
     /**
@@ -154,6 +139,7 @@ class ResultScene(
      * @param players is the list of players at the end
      */
     override fun refreshAfterShowWinner(players: List<Player>) {
+
         // Calculate scores for each player
         val playerScores = players.map { player ->
             PlayerScore(

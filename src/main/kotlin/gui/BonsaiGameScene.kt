@@ -1865,7 +1865,6 @@ class BonsaiGameScene(private val rootService: RootService) :
     }
 
 
-
     private fun createPlayerPane(player: Player) {
         val playerPane =
             Pane<ComponentView>(
