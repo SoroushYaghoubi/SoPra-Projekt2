@@ -252,11 +252,11 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     //faceup cards
     private val collected = LinearLayout<CardView>(
-        posX = 205,
-        posY = 40,
-        width = 500,
+        posX = 0,
+        posY = 30,
+        width = 400,
         height = 160,
-        spacing = 13
+        spacing = -20
     )
 
     private fun updateCollectedCards(player: Player) {
@@ -280,7 +280,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             collected.add(cardView)
         }
     }
-
 
     //TODO
     // pane for collected card
@@ -1743,7 +1742,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     }
 
     private fun updatePlayableTiles(player: Player) {
-        val tileCounts = player.playableTilesCopy.groupingBy { it }.eachCount()
+        val tileCounts = player.playableTiles.groupingBy { it }.eachCount()
         val woodCount = tileCounts[TileType.WOOD] ?: 0
         val leafCount = tileCounts[TileType.LEAF] ?: 0
         val fruitCount = tileCounts[TileType.FRUIT] ?: 0

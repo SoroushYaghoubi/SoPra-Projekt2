@@ -89,6 +89,7 @@ class MeditateGrowthCardTest {
 
         rootService.playerActionService.meditate(3, null)
         //println("personal supply:" + gameState.currentPlayer.personalSupply)
+        //println("capacity: " + gameState.currentPlayer.tileCapacity)
         assertEquals(5, gameState.currentPlayer.tileCapacity)
         assertEquals(4, gameState.currentPlayer.playableTiles.size)
         assertEquals(6, gameState.currentPlayer.personalSupply.size)
