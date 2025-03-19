@@ -334,10 +334,13 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             rootService.treeService.removeFromTree(it)
         }
 
-        message.playedTiles.forEach {
-            val tile = Tile(null, null, it.first.toTileType())
-            rootService.treeService.playTile(tile, it.second)
+        if (message.playedTiles.isNotEmpty()){
+            message.playedTiles.forEach {
+                val tile = Tile(null, null, it.first.toTileType())
+                rootService.treeService.playTile(tile, it.second)
+            }
         }
+
         message.claimedGoals.forEach {
             rootService.playerActionService.claimOrRenounceGoal(true, it.first.toGoalTileType(), it.second)
         }
