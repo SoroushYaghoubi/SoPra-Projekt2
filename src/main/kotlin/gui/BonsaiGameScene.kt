@@ -47,17 +47,17 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val goalButtons: MutableList<Button> = mutableListOf()
     private var goalTileList: MutableList<GoalTile> = mutableListOf()
 
-    private val woodTileImageVisual = ImageVisual("./BonsaiTiles/wood.png")
+    private val woodTileImageVisual = ImageVisual("wood.png")
 
-    private val leafTileImageVisual = ImageVisual("./BonsaiTiles/leaf.png")
+    private val leafTileImageVisual = ImageVisual("leaf.png")
 
-    private val flowerTileImageVisual = ImageVisual("./BonsaiTiles/flower.png")
+    private val flowerTileImageVisual = ImageVisual("flower.png")
 
-    private val fruitTileImageVisual = ImageVisual("./BonsaiTiles/fruit.png")
+    private val fruitTileImageVisual = ImageVisual("fruit.png")
 
-    private val anyTileImageVisual = ImageVisual("./BonsaiTiles/any.png")
+    private val anyTileImageVisual = ImageVisual("any.png")
 
-    private val zenCardsBack = ImageVisual("./ZenCards/cardsBack.png")
+    private val zenCardsBack = ImageVisual("cardsBack.png")
 
 
     // button for cultivate
