@@ -4,7 +4,7 @@ import entity.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import kotlin.test.Test
 
-class checkSupplyTest {
+class CheckSupplyTest {
 
     private fun setUpGame(): RootService {
         val rootService = RootService()
@@ -45,7 +45,8 @@ class checkSupplyTest {
         checkNotNull(game)
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
-        gameState.currentPlayer.personalSupply = MutableList(6) { Tile(null, null, TileType.WOOD) } // 6 Tiles, Kapazität ist 5
+        gameState.currentPlayer.personalSupply = MutableList(6){
+            Tile(null, null, TileType.WOOD) } // 6 Tiles, Kapazität ist 5
         rootService.playerActionService.checkSupply()
         assertEquals(States.DISCARDING, gameState.currentState)
     }
@@ -57,7 +58,8 @@ class checkSupplyTest {
         checkNotNull(game)
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
-        gameState.currentPlayer.personalSupply = MutableList(4) { Tile(null, null, TileType.WOOD) } // 6 Tiles, Kapazität ist 5
+        gameState.currentPlayer.personalSupply = MutableList(4){
+            Tile(null, null, TileType.WOOD) } // 6 Tiles, Kapazität ist 5
         rootService.playerActionService.checkSupply()
         assert(gameState.currentPlayer.hasPlayed)
     }
