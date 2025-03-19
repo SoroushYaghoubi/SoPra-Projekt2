@@ -1631,9 +1631,9 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
     }
 
-    private fun switchPlayerPane(playerIndex: Int, hasEndTurn: Boolean) {
-
-    }
+//    private fun switchPlayerPane(playerIndex: Int, hasEndTurn: Boolean) {
+//
+//    }
 
     /**
      * really important function for play tile

@@ -70,7 +70,7 @@ class ResultScene(
             TableColumn(
                 title = "",
                 width = 124,
-                font = Font(20, Color(0x000000), "Arial", Font.FontWeight.BOLD),
+                font = Font(40, Color(0x000000), "Arial", Font.FontWeight.BOLD),
                 formatFunction = { player -> player.name }
             ),
             // Column for leaf scores

@@ -369,7 +369,10 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             refreshConnectionState(newState)
         }
     }
-
+    /**
+     * Notifies all refreshables when a player joins.
+     * @param playerName The name of the player who joined.
+     */
     fun receivePlayerJoinedMessage(playerName: String) {
         onAllRefreshables { refreshAfterPlayerJoined(playerName) }
     }
