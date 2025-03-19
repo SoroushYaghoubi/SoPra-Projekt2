@@ -267,15 +267,11 @@ class BonsaiGameScene(private val rootService: RootService) :
         }
 
         // Hide the last player's pane and supply tiles
-        playerPanes[lastPlayerIndex].apply {
-            isVisible = false
-        }
+        playerPanes[lastPlayerIndex].isVisible = false
         hideSupply(lastPlayerIndex)
 
         // Show the current player's pane and supply tiles
-        playerPanes[currentPlayerIndex].apply {
-            isVisible = true
-        }
+        playerPanes[currentPlayerIndex].isVisible = true
         showSupply(currentPlayerIndex)
 
         // Refresh the zen board
@@ -330,8 +326,6 @@ class BonsaiGameScene(private val rootService: RootService) :
         // Reapply event handlers for face-up cards
         applyCardPosition()
 
-        // Debugging: Print the current player's personal supply after refresh
-        println("Current player's personal supply after refresh: ${gameState.currentPlayer.personalSupply}")
     }
 
 
@@ -348,6 +342,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             font = Font(36)
         ).apply {
             // hide the button in network game
+            // right now it is not visible at all because it does not work
             if (rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true) {
                 isVisible = true
                 onMouseClicked = {
