@@ -295,9 +295,24 @@ class BonsaiGameScene(private val rootService: RootService) :
                 style.borderRadius = BorderRadius(20.0)
             }
         ).apply {
+            zIndex = 1
             this.add(collected)
+            isVisible = true
         }
 
+    val collectedPane = CameraPane(
+        posX = 1154,
+        posY = 20,
+        width = 400,
+        height = 220,
+        target = collectedCardPane,
+        limitBounds = true
+    ).apply {
+        zIndex = 1
+        this.interactive = true
+        isVisible = true
+
+    }
 
 
     private val interactionText = Label(
@@ -754,11 +769,11 @@ class BonsaiGameScene(private val rootService: RootService) :
 
     init {
         addComponents(
-            zenCardPane, infoPane, interactionPane, collectedCardPane,
+            zenCardPane, infoPane, interactionPane,
             removeButton, cultivateButton, endTurnButton,
             zenDeckView, faceUpCards, cardSumText,
             overlayPane, goalTilePane, choseAnyTilePane,
-            overlayPaneDiscard
+            overlayPaneDiscard,collectedPane
         )
     }
 
