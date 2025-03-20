@@ -1310,7 +1310,6 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 updateZenBoard()
             }
         }
-        //}
     }
 
     override fun refreshAfterReceivedTile(discard: Boolean) {
@@ -1574,10 +1573,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         nameText.text = game.currentPlayer.name
         updateSupply(game.currentPlayer)
         updatePlayableTiles(game.currentPlayer)
-//        showSupply(currentPlayerIndex)
         playerPanes[currentPlayerIndex].isVisible = true
 
-//        hideSupply(lastPlayerIndex)
         playerPanes[lastPlayerIndex].isVisible = false
 
 

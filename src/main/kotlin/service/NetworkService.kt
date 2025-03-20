@@ -306,6 +306,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             it.toTileType()
         }.toMutableList()
 
+        /*
         while (removedTiles.isNotEmpty()) {
             val removedTile = removedTiles.removeFirst()
             var removed = false
@@ -315,6 +316,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                 removed = true
             }
         }
+        */
 
         // --------------- epilogue: state update ---------------
         val currentIndex = game.players.indexOf(game.currentPlayer)
