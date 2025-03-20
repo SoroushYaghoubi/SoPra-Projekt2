@@ -19,7 +19,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
     /**
      * Initialization of all scene
      */
-    private val mainMenuScene = MainMenuScene(this)
+    private val mainMenuScene = MainMenuScene(rootService, this)
     private val gameScene = BonsaiGameScene(rootService, this)
     private val configureGameMenuScene = ConfigureGameMenuScene(this, rootService)
     private val joinScene = JoinScene(this, rootService)
