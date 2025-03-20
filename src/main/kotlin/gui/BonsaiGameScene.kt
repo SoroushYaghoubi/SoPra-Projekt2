@@ -1227,12 +1227,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                         val currentPlayerIndex = getOrder(game.currentPlayer)
                         if (index == i) {
                             playerPane.isVisible = true
-                            if (index == currentPlayerIndex) {
-                                showSupply(index)
-                            }
-                        } else {
-                            playerPane.isVisible = false
-                            hideSupply(index)
+                            } else {
+                                playerPanes[index].isVisible = false
                         }
                     }
                     // show player's playable tiles
@@ -2001,7 +1997,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             visual = CompoundVisual(
                 getTileImageVisualForTileType(playedTile.tileType),
                 TextVisual(
-                    text = "$q, $r",
+                    text = "",
                     font = Font(10.0, Color(0x000000))
                 )
             ),
@@ -2068,10 +2064,23 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     }
 
     private fun hideSupply(index: Int) {
-        woodSupplyDecks[index].isVisible = false
-        leafSupplyDecks[index].isVisible = false
-        flowerSupplyDecks[index].isVisible = false
-        fruitSupplyDecks[index].isVisible = false
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        if (index != getOrder(game.currentPlayer)) {
+            woodSupplyDecks[index].forEach{
+                it.isDraggable = false
+            }
+            //woodSupplyDecks[index].isVisible = false
+            leafSupplyDecks[index].forEach{
+                it.isDraggable = false
+            }
+            flowerSupplyDecks[index].forEach {
+                it.isDraggable = false
+            }
+            fruitSupplyDecks[index].forEach{
+                it.isDraggable = false
+            }
+        }
     }
 
     private fun getColorForGoalTile(goalTileType: GoalTileType): Int {

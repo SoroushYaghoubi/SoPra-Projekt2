@@ -301,6 +301,27 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                     .claimOrRenounceGoal(false, it.first.toGoalTileType(), it.second) }
         }
 
+        val personalSupplies = game.currentPlayer.personalSupply
+        val removedTiles = message.discardedTiles.map {
+            it.toTileType()
+        }.toMutableList()
+
+        while (removedTiles.isNotEmpty()) {
+            val removedTile = removedTiles.removeFirst()
+            var removed = false
+            while(!removed) {
+                var i = personalSupplies.size
+                while(i >= 0) {
+                    val supply = personalSupplies.removeLast()
+                    if (supply.tileType == removedTile) {
+                        rootService.playerActionService.discardSupplyTile(supply)
+                        i = -1
+                    }
+                }
+                removed = true
+            }
+        }
+
         // --------------- epilogue: state update ---------------
         val currentIndex = game.players.indexOf(game.currentPlayer)
         val nextIndex = (currentIndex + 1) % game.players.size
