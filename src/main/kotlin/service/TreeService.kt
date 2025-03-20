@@ -110,8 +110,9 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             { "not a valid move" }
 
 
-            if(isMinimalAndCorrect(tilePosition)){
-                if(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF){
+
+                if((gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF)
+                    && isMinimalAndCorrect(tilePosition)){
                     if (getNeighbourTiles(tilePosition).any { it.second?.tileType == TileType.FRUIT }) {
                         getNeighbourTiles(tilePosition)
                             .filter { it.second?.tileType == TileType.FRUIT }
@@ -141,10 +142,8 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                     net.toBeSentMeditateMessage.removedTilesAxialCoordinates.add(tilePosition)
                 }
             }
-        }
+
         //require(!currentPlayer.hasPlayed) {"player has already chosen other moves"}
-
-
 
     }
 
