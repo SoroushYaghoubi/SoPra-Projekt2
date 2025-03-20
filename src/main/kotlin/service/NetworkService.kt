@@ -54,6 +54,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         } else {
             client?.createGame(GAME_ID, sessionID, "Welcome!^_^")
         }
+        onAllRefreshables { refreshAfterPlayerJoined(name) }
         updateConnectionState(ConnectionState.WAITING_FOR_HOST_CONFIRMATION)
     }
 

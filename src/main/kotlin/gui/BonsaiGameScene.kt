@@ -29,7 +29,7 @@ import util.*
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
  * lets the user play the bonsai game
  */
-class BonsaiGameScene(private val rootService: RootService) :
+class BonsaiGameScene(private val rootService: RootService, private val bonsaiApplication: BonsaiApplication) :
     BoardGameScene(1920, 1080, ColorVisual(Color(PRIMARY_COLOUR))), Refreshable {
 
     private val treeTileMaps: MutableList<BidirectionalMap<Tile, HexagonView>> = mutableListOf()
@@ -420,20 +420,17 @@ class BonsaiGameScene(private val rootService: RootService) :
             posY = 100, // Adjusted to fit within the buttonPane
             width = 260,
             height = 35,
-            visual = ColorVisual(Color(0xffffff)).apply {
+            visual = ColorVisual(221, 136, 136).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
-            text = "SAVE GAME",
+            text = "Quit Game",
             font = Font(36)
         ).apply {
             // hide the button in network game
             // right now it is not visible at all because it does not work
-            if (rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true) {
-                isVisible = true
-                onMouseClicked = {
-                    rootService.historyService.saveGame()
-                    BonsaiApplication().showMainMenuScene()
-                }
+            onMouseClicked = {
+                //rootService.historyService.saveGame()
+                bonsaiApplication.showMainMenuScene()
             }
         }
 
@@ -565,7 +562,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
 
     private val claimButton = Button(
-        posX = 100,
+        posX = 75,
         posY = 450,
         width = 250,
         height = 60,
@@ -574,7 +571,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     )
 
     private val renounceButton = Button(
-        posX = 400,
+        posX = 375,
         posY = 450,
         width = 250,
         height = 60,
@@ -595,9 +592,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val goalTilePane =
         Pane<UIComponent>(
             posX = 610,
-            posY = 340,
+            posY = 240,
             width = 700,
-            height = 400,
+            height = 600,
             visual = ColorVisual(Color(0xbebebe)).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
@@ -846,7 +843,9 @@ class BonsaiGameScene(private val rootService: RootService) :
             }
         }
         // get the empty tiles
-        createEmptyHex(player)
+        if (player.isLocal){
+            createEmptyHex(player)
+        }
     }
 
     private fun initSupply(player: Player) {
@@ -1010,7 +1009,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             faceUpCards.addAll(oldCardViews)
             applyCardPosition()
             cardSumText.text = "${game.zenDeck.size}"
-            //println("${game.faceUpCards}")
         }
         // TODO(pane needs to be smaller when less than four)
     }
@@ -1315,12 +1313,15 @@ class BonsaiGameScene(private val rootService: RootService) :
         updatePlayableTiles(game.currentPlayer)
     }
 
-    override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {
+    override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int, tilePosition: Pair<Int, Int>) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-//        if (goalTileType == null) {
-//            println(leafSupplyDecks[0].components.size)
-//        }
+
+        if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
+            !game.currentPlayer.isLocal) {
+            drawTree(game.currentPlayer, tilePosition)
+        }
+
         // update tile capacity
         capacityLabel.text = "Capacity: ${game.currentPlayer.tileCapacity}"
 
@@ -1339,7 +1340,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             //addComponents(goalTilePane)
             goalTilePane.add(
                 Label(
-                    posX = 125,
+                    posX = 100,
                     posY = 250,
                     width = 500,
                     height = 50,
@@ -1759,6 +1760,34 @@ class BonsaiGameScene(private val rootService: RootService) :
                 )
             )
         }
+    }
+
+    /**
+     * this function is used only for online game non-local player
+     */
+    private fun drawTree(player: Player, tilePosition: Pair<Int, Int>) {
+        val playerIndex = getOrder(player)
+        val treeTileMap = treeTileMaps[playerIndex]
+        val treeHexagonGrid = treeHexagonGrids[playerIndex]
+        val q = tilePosition.first
+        val r = tilePosition.second
+        val playedTile = player.bonsaiTree[q to r]
+        checkNotNull(playedTile) {"the tile does not exist"}
+        playedTile.q = q
+        playedTile.r = r
+
+        val coloredHex = HexagonView(
+            visual = CompoundVisual(
+                getTileImageVisualForTileType(playedTile.tileType),
+                TextVisual(
+                    text = "${q}, ${r}",
+                    font = Font(10.0, Color(0x000000))
+                )
+            ),
+            size = 30
+        )
+        treeTileMap.add(playedTile to coloredHex)
+        treeHexagonGrid[q, r] = coloredHex
     }
 
     private fun showSupply(index: Int) {

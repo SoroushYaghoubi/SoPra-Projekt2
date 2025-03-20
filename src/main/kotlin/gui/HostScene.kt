@@ -2,6 +2,7 @@ package gui
 
 import entity.ColorType
 import entity.GoalTileType
+import entity.Player
 import entity.PlayerType
 import service.RootService
 import tools.aqua.bgw.components.layoutviews.Pane
@@ -241,81 +242,14 @@ class HostScene(
         }
     }
 
-    val playerInput = TextFieldStyle1(
-        posX = 190,
-        posY = 270,
-        prompt = DEFAULT_NAME
-    ).apply {
-        isDisabled = true
-    }
-
-    private val playerTurn = TurnLabel(
-        posX = 40,
-        posY = 270,
-    ).apply {
-        text = "1"
-        onMouseClicked = {
-            swapPlayerWithNext(0)
-        }
-        onMouseEntered = {
-            highlightPlayers(0)
-        }
-        onMouseExited = {
-            removeHighlight()
-        }
-    }
-
-    private val playerColour = ColourButton(
-        posX = 600,
-        posY = 280
-    )
-
-    private val playerRemove = SquareButton(
-        posX = 680,
-        posY = 270
-    ).apply {
-        // When the button is clicked, the first player is removed
-        onMouseClicked = {
-            removePlayer(0)
-        }
-    }
-
-    private val playerEasyBot = CheckBoxButton(
-        posX = 830,
-        posY = 270
-    ).apply {
-        onMouseClicked = {
-            if (!isChecked) {
-                if (playerHardBots[0].isChecked) {
-                    playerHardBots[0].change()
-                }
-            }
-            change()
-        }
-    }
-
-    private val playerHardBot = CheckBoxButton(
-        posX = 980,
-        posY = 270
-    ).apply {
-        onMouseClicked = {
-            if (!isChecked) {
-                if (playerEasyBots[0].isChecked) {
-                    playerEasyBots[0].change()
-                }
-            }
-            change()
-        }
-    }
-
     // Group all player inputs in lists to easily manage them
 
-    private val playerTurns: MutableList<Label> = mutableListOf(playerTurn)
-    private val playerInputs: MutableList<TextField> = mutableListOf(playerInput)
-    private val playerColours: MutableList<Button> = mutableListOf(playerColour)
-    private val playerRemoves: MutableList<Button> = mutableListOf(playerRemove)
-    private val playerEasyBots: MutableList<CheckBoxButton> = mutableListOf(playerEasyBot)
-    private val playerHardBots: MutableList<CheckBoxButton> = mutableListOf(playerHardBot)
+    private val playerTurns: MutableList<Label> = mutableListOf()
+    private val playerInputs: MutableList<TextField> = mutableListOf()
+    private val playerColours: MutableList<Button> = mutableListOf()
+    private val playerRemoves: MutableList<Button> = mutableListOf()
+    private val playerEasyBots: MutableList<CheckBoxButton> = mutableListOf()
+    private val playerHardBots: MutableList<CheckBoxButton> = mutableListOf()
 
 
     init {
@@ -325,24 +259,25 @@ class HostScene(
             playerOrderButton,
             startButton.apply {
                 onMouseClicked = {
-                    val guiPlayer = playerInputs.mapIndexed { index, _ ->
+                    val guiPlayer = playerInputs.mapIndexed { index, playerInput ->
+                        val playerNameInLobby = playerInput.text.trim()
                         val color = playerColors[index]
-                        val playerType = when {
-                            playerEasyBots[index].isChecked -> PlayerType.EASYBOT
-                            playerHardBots[index].isChecked -> PlayerType.HARDBOT
-                            else -> PlayerType.HUMAN
-                        }
                         val client = rootService.networkService.client
                         checkNotNull(client)
-                        val name : String = if (index == 0) {
-                            client.playerName
+                        val playerType : PlayerType
+                        if (playerNameInLobby == client.playerName) {
+                            playerType = when {
+                                playerEasyBots[0].isChecked -> PlayerType.EASYBOT
+                                playerHardBots[0].isChecked -> PlayerType.HARDBOT
+                                else -> PlayerType.HUMAN
+                            }
                         } else {
-                            client.otherPlayerNames[index - 1]
+                            playerType = PlayerType.HUMAN
                         }
-                        val isLocal = (index == 0)
+                        val isLocal = (playerNameInLobby == client.playerName)
 
 
-                        entity.Player(name, playerType, isLocal, color)
+                        entity.Player(playerNameInLobby, playerType, isLocal, color)
                     }.toMutableList()
 
                     rootService.networkService
@@ -354,12 +289,6 @@ class HostScene(
                     bonsaiApplication.showGameScene()
                 }
             },
-            playerTurn,
-            playerInput,
-            playerRemove,
-            playerColour,
-            playerEasyBot,
-            playerHardBot,
         )
         contentGoalTilePane.addAll(
             titleGoalTileLabel,
@@ -407,7 +336,10 @@ class HostScene(
             posX = 190,
             posY = 270 + 140 * currentIndex,
             prompt = playerName
-        )
+        ).apply {
+            text = playerName
+            isDisabled = true
+        }
 
         val newPlayerColour = ColourButton(
             posX = 600,
@@ -428,6 +360,7 @@ class HostScene(
             }
         }
 
+        /**
         val newPlayerRemove = SquareButton(
             posX = 680,
             posY = 270 + 140 * currentIndex,
@@ -436,54 +369,60 @@ class HostScene(
                 removePlayer(currentIndex)
             }
         }
+        */
 
-        val newPlayerEasyBot = CheckBoxButton(
-            posX = 830,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                if (!isChecked) {
-                    // If hardBot is checked, uncheck it
-                    if (playerHardBots[currentIndex].isChecked) {
-                        playerHardBots[currentIndex].change()
+        if (playerName == rootService.networkService.client?.playerName){
+            val newPlayerEasyBot = CheckBoxButton(
+                posX = 830,
+                posY = 270 + 140 * currentIndex,
+            ).apply {
+                onMouseClicked = {
+                    if (!isChecked) {
+                        // If hardBot is checked, uncheck it
+                        if (playerHardBots[currentIndex].isChecked) {
+                            playerHardBots[currentIndex].change()
+                        }
                     }
+                    change()
                 }
-                change()
             }
+
+            val newPlayerHardBot = CheckBoxButton(
+                posX = 980,
+                posY = 270 + 140 * currentIndex,
+            ).apply {
+                onMouseClicked = {
+                    if (!isChecked) {
+                        // If easyBot is checked, uncheck it
+                        if (playerEasyBots[currentIndex].isChecked) {
+                            playerEasyBots[currentIndex].change()
+                        }
+                    }
+                    change()
+                }
+            }
+            contentPlayerPane.addAll(
+                newPlayerEasyBot,
+                newPlayerHardBot,
+            )
+            playerEasyBots.add(newPlayerEasyBot)
+            playerHardBots.add(newPlayerHardBot)
         }
 
-        val newPlayerHardBot = CheckBoxButton(
-            posX = 980,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                if (!isChecked) {
-                    // If easyBot is checked, uncheck it
-                    if (playerEasyBots[currentIndex].isChecked) {
-                        playerEasyBots[currentIndex].change()
-                    }
-                }
-                change()
-            }
-        }
 
         // Add components to the pane
         contentPlayerPane.addAll(
             newPlayerInput,
             newPlayerTurn,
-            newPlayerRemove,
+            //newPlayerRemove,
             newPlayerColour,
-            newPlayerEasyBot,
-            newPlayerHardBot,
         )
 
         // Add to respective lists
         playerTurns.add(newPlayerTurn)
         playerInputs.add(newPlayerInput)
         playerColours.add(newPlayerColour)
-        playerRemoves.add(newPlayerRemove)
-        playerEasyBots.add(newPlayerEasyBot)
-        playerHardBots.add(newPlayerHardBot)
+        //playerRemoves.add(newPlayerRemove)
     }
 
     private fun highlightPlayers(index: Int) {

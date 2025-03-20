@@ -29,7 +29,7 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player has played a tile
      */
-    fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {}
+    fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int, tilePosition: Pair<Int, Int>) {}
 
     /**
      * perform refreshes that are necessary after a player has meditated
