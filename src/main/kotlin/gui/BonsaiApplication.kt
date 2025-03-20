@@ -67,7 +67,7 @@ class BonsaiApplication : BoardGameApplication("Bonsai", 1920, 1080), Refreshabl
      * Funktion [showHostScene] shows the hostScene
      */
     fun showHostScene() {
-        hostScene.playerInput.prompt = rootService.networkService.myName
+        //hostScene.playerInput.prompt = rootService.networkService.myName
         this.showMenuScene(hostScene)
     }
 

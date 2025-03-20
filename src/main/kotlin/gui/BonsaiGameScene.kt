@@ -846,7 +846,9 @@ class BonsaiGameScene(private val rootService: RootService) :
             }
         }
         // get the empty tiles
-        createEmptyHex(player)
+        if (player.isLocal){
+            createEmptyHex(player)
+        }
     }
 
     private fun initSupply(player: Player) {
@@ -1010,7 +1012,6 @@ class BonsaiGameScene(private val rootService: RootService) :
             faceUpCards.addAll(oldCardViews)
             applyCardPosition()
             cardSumText.text = "${game.zenDeck.size}"
-            //println("${game.faceUpCards}")
         }
         // TODO(pane needs to be smaller when less than four)
     }
@@ -1315,12 +1316,15 @@ class BonsaiGameScene(private val rootService: RootService) :
         updatePlayableTiles(game.currentPlayer)
     }
 
-    override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {
+    override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int, tilePosition: Pair<Int, Int>) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-//        if (goalTileType == null) {
-//            println(leafSupplyDecks[0].components.size)
-//        }
+
+        if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
+            !game.currentPlayer.isLocal) {
+            drawTree(game.currentPlayer, tilePosition)
+        }
+
         // update tile capacity
         capacityLabel.text = "Capacity: ${game.currentPlayer.tileCapacity}"
 
@@ -1759,6 +1763,34 @@ class BonsaiGameScene(private val rootService: RootService) :
                 )
             )
         }
+    }
+
+    /**
+     * this function is used only for online game non-local player
+     */
+    private fun drawTree(player: Player, tilePosition: Pair<Int, Int>) {
+        val playerIndex = getOrder(player)
+        val treeTileMap = treeTileMaps[playerIndex]
+        val treeHexagonGrid = treeHexagonGrids[playerIndex]
+        val q = tilePosition.first
+        val r = tilePosition.second
+        val playedTile = player.bonsaiTree[q to r]
+        checkNotNull(playedTile) {"the tile does not exist"}
+        playedTile.q = q
+        playedTile.r = r
+
+        val coloredHex = HexagonView(
+            visual = CompoundVisual(
+                getTileImageVisualForTileType(playedTile.tileType),
+                TextVisual(
+                    text = "${q}, ${r}",
+                    font = Font(10.0, Color(0x000000))
+                )
+            ),
+            size = 30
+        )
+        treeTileMap.add(playedTile to coloredHex)
+        treeHexagonGrid[q, r] = coloredHex
     }
 
     private fun showSupply(index: Int) {

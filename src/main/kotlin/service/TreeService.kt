@@ -67,12 +67,12 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             ) {
                 // call claimOrRenounceGoal() in the gui layer
                 reached = true
-                onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier) }
+                onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier, tilePosition) }
             }
         }
         if (!reached) {
             // do other stuff in gui
-            onAllRefreshables { refreshAfterPlayTile(null, 0) }
+            onAllRefreshables { refreshAfterPlayTile(null, 0, tilePosition) }
         }
     }
 
