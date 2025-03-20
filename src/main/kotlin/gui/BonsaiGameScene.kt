@@ -24,7 +24,6 @@ import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.*
 import util.*
 
-
 /**
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
  * lets the user play the bonsai game
@@ -1338,6 +1337,9 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
 
+        // update tree
+        drawTreeFRFR()
+
         val currentPlayerType = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.playerType
         checkNotNull(currentPlayerType)
         if (currentPlayerType != PlayerType.HUMAN){
@@ -2191,6 +2193,16 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     }
                 }
                 parchCards.add(cardView)
+            }
+        }
+    }
+
+    private fun drawTreeFRFR(){
+        val players = checkNotNull(rootService.currentGame?.currentBonsaiGameState?.players)
+        for (player in players) {
+            val tree = player.bonsaiTree
+            for (tilePosition in (tree traverseFrom ROOT)) {
+                drawTree(player, tilePosition)
             }
         }
     }

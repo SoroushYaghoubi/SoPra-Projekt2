@@ -38,7 +38,7 @@ class MainMenuScene(
 
     private val continueButton = ButtonStyle1(350,615, "CONTINUE GAME").apply {
         onMouseClicked = {
-            rootService.historyService.saveGame()
+            rootService.historyService.continueGame()
             bonsaiApplication.hideMenuScene()
         }
     }

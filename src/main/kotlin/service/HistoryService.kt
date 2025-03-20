@@ -126,7 +126,12 @@ class HistoryService(private val rootService: RootService) : AbstractRefreshingS
         check(savedGameState.exists()) { "There is no saved gameState" }
 
         val jsonString = savedGameState.readText()
-        val game = Json.decodeFromString<BonsaiGame>(jsonString)
+
+        val json = Json {
+            allowStructuredMapKeys = true
+        }
+
+        val game = json.decodeFromString<BonsaiGame>(jsonString)
         rootService.currentGame = game
         onAllRefreshables { refreshAfterGameStart() }
     }
