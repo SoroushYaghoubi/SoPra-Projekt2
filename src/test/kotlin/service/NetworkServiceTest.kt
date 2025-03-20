@@ -239,7 +239,7 @@ class NetworkServiceTest {
             renouncedGoals = listOf(),
             discardedTiles = listOf()
         )
-        networkService.receiveMeditateMessage(message, "Tom")
+        networkService.receiveMeditateMessage(message)
         assertEquals(ConnectionState.PLAYING_MY_TURN, networkService.connectionState)
     }
     /**
@@ -263,7 +263,7 @@ class NetworkServiceTest {
             claimedGoals = listOf(),
             renouncedGoals = listOf()
         )
-        networkService.receiveCultivateMessage(message, "Tom")
+        networkService.receiveCultivateMessage(message)
         assertEquals(ConnectionState.WAITING_FOR_OPPONENT, networkService.connectionState)
     }
     /**
