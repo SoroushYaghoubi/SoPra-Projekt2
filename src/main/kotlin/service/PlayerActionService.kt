@@ -136,7 +136,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         when (drawnCard.tileTypes.size) {
             1 -> {
-                if (actPlayer.isLocal) {
+                if (actPlayer.isLocal && actPlayer.playerType == PlayerType.HUMAN) {
                     onAllRefreshables { refreshAfterDrawingMasterCardAny() }
                 } else {
                     onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
@@ -195,7 +195,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val actPlayer = gameState.currentPlayer
         //gameState.currentPlayer.playableTilesCopy.clear()
         //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
-        if (!gameState.currentPlayer.isLocal) {
+        if (!gameState.currentPlayer.isLocal ||
+            (gameState.currentPlayer.playerType == PlayerType.EASYBOT)||
+            (gameState.currentPlayer.playerType == PlayerType.HARDBOT)
+            ) {
             onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
         } else {
             onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }

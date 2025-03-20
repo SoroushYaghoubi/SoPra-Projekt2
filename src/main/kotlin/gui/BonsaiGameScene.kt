@@ -1127,6 +1127,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         // update collected cards
         updateCollectedCards(game.currentPlayer)
+
+        if (game.currentPlayer.playerType != PlayerType.HUMAN){
+            rootService.botService.makeRandomMove()
+        }
     }
 
     override fun refreshAfterApplyCardEffects(position: Int?) {
@@ -1463,6 +1467,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         // update collected cards
         updateCollectedCards(game.currentPlayer)
+
+        if (game.currentPlayer.playerType != PlayerType.HUMAN){
+            rootService.botService.makeRandomMove()
+        }
     }
 
 
