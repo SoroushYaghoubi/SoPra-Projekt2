@@ -252,7 +252,7 @@ class BotService(val rootService: RootService) {
         if (playableTiles.isEmpty() || hasTiles.isEmpty()) return returnList
 
         for (emptyPosition in tree.getEmptyTiles()) {
-            val neighbors = arrayOf(0, 0, 0, 0, 0)
+            val neighbors = intArrayOf(0, 0, 0, 0, 0)
             for (tilePosition in circleAround(emptyPosition)) {
                 val currentTile = tree[tilePosition]
                 if (currentTile != null) {
