@@ -316,21 +316,7 @@ class HostScene(
         val currentIndex = playerInputs.size
         if (currentIndex >= 4) return
 
-        val newPlayerTurn = TurnLabel(
-            posX = 40,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            text = "${currentIndex + 1}"
-            onMouseClicked = {
-                swapPlayerWithNext(currentIndex)
-            }
-            onMouseEntered = {
-                highlightPlayers(currentIndex)
-            }
-            onMouseExited = {
-                removeHighlight()
-            }
-        }
+        val newPlayerTurn = getTurnLabel(currentIndex)
 
         val newPlayerInput = TextFieldStyle1(
             posX = 190,
@@ -341,24 +327,7 @@ class HostScene(
             isDisabled = true
         }
 
-        val newPlayerColour = ColourButton(
-            posX = 600,
-            posY = 280 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                val currentColor = playerColors[currentIndex]
-                val newColor = nextColor(currentColor)
-                playerColors[currentIndex] = newColor
-
-                this.visual = ColorVisual(Color(colorMapping[newColor] ?: COLOUR_BLACK)).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                }
-            }
-
-            visual = ColorVisual(Color(colorMapping[playerColors[currentIndex]] ?: COLOUR_BLACK)).apply {
-                style.borderRadius = BorderRadius(20.0)
-            }
-        }
+        val newPlayerColour = getColourButton(currentIndex)
 
         /**
         val newPlayerRemove = SquareButton(
@@ -377,11 +346,9 @@ class HostScene(
                 posY = 270 + 140 * currentIndex,
             ).apply {
                 onMouseClicked = {
-                    if (!isChecked) {
+                    if (!isChecked && playerHardBots[currentIndex].isChecked) {
                         // If hardBot is checked, uncheck it
-                        if (playerHardBots[currentIndex].isChecked) {
                             playerHardBots[currentIndex].change()
-                        }
                     }
                     change()
                 }
@@ -392,11 +359,9 @@ class HostScene(
                 posY = 270 + 140 * currentIndex,
             ).apply {
                 onMouseClicked = {
-                    if (!isChecked) {
-                        // If easyBot is checked, uncheck it
-                        if (playerEasyBots[currentIndex].isChecked) {
+                    // If easyBot is checked, uncheck it
+                    if (!isChecked && playerEasyBots[currentIndex].isChecked) {
                             playerEasyBots[currentIndex].change()
-                        }
                     }
                     change()
                 }
@@ -423,6 +388,45 @@ class HostScene(
         playerInputs.add(newPlayerInput)
         playerColours.add(newPlayerColour)
         //playerRemoves.add(newPlayerRemove)
+    }
+
+    private fun getTurnLabel(currentIndex: Int): TurnLabel {
+        return TurnLabel(
+            posX = 40,
+            posY = 270 + 140 * currentIndex,
+        ).apply {
+            text = "${currentIndex + 1}"
+            onMouseClicked = {
+                swapPlayerWithNext(currentIndex)
+            }
+            onMouseEntered = {
+                highlightPlayers(currentIndex)
+            }
+            onMouseExited = {
+                removeHighlight()
+            }
+        }
+    }
+
+    private fun getColourButton(currentIndex: Int): ColourButton {
+        return ColourButton(
+            posX = 600,
+            posY = 280 + 140 * currentIndex,
+        ).apply {
+            onMouseClicked = {
+                val currentColor = playerColors[currentIndex]
+                val newColor = nextColor(currentColor)
+                playerColors[currentIndex] = newColor
+
+                this.visual = ColorVisual(Color(colorMapping[newColor] ?: COLOUR_BLACK)).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                }
+            }
+
+            visual = ColorVisual(Color(colorMapping[playerColors[currentIndex]] ?: COLOUR_BLACK)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        }
     }
 
     private fun highlightPlayers(index: Int) {

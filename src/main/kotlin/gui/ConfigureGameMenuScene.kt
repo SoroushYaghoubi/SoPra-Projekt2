@@ -445,87 +445,14 @@ class ConfigureGameMenuScene(
         val currentIndex = playerInputs.size
         if (currentIndex >= 4) return
 
-        val newPlayerTurn = TurnLabel(
-            posX = 40,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            text = "${currentIndex + 1}"
-            onMouseClicked = {
-                swapPlayerWithNext(currentIndex)
-            }
-            onMouseEntered = {
-                highlightPlayers(currentIndex)
-            }
-            onMouseExited = {
-                removeHighlight()
-            }
-        }
+        val newPlayerTurn = createTurnLabel(currentIndex)
+        val newPlayerInput = createTextField(currentIndex)
+        val newPlayerColour = createColourButton(currentIndex)
+        val newPlayerRemove = createRemoveButton(currentIndex)
+        val newPlayerEasyBot = createEasyBotButton(currentIndex)
+        val newPlayerHardBot = createHardBotButton(currentIndex)
 
-        val newPlayerInput = TextFieldStyle1(
-            posX = 190,
-            posY = 270 + 140 * currentIndex,
-            prompt = "INPUT NAME"
-        )
-
-        val newPlayerColour = ColourButton(
-            posX = 600,
-            posY = 280 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                val currentColor = playerColors[currentIndex]
-                val newColor = nextColor(currentColor)
-                playerColors[currentIndex] = newColor
-
-                this.visual = ColorVisual(Color(colorMapping[newColor] ?: COLOUR_BLACK)).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                }
-            }
-
-            visual = ColorVisual(Color(colorMapping[playerColors[currentIndex]] ?: COLOUR_BLACK)).apply {
-                style.borderRadius = BorderRadius(20.0)
-            }
-        }
-
-        val newPlayerRemove = SquareButton(
-            posX = 680,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                removePlayer(currentIndex)
-            }
-        }
-
-        val newPlayerEasyBot = CheckBoxButton(
-            posX = 830,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                if (!isChecked) {
-                    // If hardBot is checked, uncheck it
-                    if (playerHardBots[currentIndex].isChecked) {
-                        playerHardBots[currentIndex].change()
-                    }
-                }
-                change()
-            }
-        }
-
-        val newPlayerHardBot = CheckBoxButton(
-            posX = 980,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                if (!isChecked) {
-                    // If easyBot is checked, uncheck it
-                    if (playerEasyBots[currentIndex].isChecked) {
-                        playerEasyBots[currentIndex].change()
-                    }
-                }
-                change()
-            }
-        }
-
-        // Add components to the pane
+        // pane components
         contentPlayerPane.addAll(
             newPlayerInput,
             newPlayerTurn,
@@ -535,7 +462,7 @@ class ConfigureGameMenuScene(
             newPlayerHardBot,
         )
 
-        // Add to respective lists
+        // add player info to respective list
         playerTurns.add(newPlayerTurn)
         playerInputs.add(newPlayerInput)
         playerColours.add(newPlayerColour)
@@ -550,6 +477,76 @@ class ConfigureGameMenuScene(
 
         addPlayerButton.posY += 140
     }
+
+// helper functions for addPlayer
+
+    private fun createTurnLabel(index: Int) = TurnLabel(
+        posX = 40,
+        posY = 270 + 140 * index,
+    ).apply {
+        text = "${index + 1}"
+        onMouseClicked = { swapPlayerWithNext(index) }
+        onMouseEntered = { highlightPlayers(index) }
+        onMouseExited = { removeHighlight() }
+    }
+
+    private fun createTextField(index: Int) = TextFieldStyle1(
+        posX = 190,
+        posY = 270 + 140 * index,
+        prompt = "INPUT NAME"
+    )
+
+    private fun createColourButton(index: Int) = ColourButton(
+        posX = 600,
+        posY = 280 + 140 * index,
+    ).apply {
+        onMouseClicked = {
+            val currentColor = playerColors[index]
+            val newColor = nextColor(currentColor)
+            playerColors[index] = newColor
+
+            this.visual = ColorVisual(Color(colorMapping[newColor] ?: COLOUR_BLACK)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+        }
+
+        visual = ColorVisual(Color(colorMapping[playerColors[index]] ?: COLOUR_BLACK)).apply {
+            style.borderRadius = BorderRadius(20.0)
+        }
+    }
+
+    private fun createRemoveButton(index: Int) = SquareButton(
+        posX = 680,
+        posY = 270 + 140 * index,
+    ).apply {
+        onMouseClicked = { removePlayer(index) }
+    }
+
+    private fun createEasyBotButton(index: Int) = CheckBoxButton(
+        posX = 830,
+        posY = 270 + 140 * index,
+    ).apply {
+        onMouseClicked = {
+            if (!isChecked && playerHardBots[index].isChecked) {
+                playerHardBots[index].change()
+            }
+            change()
+        }
+    }
+
+    private fun createHardBotButton(index: Int) = CheckBoxButton(
+        posX = 980,
+        posY = 270 + 140 * index,
+    ).apply {
+        onMouseClicked = {
+            if (!isChecked && playerEasyBots[index].isChecked) {
+                playerEasyBots[index].change()
+            }
+            change()
+        }
+    }
+
+
 
     private fun highlightPlayers(index: Int) {
         val nextIndex = if (index == playerInputs.size - 1) 0 else index + 1
@@ -783,8 +780,6 @@ class ConfigureGameMenuScene(
         // for player 4
         val nextIndex = if (index == playerInputs.size - 1) 0 else index + 1
 
-        println("Tausche Spieler ${index + 1} mit Spieler ${nextIndex + 1}")
-
         // Swap the players in all lists
         swapInList(playerInputs, index, nextIndex)
         swapInList(playerColors, index, nextIndex)
@@ -797,9 +792,35 @@ class ConfigureGameMenuScene(
         // update the positions and click handlers
         updatePlayerPositions()
         updatePlayerClickHandlers()
-
+        updateBotHandlers()
         // highlight the newly swapped players
         highlightPlayers(index)
+    }
+
+    /**
+     * updates the bot state
+     */
+
+    private fun updateBotHandlers() {
+        for (i in playerEasyBots.indices) {
+            playerEasyBots[i].onMouseClicked = {
+                if (!playerEasyBots[i].isChecked) {
+                    if (playerHardBots[i].isChecked) {
+                        playerHardBots[i].change()
+                    }
+                }
+                playerEasyBots[i].change()
+            }
+
+            playerHardBots[i].onMouseClicked = {
+                if (!playerHardBots[i].isChecked) {
+                    if (playerEasyBots[i].isChecked) {
+                        playerEasyBots[i].change()
+                    }
+                }
+                playerHardBots[i].change()
+            }
+        }
     }
 
     /**

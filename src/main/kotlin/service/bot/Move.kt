@@ -4,6 +4,10 @@ import entity.BonsaiGameState
 import entity.GoalTile
 import entity.TileType
 
+/**
+ * describes the different actions a bot can do
+ */
+
 class Move(
     // current state of the game at the start of the move
     val currentState : BonsaiGameState,
