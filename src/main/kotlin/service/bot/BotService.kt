@@ -208,15 +208,15 @@ class BotService(val rootService: RootService) {
     }
 
 
-    // gives back the card position
-    private fun chooseCard(): Int {
-        val gameState = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(gameState)
-
-        val openCards = gameState.faceUpCards.size
-
-        return (0 until openCards).random()
-    }
+//    // gives back the card position
+//    private fun chooseCard(): Int {
+//        val gameState = rootService.currentGame?.currentBonsaiGameState
+//        checkNotNull(gameState)
+//
+//        val openCards = gameState.faceUpCards.size
+//
+//        return (0 until openCards).random()
+//    }
 
     private fun randomWoodOrLeafTile(): TileType {
         return when ((0..1).random()) {
@@ -357,87 +357,87 @@ class BotService(val rootService: RootService) {
     }
 
 
-    /**
-     * function that generates a list of all possible Moves
-     */
-    private fun getAllPossibleMoves(state: BonsaiGameState): MutableList<Move> {
-        val returnList = mutableListOf<Move>()
-        val hasTiles = mutableListOf<TileType>()
-
-        // gets the tiles that a player has
-        for (tiles in state.currentPlayer.personalSupply) {
-            hasTiles.add(tiles.tileType)
-        }
-
-        // generates all cultivate moves
-        for (listOfPlacedTiles in allPossiblePlayedTiles(
-            tree = state.currentPlayer.bonsaiTree,
-            alreadyPlayedTiles = mutableListOf(),
-            playableTiles = state.currentPlayer.playableTiles,
-            hasTiles = hasTiles,
-            returnList = mutableListOf()
-        )) {
-            returnList += Move(
-                currentState = state,
-                removedTiles = mutableListOf(),
-                actionType = CULTIVATE,
-                takenCard = null,
-                chosenWoodOrLeafTile = null,
-                allTilesReceived = mutableListOf(),
-                playedTiles = listOfPlacedTiles,
-                chosenRemoveTiles = mutableListOf(),
-            )
-        }
-
-        // generates all meditate moves
-        // generates the
-
-
-        for (position in 0 until state.faceUpCards.size) {
-            val newMove = Move(
-                currentState = state,
-                removedTiles = mutableListOf(),
-                actionType = MEDITATE,
-                takenCard = position,
-                chosenWoodOrLeafTile = null,
-                allTilesReceived = mutableListOf(),
-                playedTiles = mutableListOf(),
-                chosenRemoveTiles = mutableListOf()
-            )
-
-
-
-            when (state.faceUpCards[position].cardType) {
-                CardType.HELPERCARD -> TODO()
-                CardType.MASTERCARD -> {
-                    val card = state.faceUpCards[position] as MasterCard
-                    if (card.tileTypes.contains(TileType.ANY)) {
-                        val newMove3 = newMove
-                        val newMove4 = newMove
-                        val newMove5 = newMove
-                        val newMove6 = newMove
-
-                        newMove3.allTilesReceived.add(TileType.WOOD)
-                        newMove4.allTilesReceived.add(TileType.LEAF)
-                        newMove5.allTilesReceived.add(TileType.FLOWER)
-                        newMove6.allTilesReceived.add(TileType.FRUIT)
-
-                    } else {
-                        for (tile in card.tileTypes) {
-                            newMove.allTilesReceived.add(tile)
-                        }
-                    }
-                }
-
-                else -> TODO()
-            }
-
-
-
-            return returnList
-        }
-
-        return returnList
-    }
+//    /**
+//     * function that generates a list of all possible Moves
+//     */
+//    private fun getAllPossibleMoves(state: BonsaiGameState): MutableList<Move> {
+//        val returnList = mutableListOf<Move>()
+//        val hasTiles = mutableListOf<TileType>()
+//
+//        // gets the tiles that a player has
+//        for (tiles in state.currentPlayer.personalSupply) {
+//            hasTiles.add(tiles.tileType)
+//        }
+//
+//        // generates all cultivate moves
+//        for (listOfPlacedTiles in allPossiblePlayedTiles(
+//            tree = state.currentPlayer.bonsaiTree,
+//            alreadyPlayedTiles = mutableListOf(),
+//            playableTiles = state.currentPlayer.playableTiles,
+//            hasTiles = hasTiles,
+//            returnList = mutableListOf()
+//        )) {
+//            returnList += Move(
+//                currentState = state,
+//                removedTiles = mutableListOf(),
+//                actionType = CULTIVATE,
+//                takenCard = null,
+//                chosenWoodOrLeafTile = null,
+//                allTilesReceived = mutableListOf(),
+//                playedTiles = listOfPlacedTiles,
+//                chosenRemoveTiles = mutableListOf(),
+//            )
+//        }
+//
+//        // generates all meditate moves
+//        // generates the
+//
+//
+//        for (position in 0 until state.faceUpCards.size) {
+//            val newMove = Move(
+//                currentState = state,
+//                removedTiles = mutableListOf(),
+//                actionType = MEDITATE,
+//                takenCard = position,
+//                chosenWoodOrLeafTile = null,
+//                allTilesReceived = mutableListOf(),
+//                playedTiles = mutableListOf(),
+//                chosenRemoveTiles = mutableListOf()
+//            )
+//
+//
+//
+//            when (state.faceUpCards[position].cardType) {
+//                CardType.HELPERCARD -> TODO()
+//                CardType.MASTERCARD -> {
+//                    val card = state.faceUpCards[position] as MasterCard
+//                    if (card.tileTypes.contains(TileType.ANY)) {
+//                        val newMove3 = newMove
+//                        val newMove4 = newMove
+//                        val newMove5 = newMove
+//                        val newMove6 = newMove
+//
+//                        newMove3.allTilesReceived.add(TileType.WOOD)
+//                        newMove4.allTilesReceived.add(TileType.LEAF)
+//                        newMove5.allTilesReceived.add(TileType.FLOWER)
+//                        newMove6.allTilesReceived.add(TileType.FRUIT)
+//
+//                    } else {
+//                        for (tile in card.tileTypes) {
+//                            newMove.allTilesReceived.add(tile)
+//                        }
+//                    }
+//                }
+//
+//                else -> TODO()
+//            }
+//
+//
+//
+//            return returnList
+//        }
+//
+//        return returnList
+//    }
 }
 

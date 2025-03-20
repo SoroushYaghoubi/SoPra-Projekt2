@@ -310,14 +310,8 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
             val removedTile = removedTiles.removeFirst()
             var removed = false
             while(!removed) {
-                var i = personalSupplies.size
-                while(i >= 0) {
-                    val supply = personalSupplies.removeLast()
-                    if (supply.tileType == removedTile) {
-                        rootService.playerActionService.discardSupplyTile(supply)
-                        i = -1
-                    }
-                }
+                val i = personalSupplies.size
+                specialDiscard(i, personalSupplies, removedTile)
                 removed = true
             }
         }
@@ -329,6 +323,17 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         hasMeditated = false
         game.currentPlayer.hasPlayed = true
         rootService.playerActionService.endTurn()
+    }
+
+    private fun specialDiscard(i: Int, personalSupplies: MutableList<Tile>, removedTile: TileType){
+        var j = i
+        while(j >= 0) {
+            val supply = personalSupplies.removeLast()
+            if (supply.tileType == removedTile) {
+                rootService.playerActionService.discardSupplyTile(supply)
+                j = -1
+            }
+        }
     }
 
     /**
