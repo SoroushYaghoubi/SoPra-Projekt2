@@ -122,8 +122,7 @@ class BotService(val rootService: RootService) {
                     rootService.treeService.playTile(Tile(null, null, tile.first), tile.second)
                     currentGameState.goalTiles.forEach {
                         if (rootService.playerActionService.canClaimOrRenounceGoal(
-                                it.goalTileType,
-                                it.tier
+                                it.goalTileType, it.tier
                             ) && !currentGameState.currentPlayer.renouncedGoals.contains(it)
                         ) {
                             rootService.playerActionService.claimOrRenounceGoal(
@@ -270,7 +269,9 @@ class BotService(val rootService: RootService) {
                     }
                 }
             }
-            if (neighbors[0] >= 1 && (playableTiles.contains(TileType.WOOD) || playableTiles.contains(TileType.ANY)) && hasTiles.contains(
+
+            var isRelevantType = (playableTiles.contains(TileType.WOOD) || playableTiles.contains(TileType.ANY))
+            if (neighbors[0] >= 1 && isRelevantType && hasTiles.contains(
                     TileType.WOOD
                 )
             ) {
@@ -290,7 +291,8 @@ class BotService(val rootService: RootService) {
                 )
             }
 
-            if (neighbors[0] >= 1 && (playableTiles.contains(TileType.LEAF) || playableTiles.contains(TileType.ANY)) && hasTiles.contains(
+            isRelevantType = (playableTiles.contains(TileType.LEAF) || playableTiles.contains(TileType.ANY))
+            if (neighbors[0] >= 1 && isRelevantType && hasTiles.contains(
                     TileType.LEAF
                 )
             ) {
@@ -310,7 +312,8 @@ class BotService(val rootService: RootService) {
                 )
             }
 
-            if (neighbors[1] >= 1 && (playableTiles.contains(TileType.FLOWER) || playableTiles.contains(TileType.ANY)) && hasTiles.contains(
+            isRelevantType = (playableTiles.contains(TileType.FLOWER) || playableTiles.contains(TileType.ANY))
+            if (neighbors[1] >= 1 && isRelevantType && hasTiles.contains(
                     TileType.FLOWER
                 )
             ) {
@@ -330,9 +333,9 @@ class BotService(val rootService: RootService) {
                 )
             }
 
-            if (neighbors[1] >= 2 && neighbors[4] == 0 && (playableTiles.contains(TileType.FRUIT) || playableTiles.contains(
-                    TileType.ANY
-                )) && hasTiles.contains(TileType.FRUIT)
+            isRelevantType = (playableTiles.contains(TileType.FRUIT) || playableTiles.contains(TileType.ANY))
+
+            if (neighbors[1] >= 2 && neighbors[4] == 0 && isRelevantType && hasTiles.contains(TileType.FRUIT)
             ) {
                 val newTreeWood4 = tree
                 newTreeWood4[emptyPosition] = Tile(emptyPosition.first, emptyPosition.second, TileType.FRUIT)
