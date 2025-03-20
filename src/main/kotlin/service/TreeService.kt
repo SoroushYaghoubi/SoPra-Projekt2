@@ -127,7 +127,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 }
 
                 gameState.currentState = States.CHOOSE_ACTION
-                currentPlayer.hasPlayed = true
+                //currentPlayer.hasPlayed = true
                 // Refresh GUI to reflect the updated tree
                 onAllRefreshables { refreshAfterRemoveFromTree(tilePosition) }
 
