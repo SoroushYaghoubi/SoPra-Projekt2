@@ -5,6 +5,7 @@ import entity.*
 //import java.util.*
 //import kotlin.concurrent.schedule
 import kotlin.math.max
+import util.SIDE_VECTORS
 
 
 // todo: `msgToBeSent` should even be handled in the `refreshAfter` methods.
@@ -136,7 +137,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         when (drawnCard.tileTypes.size) {
             1 -> {
-                if (actPlayer.isLocal && actPlayer.playerType == PlayerType.HUMAN) {
+                if (actPlayer.isLocal) {
                     onAllRefreshables { refreshAfterDrawingMasterCardAny() }
                 } else {
                     onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
@@ -192,13 +193,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
-        val actPlayer = gameState.currentPlayer
-        //gameState.currentPlayer.playableTilesCopy.clear()
-        //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
-        if (!gameState.currentPlayer.isLocal ||
-            (gameState.currentPlayer.playerType == PlayerType.EASYBOT)||
-            (gameState.currentPlayer.playerType == PlayerType.HARDBOT)
-            ) {
+        if (!gameState.currentPlayer.isLocal) {
             onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
         } else {
             onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
@@ -362,7 +357,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val gameState = checkNotNull(game.currentBonsaiGameState) { "No active game state." }
 
         val player = getCurrentPlayer()
-        val net = rootService.networkService
 
         require(canClaimOrRenounceGoal(goalTileType, tier))
 
@@ -377,15 +371,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 } else false
             }
             // update message
-            if (net.connectionState != ConnectionState.DISCONNECTED &&
-                player.isLocal
-            ) {
-                if (net.hasCultivated) {
-                    net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
-                } else if (net.hasMeditated) {
-                    net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
-                }
-            }
+            writeGoalInMessage(goalTileType, tier, true)
         } else {
             gameState.goalTiles.forEach { tile ->
                 if (tile.goalTileType == goalTileType && tile.tier == tier) {
@@ -393,63 +379,32 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 }
             }
             // update message
-            if (net.connectionState != ConnectionState.DISCONNECTED &&
-                player.isLocal
-            ) {
-                if (net.hasCultivated) {
-                    net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
-
-                } else if (net.hasMeditated) {
-                    net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
-                }
-            }
+            writeGoalInMessage(goalTileType, tier, false)
         }
 
         onAllRefreshables { refreshAfterClaimGoal() }
+    }
 
-        /**
-        // checks if a player has already claimed a goal tile from a specific tile type
-        for (goalTile in gameState.goalTiles.flatten()) {
-        if (player.claimedGoals.any { it.goalTileType == goalTile.goalTileType }) {
-        continue
-        }
-        // checks if player has renounced the current goal tile
-        if (goalTile in player.renouncedGoals) {
-        continue
-        }
+    private fun writeGoalInMessage(goalTileType: GoalTileType, tier: Int, claim: Boolean) {
+        val net = rootService.networkService
 
-        // checks if one of the goal tile requirements is reached
-        if (canClaimOrRenounceGoal(goalTile.goalTileType, goalTile.tier)) {
-        // if the goal tile requirement is reached, get goal tile based on the claim
-        if (claim) {
-        player.claimedGoals.add(goalTile)
-        // update message
         if (net.connectionState != ConnectionState.DISCONNECTED &&
-        player.isLocal
+            getCurrentPlayer().isLocal && claim
         ) {
-        net.toBeSentCultivateMessage.claimedGoals.add((goalTile.goalTileType to goalTile.tier))
-        }
-        // remove the claimed goal tile from the list
-        for (goalTileList in gameState.goalTiles) {
-        if (goalTileList.contains(goalTile)) {
-        goalTileList.remove(goalTile)
-        break
-        }
-        }
-        } else {
-        player.renouncedGoals.add(goalTile)
-        // update message
-        if (net.connectionState != ConnectionState.DISCONNECTED &&
-        player.isLocal
-        ) {
-        net.toBeSentCultivateMessage.renouncedGoals.add((goalTile.goalTileType to goalTile.tier))
-        }
-        break
-        }
-        }
-        }
-         */
+            if (net.hasCultivated) {
+                net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
+            } else if (net.hasMeditated) {
+                net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
+            }
+        } else if (net.connectionState != ConnectionState.DISCONNECTED &&
+            getCurrentPlayer().isLocal && !claim) {
+            if (net.hasCultivated) {
+                net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
 
+            } else if (net.hasMeditated) {
+                net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
+            }
+        }
     }
 
 
@@ -513,43 +468,15 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      */
     private fun hasReachedGreenGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
         // Directions for hexagonal grid adjacency
-        val directions = listOf(
-            Pair(1, 0), Pair(0, 1), Pair(-1, 1),
-            Pair(-1, 0), Pair(0, -1), Pair(1, -1)
-        )
 
         // Set to keep track of visited tiles so that there are no redundant calculations
         val visited = mutableSetOf<Pair<Int, Int>>()
-
-        // Function to perform depth-first search and count the size of a cluster
-        fun dfs(tilePos: Pair<Int, Int>): Int {
-            //stack to keep track of all the tiles
-            val stack = mutableListOf(tilePos)
-            var count = 0
-
-            while (stack.isNotEmpty()) {
-                val (q, r) = stack.removeLast()
-                // Skip already visited tiles
-                if (!visited.add(Pair(q, r))) continue
-
-                count++
-                // find adjacent tiles
-                for ((dq, dr) in directions) {
-                    val neighbor = Pair(q + dq, r + dr)
-                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType ==
-                        TileType.LEAF && neighbor !in visited) {
-                        stack.add(neighbor)
-                    }
-                }
-            }
-            return count
-        }
 
         // Find the size of the largest cluster of LEAF tiles
         var maxLeafCluster = 0
         for ((pos, tile) in bonsaiTree) {
             if (tile.tileType == TileType.LEAF && pos !in visited) {
-                maxLeafCluster = maxOf(maxLeafCluster, dfs(pos))
+                maxLeafCluster = maxOf(maxLeafCluster, dfs(pos, visited, bonsaiTree))
             }
         }
 
@@ -560,6 +487,32 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             2 -> maxLeafCluster >= 9
             else -> false
         }
+    }
+
+    // Function to perform depth-first search and count the size of a cluster
+    private fun dfs(tilePos: Pair<Int, Int>,
+                    visited: MutableSet<Pair<Int, Int>>,
+                    bonsaiTree: MutableMap<Pair<Int, Int>, Tile>): Int {
+        //stack to keep track of all the tiles
+        val stack = mutableListOf(tilePos)
+        var count = 0
+
+        while (stack.isNotEmpty()) {
+            val (q, r) = stack.removeLast()
+            // Skip already visited tiles
+            if (!visited.add(Pair(q, r))) continue
+
+            count++
+            // find adjacent tiles
+            for ((dq, dr) in SIDE_VECTORS) {
+                val neighbor = Pair(q + dq, r + dr)
+                if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType ==
+                    TileType.LEAF && neighbor !in visited) {
+                    stack.add(neighbor)
+                }
+            }
+        }
+        return count
     }
 
     /**

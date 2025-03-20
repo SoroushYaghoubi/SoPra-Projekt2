@@ -106,7 +106,7 @@ class BonsaiNetworkClient(
         }
     }
 
-
+/**
     override fun onGameActionResponse(response: GameActionResponse) {
         BoardGameApplication.run {
             check(networkService.connectionState == ConnectionState.PLAYING_MY_TURN ||
@@ -119,6 +119,7 @@ class BonsaiNetworkClient(
             }
         }
     }
+    */
 
     /**
      * handle a [CultivateMessage] sent by the server

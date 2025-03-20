@@ -182,11 +182,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             val hasWoodNeighbor = neighbourTiles.any { it.second?.tileType == TileType.WOOD }
 
             if (hasNullNeighbor && hasWoodNeighbor) {
-                if (neighbourTiles.all {
-                        it.second == null ||
-                                it.second?.tileType == TileType.WOOD ||
-                                it.second?.tileType == TileType.LEAF
-                    }) {
+                if (neighbourTiles.all { checkNullWoodLeaf(it) }) {
                     removableFlowers.add(position)
                 }
             }
@@ -200,13 +196,10 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             val neighbourTiles = getNeighbourTiles(position)
             if (neighbourTiles.any { it.second == null }) {
                 if (neighbourTiles.all {
-                        it.second == null ||
-                                it.second?.tileType == TileType.WOOD ||
-                                it.second?.tileType == TileType.LEAF ||
-                                (it.second?.tileType == TileType.FLOWER &&
-                                        getNeighbourTiles(it.first)
-                                            .filter { neighbor -> neighbor.first != position }
-                                            .any { neighbor -> neighbor.second?.tileType == TileType.LEAF })
+                        checkNullWoodLeaf(it) || (it.second?.tileType == TileType.FLOWER &&
+                                getNeighbourTiles(it.first)
+                                    .filter { neighbor -> neighbor.first != position }
+                                    .any { neighbor -> neighbor.second?.tileType == TileType.LEAF })
                     }) {
                     removableLeafs1.add(position)
                 } else {
@@ -222,6 +215,12 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                     return removableLeafs2.contains(tilePosition)
         }
 
+    }
+
+    private fun checkNullWoodLeaf(neighbourTile: Pair<Pair<Int, Int>, Tile?>): Boolean{
+        return  neighbourTile.second == null ||
+                neighbourTile.second?.tileType == TileType.WOOD ||
+                neighbourTile.second?.tileType == TileType.LEAF
     }
 
     /**

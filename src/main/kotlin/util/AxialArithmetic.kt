@@ -17,7 +17,7 @@ private val VECTOR_LEFT = -1 to 0
 private val VECTOR_TOP_LEFT = 0 to -1
 
 // set of possible direction vector
-private val SIDE_VECTORS = listOf(
+val SIDE_VECTORS = listOf(
     VECTOR_TOP_RIGHT,
     VECTOR_RIGHT,
     VECTOR_BOTTOM_RIGHT,
@@ -160,21 +160,4 @@ private infix fun Pair<Int, Int>.rotateCounterClockwiseAround(center: Pair<Int, 
         VECTOR_BOTTOM_LEFT -> this + VECTOR_RIGHT
         else -> throw IllegalArgumentException("Invalid radius. Implement non-adjacent ones yourself >:)")
     }
-*/
-
-
-/**
-/**
- * Override axial coordinates to act like they know vector arithmetic
- */
-private operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> {
-    return Pair(this.first - other.first, this.second - other.second)
-}
-
-/**
- * Override axial coordinates to act like they know vector arithmetic
- */
-private operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
-    return Pair(this.first + other.first, this.second + other.second)
-}
 */
