@@ -127,7 +127,7 @@ class BonsaiNetworkClient(
     @GameActionReceiver
     fun onCultivateMessage(message: CultivateMessage, sender: String) {
         BoardGameApplication.run {
-            networkService.receiveCultivateMessage(message, sender)
+            networkService.receiveCultivateMessage(message)
         }
     }
 
@@ -138,7 +138,7 @@ class BonsaiNetworkClient(
     @GameActionReceiver
     fun onMeditateMessage(message: MeditateMessage, sender: String) {
         BoardGameApplication.run {
-            networkService.receiveMeditateMessage(message, sender)
+            networkService.receiveMeditateMessage(message)
         }
     }
 

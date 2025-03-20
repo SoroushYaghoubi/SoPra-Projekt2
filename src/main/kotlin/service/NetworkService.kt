@@ -257,7 +257,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * @param message The Meditate message received from the opponent.
      * @param sender The name of the sender (opponent).
      */
-    fun receiveMeditateMessage(message: MeditateMessage, sender: String) {
+    fun receiveMeditateMessage(message: MeditateMessage) {
         // --------------- prologue: state check ---------------
         check(connectionState == ConnectionState.WAITING_FOR_OPPONENT)
             { "currently not expecting an opponent's turn." }
@@ -316,7 +316,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * @param message The Cultivate message received from the opponent.
      * @param sender The name of the sender (opponent).
      */
-    fun receiveCultivateMessage(message: CultivateMessage, sender: String) {
+    fun receiveCultivateMessage(message: CultivateMessage) {
         check(connectionState == ConnectionState.WAITING_FOR_OPPONENT)
         { "currently not expecting an opponent's turn." }
 
