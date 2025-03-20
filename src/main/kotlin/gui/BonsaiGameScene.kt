@@ -423,7 +423,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             visual = ColorVisual(221, 136, 136).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
-            text = "Quit Game",
+            text = "Save & Quit",
             font = Font(36)
         ).apply {
             onMouseClicked = {
