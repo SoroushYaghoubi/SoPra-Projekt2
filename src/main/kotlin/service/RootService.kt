@@ -2,6 +2,7 @@ package service
 
 import entity.*
 import gui.Refreshable
+import service.bot.BotService
 
 /**
  * Main class of the service layer for the Bonsai game. Provides access
@@ -15,6 +16,7 @@ class RootService {
     val networkService = NetworkService(this)
     val historyService = HistoryService(this)
     val treeService = TreeService(this)
+    val botService = BotService(this)
 
     /** current active Game, that could be Null if the game hasn't started yet*/
     var currentGame: BonsaiGame? = null

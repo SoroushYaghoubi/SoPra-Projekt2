@@ -45,7 +45,9 @@ class ResultScene(
         posY = 900,
         text = "QUIT",
     ).apply {
-        bonsaiApplication.exit()
+        onMouseClicked = {
+            bonsaiApplication.exit()
+        }
     }
 
     // Button to back to menu scene

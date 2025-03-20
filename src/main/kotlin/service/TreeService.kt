@@ -1,9 +1,6 @@
 package service
 
-import entity.Player
-import entity.States
-import entity.Tile
-import entity.TileType
+import entity.*
 import util.POT
 
 
@@ -63,6 +60,7 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         game.goalTiles.forEach {
             if (rootService.playerActionService.canClaimOrRenounceGoal(it.goalTileType, it.tier) &&
                 currentPlayer.isLocal &&
+                currentPlayer.playerType == PlayerType.HUMAN &&
                 !currentPlayer.renouncedGoals.contains(it)
             ) {
                 // call claimOrRenounceGoal() in the gui layer
