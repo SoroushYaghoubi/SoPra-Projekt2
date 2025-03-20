@@ -1679,6 +1679,13 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         if (currentPlayerType != PlayerType.HUMAN){
             rootService.botService.makeRandomMove()
         }
+
+
+        if (!game.currentPlayer.isLocal) {
+            faceUpCards.forEach {
+                it.onMouseClicked = null
+            }
+        }
     }
 
 
