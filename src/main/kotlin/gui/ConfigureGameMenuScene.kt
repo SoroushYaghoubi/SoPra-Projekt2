@@ -18,6 +18,8 @@ import util.SECONDARY_COLOUR
 import util.TERTIARY_COLOUR
 import util.*
 
+const val MAX_NAME_LENGTH = 5
+
 /**
  * The [ConfigureGameMenuScene] is a [MenuScene] to configure the starting parameters
  * of a game of bonsai in hot seat mode
@@ -386,7 +388,7 @@ class ConfigureGameMenuScene(
                             else -> PlayerType.HUMAN
                         }
                         println(playerInput.text.trim())
-                        val name =
+                        var name =
                             if (playerInput.text.trim() == "") {
                                 when (index) {
                                     3 -> "Alice"
@@ -398,6 +400,7 @@ class ConfigureGameMenuScene(
                                 playerInput.text.trim()
 
                             }
+                        if (name.length > MAX_NAME_LENGTH) name = "${name.first().uppercaseChar()}."
                         entity.Player(name, playerType, true, color)
                     }.toMutableList()
 
