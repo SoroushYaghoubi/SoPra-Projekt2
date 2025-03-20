@@ -148,7 +148,7 @@ class RefreshableTest(val rootService: RootService) : Refreshable {
         refreshAfterRemoveFromTreeCalled = false
     }
 
-    override fun refreshAfterClaimGoal() {
+    override fun refreshAfterClaimGoal(goalTileType: GoalTileType, tier: Int) {
         refreshAfterClaimGoalCalled = false
     }
 

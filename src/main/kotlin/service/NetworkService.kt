@@ -301,6 +301,18 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                     .claimOrRenounceGoal(false, it.first.toGoalTileType(), it.second) }
         }
 
+        /*
+        while (removedTiles.isNotEmpty()) {
+            val removedTile = removedTiles.removeFirst()
+            var removed = false
+            while(!removed) {
+                val i = personalSupplies.size
+                specialDiscard(i, personalSupplies, removedTile)
+                removed = true
+            }
+        }
+        */
+
         // --------------- epilogue: state update ---------------
         val currentIndex = game.players.indexOf(game.currentPlayer)
         val nextIndex = (currentIndex + 1) % game.players.size
@@ -309,6 +321,18 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         game.currentPlayer.hasPlayed = true
         rootService.playerActionService.endTurn()
     }
+
+    // This is not used so...
+//    private fun specialDiscard(i: Int, personalSupplies: MutableList<Tile>, removedTile: TileType){
+//        var j = i
+//        while(j >= 0) {
+//            val supply = personalSupplies.removeLast()
+//            if (supply.tileType == removedTile) {
+//                rootService.playerActionService.discardSupplyTile(supply)
+//                j = -1
+//            }
+//        }
+//    }
 
     /**
      * Receives and processes the Cultivate action message from another player.

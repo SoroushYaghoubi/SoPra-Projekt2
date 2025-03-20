@@ -114,9 +114,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 //gameState.currentPlayer.hasPlayed = true
                 return
             }
-
             is ParchmentCard -> {}
-
         }
         onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
     }
@@ -305,7 +303,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             } else if (net.hasMeditated &&
                 net.connectionState == ConnectionState.PLAYING_MY_TURN) {
                 net.sendMeditateMessage()
-                net.hasCultivated = false
+                net.hasMeditated = false
             }
         }
 
@@ -382,7 +380,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             writeGoalInMessage(goalTileType, tier, false)
         }
 
-        onAllRefreshables { refreshAfterClaimGoal() }
+        if(!getCurrentPlayer().isLocal && claim) onAllRefreshables {
+            refreshAfterClaimGoal(goalTileType, tier) }
     }
 
     private fun writeGoalInMessage(goalTileType: GoalTileType, tier: Int, claim: Boolean) {

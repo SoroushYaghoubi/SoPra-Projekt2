@@ -9,12 +9,12 @@ import entity.Tile
 // -----------------------------------------
 // -----------------------------------------
 // hex-movement vectors
-private val VECTOR_TOP_RIGHT = 1 to -1
-private val VECTOR_RIGHT = 1 to 0
-private val VECTOR_BOTTOM_RIGHT = 0 to 1
-private val VECTOR_BOTTOM_LEFT = -1 to 1
-private val VECTOR_LEFT = -1 to 0
-private val VECTOR_TOP_LEFT = 0 to -1
+val VECTOR_TOP_RIGHT = 1 to -1
+val VECTOR_RIGHT = 1 to 0
+val VECTOR_BOTTOM_RIGHT = 0 to 1
+val VECTOR_BOTTOM_LEFT = -1 to 1
+val VECTOR_LEFT = -1 to 0
+val VECTOR_TOP_LEFT = 0 to -1
 
 // set of possible direction vector
 val SIDE_VECTORS = listOf(
@@ -73,7 +73,7 @@ fun MutableMap<Pair<Int, Int>, Tile>.getEmptyTiles(): Set<Pair<Int, Int>> {
  *
  * @return tile position as a lazy sequence
  */
-private infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>) :
+infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<Int, Int>) :
         Sequence<Pair<Int, Int>> = sequence {
     // args check
     checkNotNull(this@traverseFrom[bfsRoot]) { "Cannot start from non-existing tile." }

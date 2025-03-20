@@ -16,7 +16,7 @@ class RemoveFromTreeTest {
     @Test
     fun `Remove only the chosen Tile test`() {
         val rootService = RootService()
-
+        rootService.networkService.updateConnectionState(ConnectionState.CONNECTED)
         //SETUP for game
         val players = mutableListOf(
             Player("Alice", PlayerType.HUMAN, true, ColorType.RED),

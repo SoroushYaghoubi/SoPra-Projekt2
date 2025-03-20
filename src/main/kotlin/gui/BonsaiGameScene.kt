@@ -24,7 +24,6 @@ import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.*
 import util.*
 
-
 /**
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
  * lets the user play the bonsai game
@@ -241,7 +240,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             posY = 20,
             width = 400,
             height = 220,
-            visual = ColorVisual(255,255,255,0.5).apply {
+            visual = ColorVisual(255, 255, 255, 0.5).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
         ).apply {
@@ -256,64 +255,34 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
 
     private val parchCards = LinearLayout<CardView>(
-        posX = 100,
+        posX = 0,
         posY = 5,
-        width = 300,
-        height = 220,
+        width = 400,
+        height = 100,
         spacing = 0
     )
 
-    private fun updateParchCards (player: Player) {
-        parchCards.clear()
-
-        val currentPlayer = rootService.currentGame?.currentBonsaiGameState?.currentPlayer
-        val columns = 4
-
-        player.collectedCards.forEachIndexed { index, card ->
-
-            val row = index / columns
-            val col = index % columns
-            if(card.cardType == CardType.PARCHMENTCARD) {
-                val cardView = CardView(
-                    posX = (col * 75).toDouble(),
-                    posY = (row * 100).toDouble(),
-                    height = 100,
-                    width = 75,
-                    front = ImageVisual("ZenCards/${card.id}.png"),
-                    back = zenCardsBack,
-                ).apply {
-                    showBack()
-                    onMouseClicked = {
-                        if (player.isLocal && player == currentPlayer) {
-                            showFront()
-                        }
-                    }
-                }
-                parchCards.add(cardView)
-            }
+    /*
+        private val helperAmount = Label(
+            posX = 0,
+            posY = 60,
+            width = 100,
+            height = 40,
+            text = "0",
+            alignment = Alignment.TOP_CENTER,
+            font = Font(20, Color.BLACK)
+        ).apply {
+            isWrapText = true
         }
-    }
-
-    private val helperAmount = Label(
-        posX = 0,
-        posY = 60,
-        width = 100,
-        height = 40,
-        text = "0",
-        alignment = Alignment.TOP_CENTER,
-        font = Font(20, Color.BLACK)
-    ).apply {
-        isWrapText = true
-    }
-
+    */
     private val helperLabel = Label(
         posX = 0,
-        posY = 10,
-        width = 100,
+        posY = 165,
+        width = 200,
         height = 50,
-        text = "Helper Cards:",
+        text = "Helper Cards: 0",
         alignment = Alignment.CENTER,
-        font = Font(20, Color.BLACK)
+        font = Font(25, Color.BLACK)
     ).apply {
         isWrapText = true
     }
@@ -321,57 +290,41 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     private val masterLabel = Label(
         posX = 0,
         posY = 110,
-        width = 100,
+        width = 200,
         height = 50,
-        text = "Master Cards:",
+        text = "Master Cards: 0",
         alignment = Alignment.CENTER,
-        font = Font(20, Color.BLACK)
+        font = Font(25, Color.BLACK)
     ).apply {
         isWrapText = true
     }
 
-    private val masterAmount = Label(
-        posX = 0,
-        posY = 160,
-        width = 100,
-        height = 40,
-        text = "0",
-        alignment = Alignment.TOP_CENTER,
-        font = Font(20, Color.BLACK)
-    ).apply {
-        isVisible = true
-        isWrapText = true
-    }
-
-    private fun updateCollectedMasterHelper(player: Player) {
-        masterAmount.text = ""
-        helperAmount.text = ""
-
-        val collectedCards = player.collectedCards.groupingBy { it.cardType }.eachCount()
-        val helperCardsAmount = collectedCards[CardType.HELPERCARD] ?: 0
-        val masterCardsAmount = collectedCards[CardType.MASTERCARD] ?: 0
-
-        if(helperCardsAmount > 0){
-            helperAmount.text = "$helperCardsAmount"
-
+    /*
+        private val masterAmount = Label(
+            posX = 0,
+            posY = 160,
+            width = 100,
+            height = 40,
+            text = "0",
+            alignment = Alignment.TOP_CENTER,
+            font = Font(20, Color.BLACK)
+        ).apply {
+            isVisible = true
+            isWrapText = true
         }
-        if (masterCardsAmount > 0) {
-            masterAmount.text = "$masterCardsAmount"
-        }
-    }
-
+    */
     private val collectedCardPane = Pane<ComponentView>(
         posX = 1154,
         posY = 20,
         width = 403,
         height = 220,
-        visual = ColorVisual(255,255,255,0.5).apply {
+        visual = ColorVisual(255, 255, 255, 0.5).apply {
             style.borderRadius = BorderRadius(20.0)
         }
     ).apply {
         this.add(parchCards)
-        this.add(masterAmount)
-        this.add(helperAmount)
+        //this.add(masterAmount)
+        //this.add(helperAmount)
         this.add(helperLabel)
         this.add(masterLabel)
     }
@@ -423,7 +376,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
     }
     */
-   // private val collectedPane = CameraPane(
+    // private val collectedPane = CameraPane(
     // private val collectedPane = CameraPane(
     //    posX = 1154,
     //    posY = 20,
@@ -454,7 +407,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             posY = 260,
             width = 1020,
             height = 100,
-            visual = ColorVisual(255,255,255,0.5).apply {
+            visual = ColorVisual(255, 255, 255, 0.5).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
         ).apply {
@@ -551,7 +504,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         posY = 20,
         width = 300,
         height = 1040,
-        visual = ColorVisual(255,255,255,0.5).apply {
+        visual = ColorVisual(255, 255, 255, 0.5).apply {
             style.borderRadius = BorderRadius(20.0)
         }
     ).apply {
@@ -559,104 +512,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         this.add(redoButton)
         this.add(saveButton)
     }
-/*
-    private fun createRightSidePane() {
-        val gameState = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(gameState) { "Game state is not initialized." }
 
-        // sorted goal tiles in order: brown, green, orange, pink, blue
-        val sortedGoalTiles = gameState.goalTiles.sortedBy {
-            when (it.goalTileType) {
-                GoalTileType.BROWN -> 0
-                GoalTileType.GREEN -> 1
-                GoalTileType.ORANGE -> 2
-                GoalTileType.PINK -> 3
-                GoalTileType.BLUE -> 4
-            }
-        }
-        goalTileList = sortedGoalTiles.toMutableList()
-
-
-        // player buttons below the save button
-        val playerButtonsY = saveButton.posY + saveButton.height + 20
-        val playerButtonHeight = 35
-        val playerButtonSpacing = 20
-
-        // number of necessary player buttons
-        val numberOfPlayerButtons = gameState.players.size
-
-        // created player buttons
-        for (i in 0 until numberOfPlayerButtons) {
-            // current player needs no buttons
-            val player = gameState.players[i]
-            val playerButton = Button(
-                posX = saveButton.posX,
-                posY = playerButtonsY + (playerButtonHeight + playerButtonSpacing) * i,
-                width = saveButton.width,
-                height = playerButtonHeight,
-                visual = ColorVisual(Color(0xffffff)).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
-                text = player.name,
-                font = Font(30)
-            ).apply {
-                playerButtons.add(this)
-                onMouseClicked = {
-                    val game = rootService.currentGame?.currentBonsaiGameState
-                    checkNotNull(game)
-                    playerPanes.forEachIndexed { index, playerPane ->
-                        val currentPlayerIndex = getOrder(game.currentPlayer)
-                        if (index == i) {
-                            playerPane.isVisible = true
-                            if (index == currentPlayerIndex) {
-                                showSupply(index)
-                            }
-                        } else {
-                            playerPane.isVisible = false
-                            hideSupply(index)
-                        }
-                    }
-                    // show player's playable tiles
-                    updatePlayableTiles(player)
-
-                    //update player's collected cards
-                    updateParchCards(player)
-                    updateCollectedMasterHelper(player)
-                }
-            }
-            buttonPane.add(playerButton)
-        }
-
-        val buttonHeight = 45
-        val buttonSpacing = 30
-        var currentY = 370
-
-        // need 6 goal tiles for 2 players and 9 for 3
-        val numberOfButtons = if (gameState.players.size == 2) 6 else 9
-
-        // create goal tile buttons in correct order
-        for (i in 0 until numberOfButtons) {
-            val goalTile = sortedGoalTiles[i % sortedGoalTiles.size]
-            val goalButton = Button(
-                posX = 20,
-                posY = currentY,
-                width = 260,
-                height = buttonHeight,
-                visual = ColorVisual(Color(getColorForGoalTile(goalTile.goalTileType))).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
-                text = "Tier: ${goalTile.tier} Score: ${goalTile.score}",
-                font = Font(30)
-            )
-            goalButtons.add(goalButton)
-            buttonPane.add(goalButton)
-            currentY += buttonHeight + buttonSpacing
-        }
-
-        // add panel to the scene
-        addComponents(buttonPane)
-    }
-    */
     // Overlay the game scene to prompt the player to choose tile
     private val overlayPane = Pane<ComponentView>(
         posX = 0, posY = 0,
@@ -674,40 +530,45 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
 
     private val claimButton = Button(
-        posX = 75,
-        posY = 450,
-        width = 250,
-        height = 60,
+        posX = 510,
+        posY = 560,
+        width = 150,
+        height = 80,
+        visual = ColorVisual(Color(0x92A079)).apply {
+            style.borderRadius = BorderRadius(20.0)
+        },
         text = "Claim",
-        font = Font(20)
+        font = Font(30)
     )
 
     private val renounceButton = Button(
-        posX = 375,
-        posY = 450,
-        width = 250,
-        height = 60,
+        posX = 190,
+        posY = 560,
+        width = 150,
+        height = 80,
+        visual = ColorVisual(Color(0x92A079)).apply {
+            style.borderRadius = BorderRadius(20.0)
+        },
         text = "Renounce",
-        font = Font(20)
+        font = Font(30)
     )
 
     private val goalTileText = Label(
-        posX = 175,
-        posY = 100,
-        width = 400,
-        height = 50,
-        text = "You can claim a goal tile",
+        text = "You can claim this goal 🎉",
+        posX = 180,
+        posY = 30,
+        height = 60, width = 500,
         font = Font(30)
     )
 
     // pane for claim or renounce goal tile
     private val goalTilePane =
-        Pane<UIComponent>(
-            posX = 610,
+        Pane<ComponentView>(
+            posX = 630,
             posY = 240,
-            width = 700,
-            height = 600,
-            visual = ColorVisual(Color(0xbebebe)).apply {
+            width = 850,
+            height = 700,
+            visual = ColorVisual(Color(0xC4C8AC)).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
         ).apply {
@@ -721,33 +582,33 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
 
     private val titleText = Label(
-        text = " Choose a tile to claim",
-        posX = 150,
-        posY = 50,
+        text = "Choose a tile to claim",
+        posX = 180,
+        posY = 40,
         height = 60, width = 500,
-        font = Font(30)
+        font = Font(40)
     )
     private val leafTile = HexagonView(
-        posY = 180,
-        posX = 60,
+        posY = 200,
+        posX = 120,
         size = 60,
         visual = leafTileImageVisual
     )
     private val woodTile = HexagonView(
-        posY = 180,
-        posX = 220,
+        posY = 200,
+        posX = 280,
         size = 60,
         visual = woodTileImageVisual
     )
     private val fruitTile = HexagonView(
-        posY = 180,
-        posX = 380,
+        posY = 200,
+        posX = 440,
         size = 60,
         visual = fruitTileImageVisual
     )
     private val flowerTile = HexagonView(
-        posY = 180,
-        posX = 540,
+        posY = 200,
+        posX = 600,
         size = 60,
         visual = flowerTileImageVisual
     )
@@ -755,10 +616,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     // pane for claim or renounce goal tile
     private val choseAnyTilePane =
         Pane<ComponentView>(
-            posX = 610,
-            posY = 400,
-            width = 700,
-            height = 400,
+            posX = 535,
+            posY = 240,
+            width = 850,
+            height = 500,
             visual = ColorVisual(Color(0xC4C8AC)).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
@@ -802,11 +663,11 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         // Hide the last player's pane and supply tiles
         playerPanes[lastPlayerIndex].isVisible = false
-        hideSupply(lastPlayerIndex)
+//        hideSupply(lastPlayerIndex)
 
         // Show the current player's pane and supply tiles
         playerPanes[currentPlayerIndex].isVisible = true
-        showSupply(currentPlayerIndex)
+//        showSupply(currentPlayerIndex)
 
         newZenBoardForRedoOrUndo()
 
@@ -827,7 +688,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         interactionText.text = "Undo/Redo performed. Current player: ${gameState.currentPlayer.name}"
 
         // Update tile capacity label
-        capacityLabel.text = "Capacity: ${gameState.currentPlayer.tileCapacity}"
+        //TODO()
+        //capacityLabel.text = "Capacity: ${gameState.currentPlayer.tileCapacity}"
 
         // Update remove button visibility
         removeButton.isVisible = !rootService.treeService.canPlayWood()
@@ -1010,7 +872,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 TileType.FLOWER -> flowerSupplyDeck.add(supplyHex)
                 else -> fruitSupplyDeck.add(supplyHex)
             }
-            hideSupply(getOrder(player))
+//            hideSupply(getOrder(player))
         }
         updateSupplyAmount(player)
     }
@@ -1139,6 +1001,12 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             faceUpCards.addAll(oldCardViews)
             applyCardPosition()
             cardSumText.text = "${game.zenDeck.size}"
+        } else {
+            val oldCardViews = faceUpCards.components.toMutableList()
+            faceUpCards.clear()
+            faceUpCards.addAll(oldCardViews)
+            applyCardPosition()
+            cardSumText.text = "${game.zenDeck.size}"
         }
         // TODO(pane needs to be smaller when less than four)
     }
@@ -1237,6 +1105,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
 
         // add panel to the scene
+
+        removeComponents(buttonPane)
         addComponents(buttonPane)
     }
 
@@ -1254,6 +1124,16 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         // created player buttons
         for (i in 0 until numberOfPlayerButtons) {
+            var visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+            var font = Font(30)
+            if (gameState.players[i].isLocal) {
+                visual = ColorVisual(Color(0x000000)).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                }
+                font = Font(30, Color.WHITE)
+            }
             // current player needs no buttons
             val player = gameState.players[i]
             val playerButton = Button(
@@ -1261,26 +1141,17 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 posY = playerButtonsY + (playerButtonHeight + playerButtonSpacing) * i,
                 width = saveButton.width,
                 height = playerButtonHeight,
-                visual = ColorVisual(Color(0xffffff)).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
+                visual = visual,
                 text = player.name,
-                font = Font(30)
+                font = font
             ).apply {
                 playerButtons.add(this)
                 onMouseClicked = {
-                    val game = rootService.currentGame?.currentBonsaiGameState
-                    checkNotNull(game)
                     playerPanes.forEachIndexed { index, playerPane ->
-                        val currentPlayerIndex = getOrder(game.currentPlayer)
                         if (index == i) {
                             playerPane.isVisible = true
-                            if (index == currentPlayerIndex) {
-                                showSupply(index)
-                            }
-                        } else {
-                            playerPane.isVisible = false
-                            hideSupply(index)
+                            } else {
+                                playerPane.isVisible = false
                         }
                     }
                     // show player's playable tiles
@@ -1289,6 +1160,12 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     //update player's collected cards
                     updateParchCards(player)
                     updateCollectedMasterHelper(player)
+
+                    //update player's name
+                    nameText.text = gameState.players[i].name
+
+                    // update player's capacity
+                    updateCapacity(player)
                 }
             }
             buttonPane.add(playerButton)
@@ -1333,7 +1210,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     }
 
     private fun checkCanPlayWood() {
-        if (rootService.treeService.canPlayWood()) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        if (rootService.treeService.canPlayWood() &&
+            game.currentPlayer.isLocal) {
             removeButton.isVisible = false
             interactionText.text = "You can now Cultivate or Meditate"
         }
@@ -1370,13 +1250,15 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         nameText.text = "Player: " + game.players[0].name
         updateSupply(game.players[0])
         updatePlayableTiles(game.currentPlayer)
-        showSupply(0)
+//        showSupply(0)
         if (!rootService.treeService.canPlayWood()) {
             removeButton.isVisible = true
             interactionText.text = "You need to remove tiles on your tree 🌴"
         } else {
             removeButton.isVisible = false
-            interactionText.text = "You can now Cultivate or Meditate"
+            if (game.currentPlayer.isLocal) {
+                interactionText.text = "You can now Cultivate or Meditate"
+            }
         }
 
         // update playable tiles
@@ -1386,9 +1268,13 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
 
+        // update tree for real this time bro
+        drawTreeFRFR()
+        updateAllSuspiciously()
+
         val currentPlayerType = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.playerType
         checkNotNull(currentPlayerType)
-        if (currentPlayerType != PlayerType.HUMAN){
+        if (currentPlayerType != PlayerType.HUMAN) {
             rootService.botService.makeRandomMove()
         }
     }
@@ -1397,21 +1283,20 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         val actPlayer = game.currentPlayer
-        //TODO(timer?)
-        //Timer().schedule(1000) {
-            if (actPlayer.personalSupply.size > actPlayer.tileCapacity &&
-                game.currentPlayer.isLocal) {
-                game.currentState = States.DISCARDING
-                refreshAfterReceivedTile(true)
-                return //@schedule
-            } else {
-                actPlayer.hasPlayed = true
-                if (game.currentState != States.USING_HELPER) {
-                    updateSupply(game.currentPlayer)
-                    updatePlayableTiles(game.currentPlayer)
-                    updateParchCards(game.currentPlayer)
-                    updateCollectedMasterHelper(game.currentPlayer)
-                }
+        if (actPlayer.personalSupply.size > actPlayer.tileCapacity &&
+            game.currentPlayer.isLocal
+        ) {
+            game.currentState = States.DISCARDING
+            refreshAfterReceivedTile(true)
+            return
+        } else {
+            actPlayer.hasPlayed = true
+            if (game.currentState != States.USING_HELPER) {
+                updateSupply(game.currentPlayer)
+                updatePlayableTiles(game.currentPlayer)
+                updateParchCards(game.currentPlayer)
+                updateCollectedMasterHelper(game.currentPlayer)
+            }
 
             // update tile capacity
             capacityLabel.text = "Capacity: ${game.currentPlayer.tileCapacity}"
@@ -1431,7 +1316,6 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 updateZenBoard()
             }
         }
-        //}
     }
 
     override fun refreshAfterReceivedTile(discard: Boolean) {
@@ -1524,9 +1408,11 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             height = 50,
             posX = 850,
             posY = 25,
-            text = "finished",
-            font = Font(size = 18),
-            visual = ColorVisual(Color(0xAAAAAA))
+            text = "Finished",
+            visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
+            font = Font(30)
         ).apply {
             onMouseClicked = {
                 this.isVisible = false
@@ -1623,61 +1509,43 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             !game.currentPlayer.isLocal
         ) {
             drawTree(game.currentPlayer, tilePosition)
+        }else {
+            // update playable tiles
+            updatePlayableTiles(game.currentPlayer)
         }
 
         // update tile capacity
         capacityLabel.text = "Capacity: ${game.currentPlayer.tileCapacity}"
 
-        // update playable tiles
-        updatePlayableTiles(game.currentPlayer)
 
         if (goalTileType != null) {
-
-            var goalTileScore = 0
-
-            for (goalTile in goalTileList) {
-                if (goalTile.goalTileType == goalTileType && goalTile.tier == tier) {
-                    goalTileScore = goalTile.score
-                }
-            }
-            //addComponents(goalTilePane)
-            goalTilePane.add(
-                Label(
-                    posX = 100,
-                    posY = 250,
-                    width = 500,
-                    height = 50,
-                    visual = ColorVisual(Color(getColorForGoalTile(goalTileType))).apply {
-                        style.borderRadius = BorderRadius(20.0)
-                    },
-                    text = "Goal Tile: $goalTileType Tier: $tier Score: $goalTileScore",
-                    font = Font(30)
-                )
-
-            )
-            goalTilePane.isVisible = true
-            goalTilePane.isDisabled = false
-            claimButton.onMouseClicked = {
-                rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
-                goalTilePane.isDisabled = true
-                goalTilePane.isVisible = false
-
-                goalTileList.forEach {
-                    if (goalTileType == it.goalTileType && tier == it.tier) {
-                        goalButtons[goalTileList.indexOf(it)].text =
-                            game.currentPlayer.name + ", Score:  $goalTileScore"
-                    }
-                }
-            }
-            renounceButton.onMouseClicked = {
-                rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
-                goalTilePane.isDisabled = true
-                goalTilePane.isVisible = false
-            }
+            updateGoals(goalTileType, tier)
         }
 
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
+    }
+
+    /**
+     * it's only for non-local player
+     */
+    override fun refreshAfterClaimGoal(goalTileType: GoalTileType, tier: Int) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        var goalTileScore = 0
+
+        for (goalTile in goalTileList) {
+            if (goalTile.goalTileType == goalTileType && goalTile.tier == tier) {
+                goalTileScore = goalTile.score
+            }
+        }
+
+        goalTileList.forEach {
+            if (goalTileType == it.goalTileType && tier == it.tier) {
+                goalButtons[goalTileList.indexOf(it)].text =
+                    game.currentPlayer.name + ", Score:  $goalTileScore"
+            }
+        }
     }
 
     override fun refreshAfterDiscardTile() {
@@ -1713,10 +1581,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         nameText.text = game.currentPlayer.name
         updateSupply(game.currentPlayer)
         updatePlayableTiles(game.currentPlayer)
-        showSupply(currentPlayerIndex)
         playerPanes[currentPlayerIndex].isVisible = true
 
-        hideSupply(lastPlayerIndex)
         playerPanes[lastPlayerIndex].isVisible = false
 
 
@@ -1725,10 +1591,14 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         if (!rootService.treeService.canPlayWood()) {
             removeButton.isVisible = true
-            interactionText.text = "You can Cultivate/ Meditate/ Remove"
+            if (game.currentPlayer.isLocal) {
+                interactionText.text = "You can Cultivate/ Meditate/ Remove"
+            }
         } else {
             removeButton.isVisible = false
-            interactionText.text = "You can Cultivate/ Meditate"
+            if (game.currentPlayer.isLocal){
+                interactionText.text = "You can Cultivate/ Meditate"
+            }
         }
 
         // update tile capacity
@@ -1745,6 +1615,21 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         checkNotNull(currentPlayerType)
         if (currentPlayerType != PlayerType.HUMAN){
             rootService.botService.makeRandomMove()
+        }
+
+
+        if (!game.currentPlayer.isLocal) {
+            faceUpCards.forEach {
+                it.onMouseClicked = null
+            }
+            cultivateButton.isVisible = false
+            endTurnButton.isVisible = false
+            interactionText.text = "It's ${game.currentPlayer.name}'s turn"
+            updateSupply(game.players[lastPlayerIndex])
+        } else {
+            cultivateButton.isVisible = true
+            endTurnButton.isVisible = true
+            applyCardPosition()
         }
     }
 
@@ -1872,7 +1757,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         overlayPane.add(
             HexagonView(
-                posX = 1260, posY = 270,
+                posX = 1200, posY = 270,
                 size = 40,
                 visual = leafTileImageVisual
             )
@@ -1890,7 +1775,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 })
         overlayPane.add(
             HexagonView(
-                posX = 1380, posY = 270,
+                posX = 1300, posY = 270,
                 size = 40,
                 visual = woodTileImageVisual
             ).apply {
@@ -2069,7 +1954,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             visual = CompoundVisual(
                 getTileImageVisualForTileType(playedTile.tileType),
                 TextVisual(
-                    text = "$q, $r",
+                    text = "",
                     font = Font(10.0, Color(0x000000))
                 )
             ),
@@ -2079,6 +1964,52 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         treeHexagonGrid[q, r] = coloredHex
     }
 
+    private fun updateGoals(goalTileType: GoalTileType, tier: Int) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        var goalTileScore = 0
+
+        for (goalTile in goalTileList) {
+            if (goalTile.goalTileType == goalTileType && goalTile.tier == tier) {
+                goalTileScore = goalTile.score
+            }
+        }
+
+        //addComponents(goalTilePane)
+        goalTilePane.add(
+            Label(
+                posX = 75,
+                posY = 130,
+                width = 700,
+                height = 400,
+                visual = ImageVisual("GoalTiles/${goalTileType}_${tier}.png"),
+            )
+
+        )
+        if (game.currentPlayer.isLocal) {
+            goalTilePane.isVisible = true
+            goalTilePane.isDisabled = false
+        }
+        claimButton.onMouseClicked = {
+            rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
+            goalTilePane.isDisabled = true
+            goalTilePane.isVisible = false
+
+            goalTileList.forEach {
+                if (goalTileType == it.goalTileType && tier == it.tier) {
+                    goalButtons[goalTileList.indexOf(it)].text =
+                        game.currentPlayer.name + ", Score:  $goalTileScore"
+                }
+            }
+        }
+        renounceButton.onMouseClicked = {
+            rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
+            goalTilePane.isDisabled = true
+            goalTilePane.isVisible = false
+        }
+    }
+
+    /*
     private fun showSupply(index: Int) {
         woodSupplyDecks[index].isVisible = true
         leafSupplyDecks[index].isVisible = true
@@ -2087,11 +2018,25 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     }
 
     private fun hideSupply(index: Int) {
-        woodSupplyDecks[index].isVisible = false
-        leafSupplyDecks[index].isVisible = false
-        flowerSupplyDecks[index].isVisible = false
-        fruitSupplyDecks[index].isVisible = false
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        if (index != getOrder(game.currentPlayer)) {
+            woodSupplyDecks[index].forEach {
+                it.isDraggable = false
+            }
+            //woodSupplyDecks[index].isVisible = false
+            leafSupplyDecks[index].forEach {
+                it.isDraggable = false
+            }
+            flowerSupplyDecks[index].forEach {
+                it.isDraggable = false
+            }
+            fruitSupplyDecks[index].forEach {
+                it.isDraggable = false
+            }
+        }
     }
+     */
 
     private fun getColorForGoalTile(goalTileType: GoalTileType): Int {
         return when (goalTileType) {
@@ -2130,6 +2075,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             }
         }
         return -1
+    }
+
+    private fun updateCapacity(player: Player) {
+        capacityLabel.text = "Capacity: ${player.tileCapacity}"
     }
 
     private fun updatePlayableTiles(player: Player) {
@@ -2196,5 +2145,65 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             }
         playerPanes.add(playerPane)
         addComponents(playerPane)
+    }
+
+
+    private fun updateCollectedMasterHelper(player: Player) {
+        helperLabel.text = ""
+        masterLabel.text = ""
+
+        val collectedCards = player.collectedCards.groupingBy { it.cardType }.eachCount()
+        val helperCardsAmount = collectedCards[CardType.HELPERCARD] ?: 0
+        val masterCardsAmount = collectedCards[CardType.MASTERCARD] ?: 0
+
+        helperLabel.text = "Helper Cards: $helperCardsAmount"
+        masterLabel.text = "Master Cards: $masterCardsAmount"
+    }
+
+
+    private fun updateParchCards(player: Player) {
+        parchCards.clear()
+
+        val currentPlayer = rootService.currentGame?.currentBonsaiGameState?.currentPlayer
+        val columns = 4
+
+        player.collectedCards.forEachIndexed { index, card ->
+
+            val row = index / columns
+            val col = index % columns
+            if (card.cardType == CardType.PARCHMENTCARD) {
+                val cardView = CardView(
+                    posX = (col * 75).toDouble(),
+                    posY = (row * 100).toDouble(),
+                    height = 100,
+                    width = 75,
+                    front = ImageVisual("ZenCards/${card.id}.png"),
+                    back = zenCardsBack,
+                ).apply {
+                    showBack()
+                    onMouseClicked = {
+                        if (player.isLocal && player == currentPlayer) {
+                            showFront()
+                        }
+                    }
+                }
+                parchCards.add(cardView)
+            }
+        }
+    }
+
+    private fun drawTreeFRFR() {
+        val players = checkNotNull(rootService.currentGame?.currentBonsaiGameState?.players)
+        for (player in players) {
+            val tree = player.bonsaiTree
+            for (tilePosition in (tree traverseFrom ROOT)) {
+                drawTree(player, tilePosition)
+            }
+        }
+    }
+
+    private fun updateAllSuspiciously() {
+        val playerCount = checkNotNull(rootService.currentGame?.currentBonsaiGameState?.players?.size)
+        repeat(playerCount) { refreshAfterEndTurn() }
     }
 }

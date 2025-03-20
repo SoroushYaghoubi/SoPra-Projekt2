@@ -87,7 +87,7 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary a player has claimed a goal tile
      */
-    fun refreshAfterClaimGoal(){}
+    fun refreshAfterClaimGoal(goalTileType: GoalTileType, tier: Int){}
 
     /**
      * perform refreshes that are necessary after a player has redone or undone his turn
