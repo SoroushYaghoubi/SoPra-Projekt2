@@ -1,6 +1,7 @@
 package entity
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * general card in the game
@@ -10,7 +11,9 @@ import kotlinx.serialization.Serializable
  *
  * @throws IllegalArgumentException If [id] is negative or not an int
  */
+
 @Serializable
-abstract class Card(val id: Int, val cardType: CardType)
-
-
+sealed class Card(
+    @Transient open val id: Int = -1,
+    val cardType: CardType
+)

@@ -114,6 +114,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 return
             }
 
+            is ParchmentCard -> {}
+
         }
         onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
     }
