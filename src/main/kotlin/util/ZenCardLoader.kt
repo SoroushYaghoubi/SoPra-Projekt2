@@ -44,29 +44,13 @@ class ZenCardLoader {
 
     private fun readAllMasterCards(playerAmount: Int): List<MasterCard> {
         return csvLoader.readCsvFile<CSVMasterCardEntry>("/zenmaster.csv").mapNotNull { cardEntry ->
+            val tileTypes = mutableListOf(
+                getType1(cardEntry), getType2(cardEntry), getType3(cardEntry))
 
-            val type1 = when (cardEntry.type1) {
-                "log" -> TileType.WOOD
-                "leaf" -> TileType.LEAF
-                else-> TileType.ANY
-            }
-            val type2 = when (cardEntry.type2) {
-                "log" -> TileType.WOOD
-                "leaf" -> TileType.LEAF
-                "blossom" -> TileType.FLOWER
-                "fruit" -> TileType.FRUIT
-                else -> TileType.EMPTY
-            }
-            val type3 = when (cardEntry.type3) {
-                "blossom" -> TileType.FLOWER
-                "fruit" -> TileType.FRUIT
-                else -> TileType.EMPTY
-            }
-
-            val tileTypes = mutableListOf(type1, type2, type3)
             tileTypes.removeAll {
                 it == TileType.EMPTY
             }
+
             val result = if (playerAmount < cardEntry.minPlayerAmount) {
                 null
             } else {
@@ -119,6 +103,32 @@ class ZenCardLoader {
                 readAllMasterCards(playerAmount) +
                 readAllParchmentCards() +
                 readAllToolCards(playerAmount)
+    }
+
+    private fun getType1(cardEntry: CSVMasterCardEntry): TileType {
+        return when (cardEntry.type1) {
+            "log" -> TileType.WOOD
+            "leaf" -> TileType.LEAF
+            else-> TileType.ANY
+        }
+    }
+
+    private fun getType2(cardEntry: CSVMasterCardEntry): TileType {
+        return when (cardEntry.type2) {
+            "log" -> TileType.WOOD
+            "leaf" -> TileType.LEAF
+            "blossom" -> TileType.FLOWER
+            "fruit" -> TileType.FRUIT
+            else -> TileType.EMPTY
+        }
+    }
+
+    private fun getType3(cardEntry: CSVMasterCardEntry): TileType {
+        return when (cardEntry.type3) {
+            "blossom" -> TileType.FLOWER
+            "fruit" -> TileType.FRUIT
+            else -> TileType.EMPTY
+        }
     }
 }
 

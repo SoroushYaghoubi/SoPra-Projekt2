@@ -5,6 +5,7 @@ import entity.*
 //import java.util.*
 //import kotlin.concurrent.schedule
 import kotlin.math.max
+import util.SIDE_VECTORS
 
 
 // todo: `msgToBeSent` should even be handled in the `refreshAfter` methods.
@@ -510,43 +511,15 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      */
     private fun hasReachedGreenGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
         // Directions for hexagonal grid adjacency
-        val directions = listOf(
-            Pair(1, 0), Pair(0, 1), Pair(-1, 1),
-            Pair(-1, 0), Pair(0, -1), Pair(1, -1)
-        )
 
         // Set to keep track of visited tiles so that there are no redundant calculations
         val visited = mutableSetOf<Pair<Int, Int>>()
-
-        // Function to perform depth-first search and count the size of a cluster
-        fun dfs(tilePos: Pair<Int, Int>): Int {
-            //stack to keep track of all the tiles
-            val stack = mutableListOf(tilePos)
-            var count = 0
-
-            while (stack.isNotEmpty()) {
-                val (q, r) = stack.removeLast()
-                // Skip already visited tiles
-                if (!visited.add(Pair(q, r))) continue
-
-                count++
-                // find adjacent tiles
-                for ((dq, dr) in directions) {
-                    val neighbor = Pair(q + dq, r + dr)
-                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType ==
-                        TileType.LEAF && neighbor !in visited) {
-                        stack.add(neighbor)
-                    }
-                }
-            }
-            return count
-        }
 
         // Find the size of the largest cluster of LEAF tiles
         var maxLeafCluster = 0
         for ((pos, tile) in bonsaiTree) {
             if (tile.tileType == TileType.LEAF && pos !in visited) {
-                maxLeafCluster = maxOf(maxLeafCluster, dfs(pos))
+                maxLeafCluster = maxOf(maxLeafCluster, dfs(pos, visited, bonsaiTree))
             }
         }
 
@@ -557,6 +530,30 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             2 -> maxLeafCluster >= 9
             else -> false
         }
+    }
+
+    // Function to perform depth-first search and count the size of a cluster
+    private fun dfs(tilePos: Pair<Int, Int>, visited: MutableSet<Pair<Int, Int>>, bonsaiTree: MutableMap<Pair<Int, Int>, Tile>): Int {
+        //stack to keep track of all the tiles
+        val stack = mutableListOf(tilePos)
+        var count = 0
+
+        while (stack.isNotEmpty()) {
+            val (q, r) = stack.removeLast()
+            // Skip already visited tiles
+            if (!visited.add(Pair(q, r))) continue
+
+            count++
+            // find adjacent tiles
+            for ((dq, dr) in SIDE_VECTORS) {
+                val neighbor = Pair(q + dq, r + dr)
+                if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType ==
+                    TileType.LEAF && neighbor !in visited) {
+                    stack.add(neighbor)
+                }
+            }
+        }
+        return count
     }
 
     /**
