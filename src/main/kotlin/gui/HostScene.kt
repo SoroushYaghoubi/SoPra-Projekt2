@@ -211,11 +211,7 @@ class HostScene(
         posX = 715,
         posY = 830,
         text = "START"
-    ).apply {
-        onMouseClicked = {
-            //TODO
-        }
-    }
+    )
 
     private val backButton = ButtonStyle2(
         posX = 175,
@@ -262,9 +258,15 @@ class HostScene(
                         val client = rootService.networkService.client
                         checkNotNull(client)
                         val isLocal = (playerNameInLobby == client.playerName)
+                        var human = PlayerType.HUMAN
+                        if (StartSessionScene.easyBotButton.isChecked) {
+                            human = PlayerType.EASYBOT
+                        } else if (StartSessionScene.hardBotButton.isChecked) {
+                            human = PlayerType.HARDBOT
+                        }
 
 
-                        entity.Player(playerNameInLobby, PlayerType.HUMAN, isLocal, color)
+                        entity.Player(playerNameInLobby, human, isLocal, color)
                     }.toMutableList()
 
                     rootService.networkService
