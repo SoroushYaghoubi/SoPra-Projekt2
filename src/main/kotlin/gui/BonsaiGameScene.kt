@@ -2258,7 +2258,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
     }
 
-    fun updateAllSuspiciously(){
+    private fun updateAllSuspiciously(){
         val playerCount = checkNotNull(rootService.currentGame?.currentBonsaiGameState?.players?.size)
         repeat(playerCount) { refreshAfterEndTurn() }
     }
