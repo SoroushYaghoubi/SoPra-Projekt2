@@ -83,6 +83,10 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication, rootService: RootS
             hardBotButton
         )
     }
+
+    /**
+     * Button for bot
+     */
     companion object{
         val easyBotButton =
             CheckBoxButton2(
