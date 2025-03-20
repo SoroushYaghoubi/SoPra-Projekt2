@@ -117,7 +117,7 @@ private infix fun MutableMap<Pair<Int, Int>, Tile>.traverseFrom(bfsRoot: Pair<In
  *
  * @see `Demo` in the same dir for example usage.
  */
-private fun circleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
+fun circleAround(center: Pair<Int, Int>): Sequence<Pair<Int, Int>> = sequence {
     val (q, r) = center
 
     for ((dq, dr) in SIDE_VECTORS)

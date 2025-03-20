@@ -8,10 +8,10 @@ import util.*
 
 
 /**
- * The [EasyBotService] class is used to implement all the actions of the simple bot
+ * The [BotService] class is used to implement all the actions of the bots
  *
  */
-class EasyBotService(val rootService: RootService) {
+class BotService(val rootService: RootService) {
 
     /**
      * Function that makes a random move for the bot
@@ -40,7 +40,7 @@ class EasyBotService(val rootService: RootService) {
         }
     }
 
-    // 0 is cultivate and 1 is meditate
+    // 0 is cultivating and 1 is meditating
     private fun chooseAction() : Int = (0..1).random()
 
     // gives back the card position
@@ -183,9 +183,8 @@ class EasyBotService(val rootService: RootService) {
 
     }
 
-    private fun getAllPossibleMoves(state : BonsaiGameState){
-        val tree = state.currentPlayer.bonsaiTree
-
-
+    private fun getAllPossibleMoves(state : BonsaiGameState) : MutableList<Move>{
+        val returnList = mutableListOf<Move>()
+        return returnList
     }
 }
