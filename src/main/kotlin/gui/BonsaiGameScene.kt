@@ -1935,7 +1935,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 visual = CompoundVisual(
                     ColorVisual(255, 255, 255, 0.3),
                     TextVisual(
-                        text = "${it.first}, ${it.second}",
+                        text = "",
                         font = Font(10.0, Color(0x000000))
                     )
                 ),
@@ -1990,7 +1990,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             emptyHex.visual = CompoundVisual(
                 getTileImageVisualForTileType(tile.tileType),
                 TextVisual(
-                    text = "${position.first}, ${position.second}",
+                    text = "",
                     font = Font(10.0, Color(0x000000))
                 )
             )
