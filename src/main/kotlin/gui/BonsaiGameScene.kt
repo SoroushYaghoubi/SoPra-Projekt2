@@ -1611,7 +1611,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             }
             cultivateButton.isVisible = false
             endTurnButton.isVisible = false
-            interactionText.text = "It's ${game.currentPlayer} turn"
+            interactionText.text = "It's ${game.currentPlayer.name}'s turn"
+            updateSupply(game.players[lastPlayerIndex])
         } else {
             cultivateButton.isVisible = true
             endTurnButton.isVisible = true

@@ -318,33 +318,6 @@ class HostScene(
 
         val newPlayerColour = getColourButton(currentIndex)
 
-        /*
-        val newPlayerRemove = SquareButton(
-            posX = 680,
-            posY = 270 + 140 * currentIndex,
-        ).apply {
-            onMouseClicked = {
-                removePlayer(currentIndex)
-            }
-        }
-
-
-        if (playerName == rootService.networkService.client?.playerName) {
-            val newPlayerEasyBot = CheckBoxButton(
-                posX = 830,
-                posY = 270 + 140 * currentIndex,
-            ).apply {
-                onMouseClicked = {
-                    if (!isChecked && playerHardBot scurrentIndex.isChecked) {
-                        // If hardBot is checked, uncheck it
-                        playerHardBotscurrentIndex.change()
-                    }
-                    change()
-                }
-            }
-        }
-        */
-
 
         // Add components to the pane
         contentPlayerPane.addAll(
@@ -417,45 +390,6 @@ class HostScene(
             }
         }
     }
-
-    /*
-    private fun removePlayer(index: Int) {
-        if (playerInputs.size <= 1) return
-
-        contentPlayerPane.remove(playerTurns[index])
-        contentPlayerPane.remove(playerColours[index])
-        contentPlayerPane.remove(playerRemoves[index])
-//        contentPlayerPane.remove(playerEasyBots[index])
-//        contentPlayerPane.remove(playerHardBots[index])
-        contentPlayerPane.remove(playerInputs[index])
-
-        playerTurns.removeAt(index)
-        playerColours.removeAt(index)
-        playerRemoves.removeAt(index)
-//        playerEasyBots.removeAt(index)
-//        playerHardBots.removeAt(index)
-        playerInputs.removeAt(index)
-
-        for (i in index until playerInputs.size) {
-            playerTurns.posY -= 140
-            playerColours.posY -= 140
-            playerRemoves.posY -= 140
-//            playerEasyBots.posY -= 140
-//            playerHardBots.posY -= 140
-            playerInputs.posY -= 140
-
-            playerRemoves.onMouseClicked = {
-                removePlayer(i)
-            }
-            playerTurns.onMouseEntered = {
-                highlightPlayers(i)
-            }
-            playerTurns.onMouseExited = {
-                removeHighlight()
-            }
-        }
-    }
-    */
 
     override fun refreshAfterPlayerJoined(playerName: String) {
         addPlayer(playerName)
