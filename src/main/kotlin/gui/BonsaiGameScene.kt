@@ -1188,6 +1188,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
 
         // add panel to the scene
+
+        removeComponents(buttonPane)
         addComponents(buttonPane)
     }
 
@@ -1339,6 +1341,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         // update tree for real this time bro
         drawTreeFRFR()
+        updateAllSuspiciously()
 
         val currentPlayerType = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.playerType
         checkNotNull(currentPlayerType)
@@ -1593,7 +1596,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     }
 
     /**
-     * it's only for non local player
+     * it's only for non-local player
      */
     override fun refreshAfterClaimGoal(goalTileType: GoalTileType, tier: Int) {
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -2234,5 +2237,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 drawTree(player, tilePosition)
             }
         }
+    }
+
+    fun updateAllSuspiciously(){
+        val playerCount = checkNotNull(rootService.currentGame?.currentBonsaiGameState?.players?.size)
+        repeat(playerCount) { refreshAfterEndTurn() }
     }
 }

@@ -72,5 +72,4 @@ class MainMenuScene(
             joinGameButton,
             quitButton, )
     }
-
 }
