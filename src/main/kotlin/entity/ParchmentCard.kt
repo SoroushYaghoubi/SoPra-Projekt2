@@ -1,5 +1,7 @@
 package entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * Represents a ParchmentCard in the game.
  * extends the [Card] class and is categorized under [CardType.PARCHMENTCARD]
@@ -10,9 +12,10 @@ package entity
  * @param id is ID for the card
  */
 
+@Serializable
 class ParchmentCard(
     val parchmentTileType: TileType?,
     val parchmentCardType: CardType?,
     val basePoints: Int,
-    id: Int
+    override val id: Int
 ) : Card(id, CardType.PARCHMENTCARD)

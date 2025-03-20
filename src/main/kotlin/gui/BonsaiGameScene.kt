@@ -426,15 +426,19 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             text = "Quit Game",
             font = Font(36)
         ).apply {
-            // hide the button in network game
-            // right now it is not visible at all because it does not work
             onMouseClicked = {
-                //rootService.historyService.saveGame()
-                bonsaiApplication.showMainMenuScene()
+                val isLocal = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal ?: false
+                isVisible =  isLocal
+                onMouseClicked = {
+                    rootService.historyService.saveGame()
+                    BonsaiApplication().showMainMenuScene()
+                }
             }
         }
 
-    // right side pane
+
+
+            // right side pane
     private val buttonPane = Pane<UIComponent>(
         posX = 1600,
         posY = 20,
