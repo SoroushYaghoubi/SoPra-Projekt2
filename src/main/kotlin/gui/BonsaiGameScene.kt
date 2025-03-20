@@ -1298,17 +1298,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     //}
                     if (rootService.treeService.isMinimalAndCorrect(q to r)) {
                         rootService.treeService.removeFromTree(q to r)
-
                         interactionText.text = "Tile removed successfully"
-                        //}
 
                         // Check if more removals are needed
-                        if (rootService.treeService.canPlayWood()) {
-                            removeButton.isVisible = false
-                            interactionText.text = "You can now Cultivate or Meditate"
-
-                        }
-
+                        checkCanPlayWood()
 
                         hexagonView.removeFromParent()
                         createEmptyHex(player)
@@ -1319,6 +1312,13 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 }
             }
 
+        }
+    }
+
+    private fun checkCanPlayWood() {
+        if (rootService.treeService.canPlayWood()) {
+            removeButton.isVisible = false
+            interactionText.text = "You can now Cultivate or Meditate"
         }
     }
 
