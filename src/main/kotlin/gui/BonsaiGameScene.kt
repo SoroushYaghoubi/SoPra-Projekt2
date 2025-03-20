@@ -903,7 +903,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 visual = CompoundVisual(
                     visual,
                     TextVisual(
-                        text = "${it.first}, ${it.second}",
+                        text = "",
                         font = Font(10.0, Color(0x000000))
                     )
                 ),
