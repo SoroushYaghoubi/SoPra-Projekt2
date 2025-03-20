@@ -58,9 +58,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
     private val anyTileImageVisual = ImageVisual("any.png")
 
-    private val zenCardsBack = ImageVisual("cardsBack.png")
-
-
+    private val zenCardsBack = ImageVisual("ZenCards/cardsBack.png")
 
 
     // button for cultivate
@@ -149,7 +147,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             posX = 20, posY = 20,
             width = 700,
             height = 220,
-            visual = ImageVisual("zenBoard.JPG").apply {
+            visual = ImageVisual("zenBoard.png").apply {
                 style.borderRadius = BorderRadius(20.0)
             }
         )
@@ -272,19 +270,19 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
     )
 
-   // private val collectedPane = CameraPane(
+    // private val collectedPane = CameraPane(
     //    posX = 1154,
     //    posY = 20,
-   //     width = 400,
-   //     height = 220,
+    //     width = 400,
+    //     height = 220,
     //    target = collectedCardPane,
     //    limitBounds = true
-   // ).apply {
+    // ).apply {
     //    zIndex = 1
     //    this.interactive = true
     //    isVisible = true
 
-   // }
+    // }
 
 
     private val interactionText = Label(
@@ -384,7 +382,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         ).apply {
             onMouseClicked = {
                 val isLocal = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal ?: false
-                isVisible =  isLocal
+                isVisible = isLocal
                 onMouseClicked = {
                     bonsaiApplication.showMainMenuScene()
                     rootService.historyService.saveGame()
@@ -393,8 +391,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
 
 
-
-            // right side pane
+    // right side pane
     private val buttonPane = Pane<UIComponent>(
         posX = 1600,
         posY = 20,
@@ -685,7 +682,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             }
         }
         // get the empty tiles
-        if (player.isLocal){
+        if (player.isLocal) {
             createEmptyHex(player)
         }
     }
@@ -717,7 +714,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             limitBounds = true
         ).apply {
             this.interactive = true
-            pan(1000,1000)
+            pan(1000, 1000)
         }
         treePanes.add(treePane)
         playerPane.add(treePane)
@@ -1048,7 +1045,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         treePlayer.components.forEach { hexagonView ->
             hexagonView.onMouseClicked = {
-                if (!rootService.treeService.canPlayWood()){
+                if (!rootService.treeService.canPlayWood()) {
                     val tile = treeTileMap.backward(hexagonView)
 
                     val q = tile.q ?: throw IllegalStateException("Tile q coordinate is null.")
@@ -1059,7 +1056,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     //player.bonsaiTree.getEmptyTiles().forEach {
                     //    treePlayer[it.first, it.second]?.removeFromParent()
                     //}
-                    if (rootService.treeService.isMinimalAndCorrect(q to r )){
+                    if (rootService.treeService.isMinimalAndCorrect(q to r)) {
                         rootService.treeService.removeFromTree(q to r)
 
                         interactionText.text = "Tile removed successfully"
@@ -1138,34 +1135,36 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         val actPlayer = game.currentPlayer
         //TODO(timer?)
         //Timer().schedule(1000) {
-            if (actPlayer.personalSupply.size > actPlayer.tileCapacity &&
-                game.currentPlayer.isLocal) {
-                game.currentState = States.DISCARDING
-                refreshAfterReceivedTile(true)
-                return //@schedule
-            } else {
-                actPlayer.hasPlayed = true
-                if (game.currentState != States.USING_HELPER) {
-                    updateSupply(game.currentPlayer)
-                    updatePlayableTiles(game.currentPlayer)
-                }
-
-                // update tile capacity
-                capacityLabel.text = "Capacity: ${game.currentPlayer.tileCapacity}"
-
-                // update playable tiles
+        if (actPlayer.personalSupply.size > actPlayer.tileCapacity &&
+            game.currentPlayer.isLocal
+        ) {
+            game.currentState = States.DISCARDING
+            refreshAfterReceivedTile(true)
+            return //@schedule
+        } else {
+            actPlayer.hasPlayed = true
+            if (game.currentState != States.USING_HELPER) {
+                updateSupply(game.currentPlayer)
                 updatePlayableTiles(game.currentPlayer)
-
-                // update collected cards
-                updateCollectedCards(game.currentPlayer)
-
-                if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
-                    !game.currentPlayer.isLocal) {
-                    checkNotNull(position)
-                    faceUpCards.components[position].removeFromParent()
-                    updateZenBoard()
-                }
             }
+
+            // update tile capacity
+            capacityLabel.text = "Capacity: ${game.currentPlayer.tileCapacity}"
+
+            // update playable tiles
+            updatePlayableTiles(game.currentPlayer)
+
+            // update collected cards
+            updateCollectedCards(game.currentPlayer)
+
+            if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
+                !game.currentPlayer.isLocal
+            ) {
+                checkNotNull(position)
+                faceUpCards.components[position].removeFromParent()
+                updateZenBoard()
+            }
+        }
         //}
     }
 
@@ -1348,7 +1347,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         checkNotNull(game)
 
         if (rootService.networkService.connectionState != ConnectionState.DISCONNECTED &&
-            !game.currentPlayer.isLocal) {
+            !game.currentPlayer.isLocal
+        ) {
             drawTree(game.currentPlayer, tilePosition)
         }
 
@@ -1385,16 +1385,16 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             goalTilePane.isVisible = true
             goalTilePane.isDisabled = false
             claimButton.onMouseClicked = {
-                    rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
-                    goalTilePane.isDisabled = true
-                    goalTilePane.isVisible = false
+                rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
+                goalTilePane.isDisabled = true
+                goalTilePane.isVisible = false
 
-                    goalTileList.forEach {
-                        if (goalTileType == it.goalTileType && tier == it.tier) {
-                            goalButtons[goalTileList.indexOf(it)].text =
-                                game.currentPlayer.name + ", Score:  $goalTileScore"
-                        }
+                goalTileList.forEach {
+                    if (goalTileType == it.goalTileType && tier == it.tier) {
+                        goalButtons[goalTileList.indexOf(it)].text =
+                            game.currentPlayer.name + ", Score:  $goalTileScore"
                     }
+                }
             }
             renounceButton.onMouseClicked = {
                 rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
@@ -1421,10 +1421,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
     /**
     override fun refreshAfterMeditate(position: Int?) {
-        val game = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(game)
+    val game = rootService.currentGame?.currentBonsaiGameState
+    checkNotNull(game)
     }
-    */
+     */
 
     override fun refreshAfterEndTurn() {
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -1473,7 +1473,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 val card = generalCard as ToolCard
                 cardView.frontVisual = CompoundVisual(
                     ColorVisual.WHITE,
-                    TextVisual("${card.cardType}\n___2___")
+                    TextVisual("${card.cardType}\n___2___"),
+                    ImageVisual("ZenCards/${card.id}.png")
                 )
             }
 
@@ -1481,7 +1482,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 val card = generalCard as GrowthCard
                 cardView.frontVisual = CompoundVisual(
                     ColorVisual.WHITE,
-                    TextVisual("${card.cardType}\n___${card.tileType}___")
+                    TextVisual("${card.cardType}\n___${card.tileType}___"),
+                    ImageVisual("ZenCards/${card.id}.png")
                 )
             }
 
@@ -1489,7 +1491,9 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 val card = generalCard as HelperCard
                 cardView.frontVisual = CompoundVisual(
                     ColorVisual.WHITE,
-                    TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___")
+                    TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___"),
+                    ImageVisual("ZenCards/${card.id}.png")
+
                 )
             }
 
@@ -1501,17 +1505,23 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                         TextVisual(
                             "${card.cardType}\n___${card.tileTypes[0]}___\n" +
                                     "___${card.tileTypes[1]}___\n___${card.tileTypes[2]}___"
-                        )
+                        ),
+                        ImageVisual("ZenCards/${card.id}.png")
+
                     )
 
                     2 -> CompoundVisual(
                         ColorVisual.WHITE,
-                        TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___")
+                        TextVisual("${card.cardType}\n___${card.tileTypes[0]}___\n___${card.tileTypes[1]}___"),
+                        ImageVisual("ZenCards/${card.id}.png")
+
                     )
 
                     else -> CompoundVisual(
                         ColorVisual.WHITE,
-                        TextVisual("${card.cardType}\n___${card.tileTypes[0]}___")
+                        TextVisual("${card.cardType}\n___${card.tileTypes[0]}___"),
+                        ImageVisual("ZenCards/${card.id}.png")
+
                     )
                 }
             }
@@ -1521,12 +1531,16 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 cardView.frontVisual = if (card.parchmentCardType != null) {
                     CompoundVisual(
                         ColorVisual.WHITE,
-                        TextVisual("${card.cardType}\n___${card.parchmentCardType}___\n___${card.basePoints}___")
+                        TextVisual("${card.cardType}\n___${card.parchmentCardType}___\n___${card.basePoints}___"),
+                        ImageVisual("ZenCards/${card.id}.png")
+
                     )
                 } else {
                     CompoundVisual(
                         ColorVisual.WHITE,
-                        TextVisual("${card.cardType}\n___${card.parchmentTileType}___\n___${card.basePoints}___")
+                        TextVisual("${card.cardType}\n___${card.parchmentTileType}___\n___${card.basePoints}___"),
+                        ImageVisual("ZenCards/${card.id}.png")
+
                     )
                 }
             }
@@ -1541,69 +1555,69 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             when (index) {
                 0 -> {
                     card.onMouseClicked = {
-                            if (canClickCard()) {
-                                interactionText.text = "No extra tiles!"
-                                removeButton.isVisible = false
-                                rootService.playerActionService.meditate(0, null)
-                                card.removeFromParent()
-                                // updateSupply(game.currentPlayer)
-                                if (game.currentState != States.USING_HELPER) {
-                                    updateSupply(game.currentPlayer)
-                                    updatePlayableTiles(game.currentPlayer)
-                                }
-                                updateZenBoard()
+                        if (canClickCard()) {
+                            interactionText.text = "No extra tiles!"
+                            removeButton.isVisible = false
+                            rootService.playerActionService.meditate(0, null)
+                            card.removeFromParent()
+                            // updateSupply(game.currentPlayer)
+                            if (game.currentState != States.USING_HELPER) {
+                                updateSupply(game.currentPlayer)
+                                updatePlayableTiles(game.currentPlayer)
                             }
+                            updateZenBoard()
                         }
+                    }
                 }
 
                 1 -> {
                     card.onMouseClicked = {
-                            if (canClickCard()) {
-                                removeButton.isVisible = false
-                                interactionText.text = "Choose tile to claim: "
+                        if (canClickCard()) {
+                            removeButton.isVisible = false
+                            interactionText.text = "Choose tile to claim: "
 
-                                overlayPane.clear()
-                                overlayPane.isVisible = true
+                            overlayPane.clear()
+                            overlayPane.isVisible = true
 
-                                showChooseWoodOrLeafPane()
-                                card.removeFromParent()
-                                updateZenBoard()
-                            }
+                            showChooseWoodOrLeafPane()
+                            card.removeFromParent()
+                            updateZenBoard()
+                        }
                     }
                 }
 
                 2 -> {
                     card.onMouseClicked = {
-                            if (canClickCard()) {
-                                removeButton.isVisible = false
-                                interactionText.text = "You have received a wood 🪵 and flower 🌸 tile"
-                                rootService.playerActionService.meditate(2, null)
-                                card.removeFromParent()
-                                if (game.currentState != States.USING_HELPER) {
-                                    updateSupply(game.currentPlayer)
-                                    updatePlayableTiles(game.currentPlayer)
-                                }
-                                updateZenBoard()
+                        if (canClickCard()) {
+                            removeButton.isVisible = false
+                            interactionText.text = "You have received a wood 🪵 and flower 🌸 tile"
+                            rootService.playerActionService.meditate(2, null)
+                            card.removeFromParent()
+                            if (game.currentState != States.USING_HELPER) {
+                                updateSupply(game.currentPlayer)
+                                updatePlayableTiles(game.currentPlayer)
                             }
+                            updateZenBoard()
+                        }
                     }
                 }
 
 
                 else -> {
                     card.onMouseClicked = {
-                            if (canClickCard()) {
-                                removeButton.isVisible = false
-                                interactionText.text = "You have received a leaf 🌿 and fruit 🍊 tile"
-                                rootService.playerActionService.meditate(3, null)
-                                card.removeFromParent()
-                                if (game.currentState != States.USING_HELPER) {
-                                    updateSupply(game.currentPlayer)
-                                    updatePlayableTiles(game.currentPlayer)
-                                }
-                                updateZenBoard()
+                        if (canClickCard()) {
+                            removeButton.isVisible = false
+                            interactionText.text = "You have received a leaf 🌿 and fruit 🍊 tile"
+                            rootService.playerActionService.meditate(3, null)
+                            card.removeFromParent()
+                            if (game.currentState != States.USING_HELPER) {
+                                updateSupply(game.currentPlayer)
+                                updatePlayableTiles(game.currentPlayer)
                             }
+                            updateZenBoard()
                         }
                     }
+                }
             }
         }
     }
@@ -1651,7 +1665,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     private fun canClickCard(): Boolean {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        return  game.currentState == States.START_TURN ||
+        return game.currentState == States.START_TURN ||
                 game.currentState == States.CHOOSE_ACTION ||
                 game.currentState == States.REMOVE_TILES
     }
@@ -1701,6 +1715,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     val tile = supplyTileMap.backward(comp)
                     rootService.treeService.canPlayTile(tile, position)
                 }
+
                 else -> false
             }
         }
@@ -1802,7 +1817,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         val q = tilePosition.first
         val r = tilePosition.second
         val playedTile = player.bonsaiTree[q to r]
-        checkNotNull(playedTile) {"the tile does not exist"}
+        checkNotNull(playedTile) { "the tile does not exist" }
         playedTile.q = q
         playedTile.r = r
 
