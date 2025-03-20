@@ -1685,6 +1685,9 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             faceUpCards.forEach {
                 it.onMouseClicked = null
             }
+            cultivateButton.isVisible = true
+        } else {
+            cultivateButton.isVisible = true
         }
     }
 
