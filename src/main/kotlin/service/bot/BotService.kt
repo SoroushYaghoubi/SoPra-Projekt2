@@ -85,6 +85,92 @@ class BotService(val rootService: RootService) {
     }
 
 
+    fun makeRandomMove(){
+        val currentGameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(currentGameState)
+
+        val randomAction = (0..1).random()
+        val chosenCardSlot = (0 until currentGameState.faceUpCards.size).random()
+        val chosenRandomTile = randomWoodOrLeafTile()
+        val chosenRandomAnyTile = randomTile()
+        val hasTiles = mutableListOf<TileType>()
+
+        for (tile in currentGameState.currentPlayer.personalSupply){
+            hasTiles.add(tile.tileType)
+        }
+
+        val possibleTilePlacing = allPossiblePlayedTiles(
+            tree = currentGameState.currentPlayer.bonsaiTree,
+            alreadyPlayedTiles = mutableListOf(),
+            playableTiles = currentGameState.currentPlayer.playableTiles,
+            hasTiles = hasTiles,
+            returnList = mutableListOf()
+        )
+
+        when (randomAction) {
+            CULTIVATE -> {
+                rootService.playerActionService.cultivate()
+                val placingTiles = possibleTilePlacing.random()
+                for (tile in placingTiles){
+                    rootService.treeService.playTile(Tile(null,null,tile.first),tile.second)
+                    currentGameState.goalTiles.forEach {
+                        if (rootService.playerActionService.canClaimOrRenounceGoal(it.goalTileType, it.tier) &&
+                            !currentGameState.currentPlayer.renouncedGoals.contains(it)
+                        ) {
+                            rootService.playerActionService.claimOrRenounceGoal(
+                                randomClaimOrRenounce(),
+                                it.goalTileType,
+                                it.tier,
+                            )
+                        }
+                    }
+                }
+                rootService.playerActionService.endTurn()
+            }
+            MEDITATE -> {
+                when (chosenCardSlot) {
+                    2 -> {
+                        rootService.playerActionService.meditate(2,chosenRandomTile)
+                    }
+                    else -> {
+                        rootService.playerActionService.meditate(chosenCardSlot,null)
+                    }
+                }
+                if (currentGameState.faceUpCards[chosenCardSlot].cardType == CardType.HELPERCARD){
+                    val chosenCard = currentGameState.faceUpCards[chosenCardSlot] as HelperCard
+                    val helperCardPlayedTiles = allPossiblePlayedTiles(
+                        tree = currentGameState.currentPlayer.bonsaiTree,
+                        alreadyPlayedTiles = mutableListOf(),
+                        playableTiles = chosenCard.tileTypes,
+                        hasTiles = hasTiles,
+                        returnList = mutableListOf()
+                    ).random()
+                    for (tiles in helperCardPlayedTiles) {
+                        rootService.treeService.playTile(Tile(null,null,tiles.first),tiles.second)
+                        currentGameState.goalTiles.forEach {
+                            if (rootService.playerActionService.canClaimOrRenounceGoal(it.goalTileType, it.tier) &&
+                                !currentGameState.currentPlayer.renouncedGoals.contains(it)
+                            ) {
+                                rootService.playerActionService.claimOrRenounceGoal(
+                                    randomClaimOrRenounce(),
+                                    it.goalTileType,
+                                    it.tier,
+                                )
+                            }
+                        }
+                    }
+
+                }
+                if (currentGameState.faceUpCards[chosenCardSlot].cardType == CardType.MASTERCARD){
+                        rootService.playerActionService.chooseTile(chosenRandomAnyTile)
+                }
+                rootService.playerActionService.endTurn()
+            }
+        }
+
+    }
+
+
     private fun botPlayTiles(move : Move ){
         for (tile in move.playedTiles) {
             rootService.treeService.playTile(Tile(null, null, tile.first), tile.second)
@@ -99,6 +185,9 @@ class BotService(val rootService: RootService) {
         }
     }
 
+    private fun randomClaimOrRenounce() : Boolean{
+        return listOf(true,false).random()
+    }
 
 
 
@@ -112,13 +201,24 @@ class BotService(val rootService: RootService) {
         return (0 until openCards).random()
     }
 
-    private fun randomTile(): TileType {
+    private fun randomWoodOrLeafTile(): TileType {
         return when ((0..1).random()) {
             0 -> TileType.WOOD
             1 -> TileType.LEAF
             else -> TileType.WOOD
         }
     }
+
+    private fun randomTile(): TileType {
+        return when ((0..3).random()) {
+            0 -> TileType.WOOD
+            1 -> TileType.LEAF
+            2 -> TileType.FLOWER
+            3 -> TileType.FRUIT
+            else -> TileType.WOOD
+        }
+    }
+
 
     private fun allPossiblePlayedTiles(
         tree: MutableMap<Pair<Int, Int>, Tile>,
