@@ -24,7 +24,6 @@ import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.*
 import util.*
 
-
 /**
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
  * lets the user play the bonsai game
@@ -1189,6 +1188,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
 
         // add panel to the scene
+
+        removeComponents(buttonPane)
         addComponents(buttonPane)
     }
 
@@ -1333,6 +1334,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         // update collected cards
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
+
+        // update tree for real this time bro
+        drawTreeFRFR()
+        updateAllSuspiciously()
 
         val currentPlayerType = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.playerType
         checkNotNull(currentPlayerType)
@@ -1587,7 +1592,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     }
 
     /**
-     * it's only for non local player
+     * it's only for non-local player
      */
     override fun refreshAfterClaimGoal(goalTileType: GoalTileType, tier: Int) {
         val game = rootService.currentGame?.currentBonsaiGameState
@@ -2231,5 +2236,20 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 parchCards.add(cardView)
             }
         }
+    }
+
+    private fun drawTreeFRFR(){
+        val players = checkNotNull(rootService.currentGame?.currentBonsaiGameState?.players)
+        for (player in players) {
+            val tree = player.bonsaiTree
+            for (tilePosition in (tree traverseFrom ROOT)) {
+                drawTree(player, tilePosition)
+            }
+        }
+    }
+
+    fun updateAllSuspiciously(){
+        val playerCount = checkNotNull(rootService.currentGame?.currentBonsaiGameState?.players?.size)
+        repeat(playerCount) { refreshAfterEndTurn() }
     }
 }
