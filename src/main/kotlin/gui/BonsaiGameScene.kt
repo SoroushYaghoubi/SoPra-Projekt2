@@ -466,6 +466,41 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         goalTileList = sortedGoalTiles.toMutableList()
 
 
+        createPlayerButtons()
+
+        val buttonHeight = 45
+        val buttonSpacing = 30
+        var currentY = 370
+
+        // need 6 goal tiles for 2 players and 9 for 3
+        val numberOfButtons = if (gameState.players.size == 2) 6 else 9
+
+        // create goal tile buttons in correct order
+        for (i in 0 until numberOfButtons) {
+            val goalTile = sortedGoalTiles[i % sortedGoalTiles.size]
+            val goalButton = Button(
+                posX = 20,
+                posY = currentY,
+                width = 260,
+                height = buttonHeight,
+                visual = ColorVisual(Color(getColorForGoalTile(goalTile.goalTileType))).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                },
+                text = "Tier: ${goalTile.tier} Score: ${goalTile.score}",
+                font = Font(30)
+            )
+            goalButtons.add(goalButton)
+            buttonPane.add(goalButton)
+            currentY += buttonHeight + buttonSpacing
+        }
+
+        // add panel to the scene
+        addComponents(buttonPane)
+    }
+
+    private fun createPlayerButtons() {
+        val gameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(gameState)
         // player buttons below the save button
         val playerButtonsY = saveButton.posY + saveButton.height + 20
         val playerButtonHeight = 35
@@ -514,35 +549,6 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             }
             buttonPane.add(playerButton)
         }
-
-        val buttonHeight = 45
-        val buttonSpacing = 30
-        var currentY = 370
-
-        // need 6 goal tiles for 2 players and 9 for 3
-        val numberOfButtons = if (gameState.players.size == 2) 6 else 9
-
-        // create goal tile buttons in correct order
-        for (i in 0 until numberOfButtons) {
-            val goalTile = sortedGoalTiles[i % sortedGoalTiles.size]
-            val goalButton = Button(
-                posX = 20,
-                posY = currentY,
-                width = 260,
-                height = buttonHeight,
-                visual = ColorVisual(Color(getColorForGoalTile(goalTile.goalTileType))).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
-                text = "Tier: ${goalTile.tier} Score: ${goalTile.score}",
-                font = Font(30)
-            )
-            goalButtons.add(goalButton)
-            buttonPane.add(goalButton)
-            currentY += buttonHeight + buttonSpacing
-        }
-
-        // add panel to the scene
-        addComponents(buttonPane)
     }
 
     // Overlay the game scene to prompt the player to choose tile
@@ -695,36 +701,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         playerPanes[currentPlayerIndex].isVisible = true
         showSupply(currentPlayerIndex)
 
-        // Refresh the zen board
-        faceUpCards.clear()
-        zenDeckView.clear()
-        zenCardMap.clear()
-
-        gameState.faceUpCards.forEach { card ->
-            val cardView = CardView(
-                height = 160,
-                width = 110,
-                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
-                back = ColorVisual.BLACK,
-            )
-            cardFrontSetter(card, cardView)
-            cardView.showFront()
-            faceUpCards.add(cardView)
-            zenCardMap.add(card to cardView)
-        }
-
-        gameState.zenDeck.forEach { card ->
-            val cardView = CardView(
-                height = 160,
-                width = 110,
-                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
-                back = ColorVisual.BLACK,
-            )
-            cardFrontSetter(card, cardView)
-            cardView.showBack()
-            zenDeckView.add(cardView)
-            zenCardMap.add(card to cardView)
-        }
+        newZenBoardForRedoOrUndo()
 
         // Refresh supply tiles
         updateSupply(gameState.currentPlayer)
@@ -778,39 +755,46 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         saveButton.isVisible = gameState.currentPlayer.isLocal
     }
 
+    private fun newZenBoardForRedoOrUndo() {
+        val gameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(gameState) { "Game state is not initialized." }
+
+        // Refresh the zen board
+        faceUpCards.clear()
+        zenDeckView.clear()
+        zenCardMap.clear()
+
+        gameState.faceUpCards.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showFront()
+            faceUpCards.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+
+        gameState.zenDeck.forEach { card ->
+            val cardView = CardView(
+                height = 160,
+                width = 110,
+                front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
+                back = ColorVisual.BLACK,
+            )
+            cardFrontSetter(card, cardView)
+            cardView.showBack()
+            zenDeckView.add(cardView)
+            zenCardMap.add(card to cardView)
+        }
+    }
+
     //components for the tree boards
 
     private fun initPot(player: Player) {
-        val playerPane = playerPanes[getOrder(player)]
-        val treeHexagonGrid = HexagonGrid<HexagonView>(
-            posX = 1000,
-            posY = 1000,
-            coordinateSystem = HexagonGrid.CoordinateSystem.AXIAL
-        )
-        treeHexagonGrids.add(treeHexagonGrid)
-
-        val targetLayout = Pane<ComponentView>(
-            width = 2000,
-            height = 2000,
-            visual = ColorVisual(Color(SECONDARY_COLOUR))
-        ).apply {
-            this.add(treeHexagonGrid)
-        }
-        targetLayouts.add(targetLayout)
-
-        val treePane = CameraPane(
-            posX = 240,
-            posY = 0,
-            width = 1320,
-            height = 680,
-            target = targetLayout,
-            limitBounds = true
-        ).apply {
-            this.interactive = true
-            pan(1000,1000)
-        }
-        treePanes.add(treePane)
-        playerPane.add(treePane)
+        val treeHexagonGrid = treeHexagonGrids[getOrder(player)]
 
         POT.forEach {
             var color = getColorForPot(player.color)
@@ -848,11 +832,83 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         }
     }
 
+    private fun initTreePane(player: Player) {
+        val playerPane = playerPanes[getOrder(player)]
+        val treeHexagonGrid = HexagonGrid<HexagonView>(
+            posX = 1000,
+            posY = 1000,
+            coordinateSystem = HexagonGrid.CoordinateSystem.AXIAL
+        )
+        treeHexagonGrids.add(treeHexagonGrid)
+
+        val targetLayout = Pane<ComponentView>(
+            width = 2000,
+            height = 2000,
+            visual = ColorVisual(Color(SECONDARY_COLOUR))
+        ).apply {
+            this.add(treeHexagonGrid)
+        }
+        targetLayouts.add(targetLayout)
+
+        val treePane = CameraPane(
+            posX = 240,
+            posY = 0,
+            width = 1320,
+            height = 680,
+            target = targetLayout,
+            limitBounds = true
+        ).apply {
+            this.interactive = true
+            pan(1000,1000)
+        }
+        treePanes.add(treePane)
+        playerPane.add(treePane)
+    }
+
     private fun initSupply(player: Player) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
+        val playerIndex = getOrder(player)
+        val supplyTileMap = supplyTileMaps[playerIndex]
+        val woodSupplyDeck = woodSupplyDecks[playerIndex]
+        val leafSupplyDeck = leafSupplyDecks[playerIndex]
+        val flowerSupplyDeck = flowerSupplyDecks[playerIndex]
+        val fruitSupplyDeck = fruitSupplyDecks[playerIndex]
+
+        player.personalSupply.forEachIndexed { index, tile ->
+            val supplyHex = HexagonView(
+                visual = CompoundVisual(
+                    getTileImageVisualForTileType(tile.tileType)
+                ),
+                size = 60
+            ).apply {
+                this.isDraggable = true
+                this.onDragGestureEnded = { _, success ->
+                    if (success) {
+                        this.isDraggable = false
+                    }
+                }
+            }
+
+            tile.q = index
+            if (supplyTileMap.containsForward(tile)) {
+                supplyTileMap.removeForward(tile)
+            }
+            supplyTileMap.add(tile to supplyHex)
+
+            when (tile.tileType) {
+                TileType.WOOD -> woodSupplyDeck.add(supplyHex)
+                TileType.LEAF -> leafSupplyDeck.add(supplyHex)
+                TileType.FLOWER -> flowerSupplyDeck.add(supplyHex)
+                else -> fruitSupplyDeck.add(supplyHex)
+            }
+            hideSupply(getOrder(player))
+        }
+        updateSupplyAmount(player)
+    }
+
+    private fun initSupplyDecks(player: Player) {
         val playerPane = playerPanes[getOrder(player)]
-        val supplyTileMap = supplyTileMaps[getOrder(player)]
         val woodSupplyDeck = Area<HexagonView>(
             posX = 60, posY = 30,
             width = 100, height = 100,
@@ -884,40 +940,6 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         )
         fruitSupplyDecks.add(fruitSupplyDeck)
         playerPane.add(fruitSupplyDeck)
-
-        player.personalSupply.forEachIndexed { index, tile ->
-            val supplyHex = HexagonView(
-                visual = CompoundVisual(
-                    getTileImageVisualForTileType(tile.tileType)
-                ),
-                size = 60
-            ).apply {
-                this.isDraggable = true
-                this.onDragGestureEnded = { _, success ->
-                    if (success) {
-                        this.isDraggable = false
-                    }
-                }
-            }
-
-            tile.q = index
-            if (supplyTileMap.containsForward(tile)) {
-                supplyTileMap.removeForward(tile)
-            }
-            supplyTileMap.add(tile to supplyHex)
-
-            when (tile.tileType) {
-                TileType.WOOD -> {
-                    woodSupplyDeck.add(supplyHex)
-                }
-
-                TileType.LEAF -> leafSupplyDeck.add(supplyHex)
-                TileType.FLOWER -> flowerSupplyDeck.add(supplyHex)
-                else -> fruitSupplyDeck.add(supplyHex)
-            }
-            hideSupply(getOrder(player))
-        }
-        updateSupplyAmount(player)
     }
 
     /**
@@ -1076,7 +1098,9 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             createPlayerPane(it)
             treeTileMaps.add(BidirectionalMap())
             supplyTileMaps.add(BidirectionalMap())
+            initTreePane(it)
             initPot(it)
+            initSupplyDecks(it)
             initSupply(it)
         }
         createRightSidePane()
@@ -1516,10 +1540,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     card.apply {
 
                         onMouseClicked = {
-                            if (game.currentState == States.START_TURN ||
-                                game.currentState == States.CHOOSE_ACTION ||
-                                game.currentState == States.REMOVE_TILES
-                            ) {
+                            if (canClickCard()) {
                                 interactionText.text = "No extra tiles!"
                                 removeButton.isVisible = false
                                 rootService.playerActionService.meditate(0, null)
@@ -1538,50 +1559,14 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 1 -> {
                     card.apply {
                         onMouseClicked = {
-                            if (game.currentState == States.START_TURN ||
-                                game.currentState == States.CHOOSE_ACTION ||
-                                game.currentState == States.REMOVE_TILES
-                            ) {
+                            if (canClickCard()) {
                                 removeButton.isVisible = false
                                 interactionText.text = "Choose tile to claim: "
 
                                 overlayPane.clear()
                                 overlayPane.isVisible = true
 
-                                overlayPane.add(
-                                    HexagonView(
-                                        posX = 1260, posY = 270,
-                                        size = 40,
-                                        visual = leafTileImageVisual
-                                    )
-                                        .apply {
-                                            onMouseClicked = {
-                                                rootService.playerActionService.meditate(1, TileType.LEAF)
-                                                if (game.currentState != States.USING_HELPER) {
-                                                    updateSupply(game.currentPlayer)
-                                                    updatePlayableTiles(game.currentPlayer)
-                                                }
-                                                overlayPane.isVisible = false
-                                                interactionText.text = "You have received a leaf tile 🌿 "
-
-                                            }
-                                        })
-                                overlayPane.add(
-                                    HexagonView(
-                                        posX = 1380, posY = 270,
-                                        size = 40,
-                                        visual = woodTileImageVisual
-                                    ).apply {
-                                        onMouseClicked = {
-                                            rootService.playerActionService.meditate(1, TileType.WOOD)
-                                            if (game.currentState != States.USING_HELPER) {
-                                                updateSupply(game.currentPlayer)
-                                                updatePlayableTiles(game.currentPlayer)
-                                            }
-                                            overlayPane.isVisible = false
-                                            interactionText.text = "You have received a wood tile 🪵"
-                                        }
-                                    })
+                                showChooseWoodOrLeafPane()
                                 removeFromParent()
                                 updateZenBoard()
                             }
@@ -1592,10 +1577,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 2 -> {
                     card.apply {
                         onMouseClicked = {
-                            if (game.currentState == States.START_TURN ||
-                                game.currentState == States.CHOOSE_ACTION ||
-                                game.currentState == States.REMOVE_TILES
-                            ) {
+                            if (canClickCard()) {
                                 removeButton.isVisible = false
                                 interactionText.text = "You have received a wood 🪵 and flower 🌸 tile"
                                 rootService.playerActionService.meditate(2, null)
@@ -1614,10 +1596,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 else -> {
                     card.apply {
                         onMouseClicked = {
-                            if (game.currentState == States.START_TURN ||
-                                game.currentState == States.CHOOSE_ACTION ||
-                                game.currentState == States.REMOVE_TILES
-                            ) {
+                            if (canClickCard()) {
                                 removeButton.isVisible = false
                                 interactionText.text = "You have received a leaf 🌿 and fruit 🍊 tile"
                                 rootService.playerActionService.meditate(3, null)
@@ -1633,6 +1612,54 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 }
             }
         }
+    }
+
+    private fun showChooseWoodOrLeafPane() {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+
+        overlayPane.add(
+            HexagonView(
+                posX = 1260, posY = 270,
+                size = 40,
+                visual = leafTileImageVisual
+            )
+                .apply {
+                    onMouseClicked = {
+                        rootService.playerActionService.meditate(1, TileType.LEAF)
+                        if (game.currentState != States.USING_HELPER) {
+                            updateSupply(game.currentPlayer)
+                            updatePlayableTiles(game.currentPlayer)
+                        }
+                        overlayPane.isVisible = false
+                        interactionText.text = "You have received a leaf tile 🌿 "
+
+                    }
+                })
+        overlayPane.add(
+            HexagonView(
+                posX = 1380, posY = 270,
+                size = 40,
+                visual = woodTileImageVisual
+            ).apply {
+                onMouseClicked = {
+                    rootService.playerActionService.meditate(1, TileType.WOOD)
+                    if (game.currentState != States.USING_HELPER) {
+                        updateSupply(game.currentPlayer)
+                        updatePlayableTiles(game.currentPlayer)
+                    }
+                    overlayPane.isVisible = false
+                    interactionText.text = "You have received a wood tile 🪵"
+                }
+            })
+    }
+
+    private fun canClickCard(): Boolean {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        return  game.currentState == States.START_TURN ||
+                game.currentState == States.CHOOSE_ACTION ||
+                game.currentState == States.REMOVE_TILES
     }
 
     /**
@@ -1664,59 +1691,70 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 } else {
                     treeTileMap.add(emptyTile to this)
                 }
-
-
-                this.dropAcceptor = { dragEvent ->
-                    when (dragEvent.draggedComponent) {
-                        is HexagonView -> {
-                            // If the card is valid, the card can be dropped and played
-                            // some condition
-                            val comp = dragEvent.draggedComponent as HexagonView
-                            val tile = supplyTileMap.backward(comp)
-                            rootService.treeService.canPlayTile(tile, it)
-                        }
-
-                        else -> false
-                    }
-                }
-
-                this.onDragDropped = { dragEvent ->
-                    val comp = dragEvent.draggedComponent as HexagonView
-                    val tile = supplyTileMap.backward(comp)
-                    tile.q = it.first
-                    tile.r = it.second
-                    treeTileMap.remove(emptyTile to this)
-                    treeTileMap.add(tile to this)
-                    visual = CompoundVisual(
-                        getTileImageVisualForTileType(tile.tileType),
-                        TextVisual(
-                            text = "${it.first}, ${it.second}",
-                            font = Font(10.0, Color(0x000000))
-                        )
-                    )
-                    rootService.treeService.playTile(tile, it)
-                    val parentDeck = comp.parent //as Area<HexagonView>
-                    check(parentDeck is Area<*>)
-
-                    comp.removeFromParent()
-                    if (parentDeck.components.isNotEmpty()) {
-                        val lastHex = parentDeck.last()
-                        check(lastHex is HexagonView)
-                        val supplyTileType = supplyTileMap.backward(lastHex).tileType
-                        parentDeck.last().visual = CompoundVisual(
-                            getTileImageVisualForTileType(supplyTileType),
-                            TextVisual(
-                                "${parentDeck.components.size}",
-                                font = Font(30.0, Color(0x000000))
-                            )
-                        )
-                    }
-                    createEmptyHex(player)
-                }
+                setEmptyHexDraggedCondition(this, it, player)
+                setEmptyHexDroppedEvent(this, it, emptyTile, player)
             }
             treeHexagonGrid[it.first, it.second] = hexagon
         }
+    }
 
+    private fun setEmptyHexDraggedCondition(emptyHex: HexagonView, position: Pair<Int, Int>, player: Player) {
+        val supplyTileMap = supplyTileMaps[getOrder(player)]
+        emptyHex.dropAcceptor = { dragEvent ->
+            when (dragEvent.draggedComponent) {
+                is HexagonView -> {
+                    // If the card is valid, the card can be dropped and played
+                    // some condition
+                    val comp = dragEvent.draggedComponent as HexagonView
+                    val tile = supplyTileMap.backward(comp)
+                    rootService.treeService.canPlayTile(tile, position)
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun setEmptyHexDroppedEvent(
+        emptyHex: HexagonView,
+        position: Pair<Int, Int>,
+        emptyTile: Tile,
+        player: Player
+    ) {
+        val supplyTileMap = supplyTileMaps[getOrder(player)]
+        val treeTileMap = treeTileMaps[getOrder(player)]
+        emptyHex.onDragDropped = { dragEvent ->
+            val comp = dragEvent.draggedComponent as HexagonView
+            val tile = supplyTileMap.backward(comp)
+            tile.q = position.first
+            tile.r = position.second
+            treeTileMap.remove(emptyTile to emptyHex)
+            treeTileMap.add(tile to emptyHex)
+            emptyHex.visual = CompoundVisual(
+                getTileImageVisualForTileType(tile.tileType),
+                TextVisual(
+                    text = "${position.first}, ${position.second}",
+                    font = Font(10.0, Color(0x000000))
+                )
+            )
+            rootService.treeService.playTile(tile, position)
+            val parentDeck = comp.parent //as Area<HexagonView>
+            check(parentDeck is Area<*>)
+
+            comp.removeFromParent()
+            if (parentDeck.components.isNotEmpty()) {
+                val lastHex = parentDeck.last()
+                check(lastHex is HexagonView)
+                val supplyTileType = supplyTileMap.backward(lastHex).tileType
+                parentDeck.last().visual = CompoundVisual(
+                    getTileImageVisualForTileType(supplyTileType),
+                    TextVisual(
+                        "${parentDeck.components.size}",
+                        font = Font(30.0, Color(0x000000))
+                    )
+                )
+            }
+            createEmptyHex(player)
+        }
     }
 
     private fun updateSupplyAmount(player: Player) {
