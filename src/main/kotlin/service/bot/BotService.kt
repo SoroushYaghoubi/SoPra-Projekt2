@@ -2,7 +2,6 @@ package service.bot
 
 import entity.*
 import service.RootService
-import util.*
 
 
 /**
@@ -98,13 +97,14 @@ class BotService(val rootService: RootService) {
         val currentGameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(currentGameState)
 
-        val randomAction = MEDITATE //(0..1).random()
+        //val randomAction = MEDITATE //(0..1).random()
 
         val hasTiles = mutableListOf<TileType>()
 
         for (tile in currentGameState.currentPlayer.personalSupply) {
             hasTiles.add(tile.tileType)
         }
+        /*
 
         val possibleTilePlacing = allPossiblePlayedTiles(
             tree = currentGameState.currentPlayer.bonsaiTree,
@@ -115,6 +115,7 @@ class BotService(val rootService: RootService) {
         )
 
         when (randomAction) {
+
             CULTIVATE -> {
                 rootService.playerActionService.cultivate()
                 val placingTiles = possibleTilePlacing.random()
@@ -135,10 +136,11 @@ class BotService(val rootService: RootService) {
                 }
                 rootService.playerActionService.endTurn()
             }
+            */
 
-            MEDITATE -> onMeditateRandomAction()
-        }
 
+            //MEDITATE ->
+        onMeditateRandomAction()
     }
 
     private fun onMeditateRandomAction(){
@@ -216,9 +218,11 @@ class BotService(val rootService: RootService) {
     }
     */
 
+    /*
     private fun randomClaimOrRenounce(): Boolean {
         return listOf(true, false).random()
     }
+     */
 
 
 //    // gives back the card position
@@ -249,7 +253,7 @@ class BotService(val rootService: RootService) {
         }
     }
 
-
+/*
     private fun allPossiblePlayedTiles(
         tree: MutableMap<Pair<Int, Int>, Tile>,
         alreadyPlayedTiles: MutableList<Pair<TileType, Pair<Int, Int>>>,
@@ -368,6 +372,8 @@ class BotService(val rootService: RootService) {
         return returnList
 
     }
+
+ */
 
 
 //    /**
