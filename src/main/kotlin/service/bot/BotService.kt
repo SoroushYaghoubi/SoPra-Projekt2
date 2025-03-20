@@ -427,9 +427,6 @@ class BotService(val rootService: RootService) {
                             newMove.allTilesReceived.add(tile)
                         }
                     }
-                    if (position == 2) {
-
-                    }
                 }
 
                 else -> TODO()
