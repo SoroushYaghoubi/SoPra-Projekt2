@@ -2,6 +2,7 @@ package service
 
 import edu.udo.cs.sopra.ntf.*
 import entity.*
+import util.SECRET_KEY
 import util.ZenCardLoader
 import kotlin.test.*
 
@@ -291,4 +292,48 @@ class NetworkServiceTest {
     }
 
 
+    /**
+     * Test if correctly sent Cultivate Message
+     */
+    @Test
+    fun testSendMeditate() {
+        val rootService1 = RootService()
+        val rootService2 = RootService()
+        val sessionId = (10001.. 50000).random().toString()
+        rootService1.networkService.createGame (
+            SECRET_KEY,
+            "Gary",
+            sessionId
+        )
+
+        Thread.sleep(2000)
+        rootService2.networkService.joinGame(
+            SECRET_KEY,
+            "HIHI",
+            sessionId
+        )
+        Thread.sleep(2000)
+
+        val player1 = Player(
+            "Gary", PlayerType.HUMAN, true, ColorType.RED)
+        val player2 = Player(
+            "HIHI", PlayerType.HUMAN, false, ColorType.PURPLE)
+
+        rootService1.networkService.sendStartGameMessage(
+            mutableListOf(player1,player2),
+            mutableListOf(
+                GoalTileType.BROWN, GoalTileType.PINK, GoalTileType.GREEN)
+        )
+        Thread.sleep(1000)
+
+        val game1 = rootService1.currentGame?.currentBonsaiGameState
+        val game2 = rootService2.currentGame?.currentBonsaiGameState
+        checkNotNull(game1)
+        checkNotNull(game2)
+        rootService1.playerActionService.cultivate()
+        //rootService1.treeService.playTile(game1.currentPlayer.personalSupply.last(), (0 to -1))
+        rootService1.playerActionService.endTurn()
+        Thread.sleep(1000)
+        assertEquals(game2.currentPlayer, game2.players[1])
+    }
 }

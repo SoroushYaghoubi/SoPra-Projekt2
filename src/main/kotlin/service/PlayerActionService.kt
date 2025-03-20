@@ -303,7 +303,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             } else if (net.hasMeditated &&
                 net.connectionState == ConnectionState.PLAYING_MY_TURN) {
                 net.sendMeditateMessage()
-                net.hasCultivated = false
+                net.hasMeditated = false
             }
         }
 

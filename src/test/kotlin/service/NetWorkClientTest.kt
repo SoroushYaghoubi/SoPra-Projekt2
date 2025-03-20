@@ -96,6 +96,14 @@ class NetWorkClientTest {
         rootService1.networkService.sendMeditateMessage()
         Thread.sleep(1000)
         assertEquals(game1.players[0].tileCapacity, game2.players[0].tileCapacity)
+        game1.faceUpCards[1] = ParchmentCard(null,null,2,2)
+        game2.faceUpCards[1] = ParchmentCard(null,null,2,2)
+        rootService2.gameService.switchPlayerTurn()
+        rootService1.playerActionService.meditate(1,TileType.LEAF)
+        game1.currentPlayer.hasPlayed = true
+        rootService1.playerActionService.endTurn()
+        Thread.sleep(1000)
+        assertEquals(game1.players[1].personalSupply.last().tileType, TileType.LEAF)
     }
 
     /**
