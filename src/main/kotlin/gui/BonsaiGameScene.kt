@@ -133,13 +133,14 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
     // text for how many cards there are
     private val cardSumText = Label(
-        posX = 90, posY = 90,
+        posX = 86, posY = 90,
         width = 50, height = 50,
         visual = ColorVisual(Color(0, 0, 0, 0)),
         text = "",
         font = Font(40, Color.WHITE, fontWeight = Font.FontWeight.SEMI_BOLD)
-
-    )
+    ).apply {
+        isFocusable = true
+    }
 
     // pane for the cards
     private val zenCardPane =
@@ -309,17 +310,17 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
     //zenDeck
     private val zenDeckView = CardStack<CardView>(
-        posX = 60, posY = 40,
-        width = 110, height = 160
+        posX = 47, posY = 30,
+        width = 120, height = 170
     )
 
     //faceup cards
     private val faceUpCards = LinearLayout<CardView>(
-        posX = 205,
-        posY = 40,
-        width = 500,
-        height = 160,
-        spacing = 13
+        posX = 195,
+        posY = 30,
+        width = 510,
+        height = 170,
+        spacing = 6
     )
 
     private val undoButton =
@@ -621,8 +622,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         gameState.faceUpCards.forEach { card ->
             val cardView = CardView(
-                height = 160,
-                width = 110,
+                height = 170,
+                width = 120,
                 front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
                 back = ColorVisual.BLACK,
             )
@@ -634,8 +635,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         gameState.zenDeck.forEach { card ->
             val cardView = CardView(
-                height = 160,
-                width = 110,
+                height = 170,
+                width = 120,
                 front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.id}")),
                 back = ColorVisual.BLACK,
             )
@@ -847,8 +848,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         checkNotNull(game)
         game.zenDeck.forEach {
             val cardView = CardView(
-                height = 160,
-                width = 110,
+                height = 170,
+                width = 120,
                 front = CompoundVisual(ColorVisual.WHITE, TextVisual("${it.id}")),
                 back = zenCardsBack,
             )
@@ -861,8 +862,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         game.faceUpCards.forEach {
             val cardView = CardView(
-                height = 160,
-                width = 110,
+                height = 170,
+                width = 120,
                 front = CompoundVisual(ColorVisual.WHITE, TextVisual("${it.id}")),
                 back = ColorVisual.BLACK,
             )
