@@ -129,8 +129,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
     // text for how many cards there are
     private val cardSumText = Label(
-        posX = 86, posY = 90,
-        width = 50, height = 50,
+        posX = 82, posY = 200,
+        width = 50, height = 40,
         visual = ColorVisual(Color(0, 0, 0, 0)),
         text = "",
         font = Font(40, Color.WHITE, fontWeight = Font.FontWeight.SEMI_BOLD)
