@@ -992,7 +992,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     private fun updateZenBoard() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if (zenDeckView.isNotEmpty()) {
+        if (game.zenDeck.isNotEmpty()) {
             val newCardView = zenDeckView.pop()
             newCardView.showFront()
             val oldCardViews = faceUpCards.components.toMutableList()
@@ -1979,7 +1979,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         goalTilePane.add(
             Label(
                 posX = 75,
-                posY = 175,
+                posY = 130,
                 width = 700,
                 height = 400,
                 visual = ImageVisual("GoalTiles/${goalTileType}_${tier}.png"),
