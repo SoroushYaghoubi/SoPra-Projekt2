@@ -128,7 +128,7 @@ class RefreshableTest(val rootService: RootService) : Refreshable {
     }
 
 
-    override fun refreshAfterApplyCardEffects() {
+    override fun refreshAfterApplyCardEffects(position: Int?) {
         refreshAfterApplyCardEffectsCalled = false
     }
 

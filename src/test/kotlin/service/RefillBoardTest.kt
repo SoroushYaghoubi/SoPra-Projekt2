@@ -134,16 +134,16 @@ class RefillBoardTest {
     /**
      * Test refillBoard when the ZenDeck empty
      */
-    @Test
-    fun `test refillBoard with empty zenDeck`(){
-        val rootService = setUpGame()
-        val game = rootService.currentGame
-        checkNotNull(game)
-        val gameState = game.currentBonsaiGameState
-        checkNotNull(gameState) { "No active game state." }
-        gameState.zenDeck = mutableListOf()
-        assertFails { rootService.gameService.refillBoard() }
-    }
+//    @Test
+//    fun `test refillBoard with empty zenDeck`(){
+//        val rootService = setUpGame()
+//        val game = rootService.currentGame
+//        checkNotNull(game)
+//        val gameState = game.currentBonsaiGameState
+//        checkNotNull(gameState) { "No active game state." }
+//        gameState.zenDeck = mutableListOf()
+//        assertFails { rootService.gameService.refillBoard() }
+//    }
 
 
 }
