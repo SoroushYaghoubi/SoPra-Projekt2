@@ -13,7 +13,7 @@ import kotlinx.serialization.Transient
  */
 
 @Serializable
-abstract class Card(
+sealed class Card(
     @Transient open val id: Int = -1,
     val cardType: CardType
 )
