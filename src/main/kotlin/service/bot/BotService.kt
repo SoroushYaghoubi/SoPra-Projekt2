@@ -93,7 +93,7 @@ class BotService(val rootService: RootService) {
         val currentGameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(currentGameState)
 
-        val randomAction = (0..1).random()
+        val randomAction = MEDITATE //(0..1).random()
         val chosenCardSlot = (0 until currentGameState.faceUpCards.size).random()
         val chosenRandomTile = randomWoodOrLeafTile()
         val chosenRandomAnyTile = randomTile()
@@ -133,8 +133,8 @@ class BotService(val rootService: RootService) {
             }
             MEDITATE -> {
                 when (chosenCardSlot) {
-                    2 -> {
-                        rootService.playerActionService.meditate(2,chosenRandomTile)
+                    1 -> {
+                        rootService.playerActionService.meditate(1,chosenRandomTile)
                     }
                     else -> {
                         rootService.playerActionService.meditate(chosenCardSlot,null)
@@ -149,7 +149,7 @@ class BotService(val rootService: RootService) {
                         hasTiles = hasTiles,
                         returnList = mutableListOf()
                     ).random()
-                    for (tiles in helperCardPlayedTiles) {
+                    /*for (tiles in helperCardPlayedTiles) {
                         rootService.treeService.playTile(Tile(null,null,tiles.first),tiles.second)
                         currentGameState.goalTiles.forEach {
                             if (rootService.playerActionService.canClaimOrRenounceGoal(it.goalTileType, it.tier) &&
@@ -163,10 +163,18 @@ class BotService(val rootService: RootService) {
                             }
                         }
                     }
-
+                    */
                 }
                 if (currentGameState.faceUpCards[chosenCardSlot].cardType == CardType.MASTERCARD){
+                        currentGameState.currentState = States.USING_MASTER
                         rootService.playerActionService.chooseTile(chosenRandomAnyTile)
+                }
+                val personalSupply = currentGameState.currentPlayer.personalSupply
+                var differenceSupplyAndTiles = currentGameState.currentPlayer.tileCapacity -
+                        personalSupply.size
+                while (differenceSupplyAndTiles < 0){
+                    personalSupply.removeAt((0 until personalSupply.size).random())
+                    differenceSupplyAndTiles = currentGameState.currentPlayer.tileCapacity - personalSupply.size
                 }
                 rootService.playerActionService.endTurn()
             }
@@ -222,6 +230,7 @@ class BotService(val rootService: RootService) {
             else -> TileType.WOOD
         }
     }
+
 
 
     private fun allPossiblePlayedTiles(
@@ -363,6 +372,8 @@ class BotService(val rootService: RootService) {
         return returnList
 
     }
+
+
 
     /**
      * function that generates a list of all possible Moves
