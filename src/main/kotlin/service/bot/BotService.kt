@@ -164,6 +164,13 @@ class BotService(val rootService: RootService) {
                 if (currentGameState.faceUpCards[chosenCardSlot].cardType == CardType.MASTERCARD){
                         rootService.playerActionService.chooseTile(chosenRandomAnyTile)
                 }
+                val personalSupply = currentGameState.currentPlayer.personalSupply
+                var differenceSupplyAndTiles = currentGameState.currentPlayer.personalSupply.size -
+                        currentGameState.currentPlayer.tileCapacity
+                while (differenceSupplyAndTiles < 0){
+                    personalSupply.removeAt((0 until personalSupply.size).random())
+                    differenceSupplyAndTiles = personalSupply.size - currentGameState.currentPlayer.tileCapacity
+                }
                 rootService.playerActionService.endTurn()
             }
         }
