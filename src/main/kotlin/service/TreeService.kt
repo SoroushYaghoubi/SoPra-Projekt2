@@ -102,8 +102,10 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         val currentPlayer = getCurrentPlayer()
 
-        if(!canPlayWood()){
-            require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF
+        require(!canPlayWood())
+
+
+        require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF
                     || gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.FLOWER)
             { "not a valid move" }
 
@@ -139,7 +141,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                     net.toBeSentCultivateMessage.removedTilesAxialCoordinates.add(tilePosition)
                     net.toBeSentMeditateMessage.removedTilesAxialCoordinates.add(tilePosition)
                 }
-            }
 
         //require(!currentPlayer.hasPlayed) {"player has already chosen other moves"}
 
