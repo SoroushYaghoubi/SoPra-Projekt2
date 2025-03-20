@@ -283,8 +283,10 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     posY = (row * 75).toDouble(),
                     height = 75,
                     width = 53,
-                    front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.cardType}\nID: ${card.id}")),
-                    back = zenCardsBack,
+                    //front = CompoundVisual(ColorVisual.WHITE, TextVisual("${card.cardType}\nID: ${card.id}")),
+                    front = ImageVisual("ZenCards/${card.id}.png"),
+
+                            back = zenCardsBack,
                 ).apply {
                     showBack()
                     onMouseClicked = {
