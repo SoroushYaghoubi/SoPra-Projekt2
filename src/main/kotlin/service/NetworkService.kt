@@ -54,6 +54,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         } else {
             client?.createGame(GAME_ID, sessionID, "Welcome!^_^")
         }
+        onAllRefreshables { refreshAfterPlayerJoined(name) }
         updateConnectionState(ConnectionState.WAITING_FOR_HOST_CONFIRMATION)
     }
 
@@ -305,10 +306,7 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         val nextIndex = (currentIndex + 1) % game.players.size
         if (game.players[nextIndex].name == myName) updateConnectionState(ConnectionState.PLAYING_MY_TURN)
         hasMeditated = false
-        //TODO(refresh after meditate)
         game.currentPlayer.hasPlayed = true
-        //onAllRefreshables { refreshAfterMeditate(message.chosenCardPosition) }
-        println(game.faceUpCards)
         rootService.playerActionService.endTurn()
     }
 

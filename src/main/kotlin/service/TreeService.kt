@@ -67,12 +67,12 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             ) {
                 // call claimOrRenounceGoal() in the gui layer
                 reached = true
-                onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier) }
+                onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier, tilePosition) }
             }
         }
         if (!reached) {
             // do other stuff in gui
-            onAllRefreshables { refreshAfterPlayTile(null, 0) }
+            onAllRefreshables { refreshAfterPlayTile(null, 0, tilePosition) }
         }
     }
 
@@ -413,7 +413,9 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 for (i in 0 until leafPositions.size - 1) {
                     val firstLeaf = leafPositions[i]
                     val secondLeaf = leafPositions[i + 1]
-                    if (neighbours.indexOf(firstLeaf) + 1 == neighbours.indexOf(secondLeaf)) {
+                    val firstIndex = neighbours.indexOf(firstLeaf)
+                    val secondIndex = neighbours.indexOf(secondLeaf)
+                    if ((firstIndex + 1) % 6 == secondIndex || (secondIndex + 1) % 6 == firstIndex) {
                         return !neighbourTiles.contains(TileType.FRUIT)
                     }
                 }

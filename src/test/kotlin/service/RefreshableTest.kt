@@ -98,7 +98,7 @@ class RefreshableTest(val rootService: RootService) : Refreshable {
         refreshAfterGameEndCalled = true
     }
 
-    override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {
+    override fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int, tilePosition: Pair<Int, Int>) {
         refreshAfterPlayTileCalled = false
     }
 

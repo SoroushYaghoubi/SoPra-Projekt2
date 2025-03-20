@@ -29,12 +29,12 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player has played a tile
      */
-    fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int) {}
+    fun refreshAfterPlayTile(goalTileType: GoalTileType?, tier: Int, tilePosition: Pair<Int, Int>) {}
 
     /**
      * perform refreshes that are necessary after a player has meditated
      */
-    fun refreshAfterMeditate(position: Int?){}
+    //fun refreshAfterMeditate(position: Int?){}
 
     /**
      * perform refreshes that are necessary after a player has started the cultivate action

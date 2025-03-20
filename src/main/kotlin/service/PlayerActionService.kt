@@ -217,7 +217,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate(null) }
+        //onAllRefreshables { refreshAfterMeditate(null) }
+        onAllRefreshables { refreshAfterApplyCardEffects(null) }
     }
 
     /**
@@ -381,11 +382,10 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 }
             }
         } else {
-            gameState.goalTiles.removeIf { tile ->
+            gameState.goalTiles.forEach { tile ->
                 if (tile.goalTileType == goalTileType && tile.tier == tier) {
                     player.renouncedGoals.add(tile)
-                    true
-                } else false
+                }
             }
             // update message
             if (net.connectionState != ConnectionState.DISCONNECTED &&
