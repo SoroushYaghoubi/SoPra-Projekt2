@@ -1389,6 +1389,12 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         // update collected cards
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
+
+        val currentPlayerType = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.playerType
+        checkNotNull(currentPlayerType)
+        if (currentPlayerType != PlayerType.HUMAN){
+            rootService.botService.makeRandomMove()
+        }
     }
 
     override fun refreshAfterApplyCardEffects(position: Int?) {
@@ -1738,6 +1744,12 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         // update collected cards
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
+
+        val currentPlayerType = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.playerType
+        checkNotNull(currentPlayerType)
+        if (currentPlayerType != PlayerType.HUMAN){
+            rootService.botService.makeRandomMove()
+        }
     }
 
 
