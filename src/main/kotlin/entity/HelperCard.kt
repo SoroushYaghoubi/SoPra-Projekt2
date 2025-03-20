@@ -1,5 +1,7 @@
 package entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * A helper card in the game, which lets a player play tiles at acquisition
  *
@@ -8,6 +10,7 @@ package entity
  * @throws IllegalArgumentException If [id] is not a non-negative int
  */
 
-class HelperCard(tileType: TileType, id: Int) : Card(id, CardType.HELPERCARD) {
+@Serializable
+class HelperCard(val tileType: TileType,override val id: Int) : Card(id, CardType.HELPERCARD) {
     val tileTypes = mutableListOf(TileType.ANY, tileType)
 }
