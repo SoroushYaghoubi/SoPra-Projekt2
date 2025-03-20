@@ -265,17 +265,17 @@ class PlayTileTest {
             TileType.LEAF
         )
 
+        rootService.networkService.hasMeditated = true
         treeService.playTile(tile, Pair(2, -2))
 
         //println("Meditate Message Tiles: ${rootService.networkService.toBeSentMeditateMessage.playedTiles}")
         //println("Cultivate Message Tiles: ${rootService.networkService.toBeSentCultivateMessage.playedTiles}")
-
         assertTrue(
             rootService.networkService.toBeSentMeditateMessage.playedTiles.contains(
                 TileType.LEAF to Pair(2, -2)
             )
         )
-        assertTrue(
+        assertFalse(
             rootService.networkService.toBeSentCultivateMessage.playedTiles.contains(
                 TileType.LEAF to Pair(2, -2)
             )
