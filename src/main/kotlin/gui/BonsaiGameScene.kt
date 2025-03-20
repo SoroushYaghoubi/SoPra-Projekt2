@@ -1337,7 +1337,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
 
-        // update tree
+        // update tree for real this time bro
         drawTreeFRFR()
 
         val currentPlayerType = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.playerType
