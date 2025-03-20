@@ -1351,13 +1351,11 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
         val actPlayer = game.currentPlayer
-        //TODO(timer?)
-        //Timer().schedule(1000) {
             if (actPlayer.personalSupply.size > actPlayer.tileCapacity &&
                 game.currentPlayer.isLocal) {
                 game.currentState = States.DISCARDING
                 refreshAfterReceivedTile(true)
-                return //@schedule
+                return
             } else {
                 actPlayer.hasPlayed = true
                 if (game.currentState != States.USING_HELPER) {
@@ -1577,61 +1575,43 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             !game.currentPlayer.isLocal
         ) {
             drawTree(game.currentPlayer, tilePosition)
+        }else {
+            // update playable tiles
+            updatePlayableTiles(game.currentPlayer)
         }
 
         // update tile capacity
         capacityLabel.text = "Capacity: ${game.currentPlayer.tileCapacity}"
 
-        // update playable tiles
-        updatePlayableTiles(game.currentPlayer)
 
         if (goalTileType != null) {
-
-            var goalTileScore = 0
-
-            for (goalTile in goalTileList) {
-                if (goalTile.goalTileType == goalTileType && goalTile.tier == tier) {
-                    goalTileScore = goalTile.score
-                }
-            }
-            //addComponents(goalTilePane)
-            goalTilePane.add(
-                Label(
-                    posX = 100,
-                    posY = 250,
-                    width = 500,
-                    height = 50,
-                    visual = ColorVisual(Color(getColorForGoalTile(goalTileType))).apply {
-                        style.borderRadius = BorderRadius(20.0)
-                    },
-                    text = "Goal Tile: $goalTileType Tier: $tier Score: $goalTileScore",
-                    font = Font(30)
-                )
-
-            )
-            goalTilePane.isVisible = true
-            goalTilePane.isDisabled = false
-            claimButton.onMouseClicked = {
-                rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
-                goalTilePane.isDisabled = true
-                goalTilePane.isVisible = false
-
-                goalTileList.forEach {
-                    if (goalTileType == it.goalTileType && tier == it.tier) {
-                        goalButtons[goalTileList.indexOf(it)].text =
-                            game.currentPlayer.name + ", Score:  $goalTileScore"
-                    }
-                }
-            }
-            renounceButton.onMouseClicked = {
-                rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
-                goalTilePane.isDisabled = true
-                goalTilePane.isVisible = false
-            }
+            updateGoals(goalTileType, tier)
         }
 
         updateParchCards(game.currentPlayer)
         updateCollectedMasterHelper(game.currentPlayer)
+    }
+
+    /**
+     * it's only for non local player
+     */
+    override fun refreshAfterClaimGoal(goalTileType: GoalTileType, tier: Int) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        var goalTileScore = 0
+
+        for (goalTile in goalTileList) {
+            if (goalTile.goalTileType == goalTileType && goalTile.tier == tier) {
+                goalTileScore = goalTile.score
+            }
+        }
+
+        goalTileList.forEach {
+            if (goalTileType == it.goalTileType && tier == it.tier) {
+                goalButtons[goalTileList.indexOf(it)].text =
+                    game.currentPlayer.name + ", Score:  $goalTileScore"
+            }
+        }
     }
 
     override fun refreshAfterDiscardTile() {
@@ -2031,6 +2011,55 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         )
         treeTileMap.add(playedTile to coloredHex)
         treeHexagonGrid[q, r] = coloredHex
+    }
+
+    private fun updateGoals(goalTileType: GoalTileType, tier: Int) {
+        val game = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(game)
+        var goalTileScore = 0
+
+        for (goalTile in goalTileList) {
+            if (goalTile.goalTileType == goalTileType && goalTile.tier == tier) {
+                goalTileScore = goalTile.score
+            }
+        }
+
+        //addComponents(goalTilePane)
+        goalTilePane.add(
+            Label(
+                posX = 100,
+                posY = 250,
+                width = 500,
+                height = 50,
+                visual = ColorVisual(Color(getColorForGoalTile(goalTileType))).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                },
+                text = "Goal Tile: $goalTileType Tier: $tier Score: $goalTileScore",
+                font = Font(30)
+            )
+
+        )
+        if (game.currentPlayer.isLocal){
+            goalTilePane.isVisible = true
+            goalTilePane.isDisabled = false
+        }
+        claimButton.onMouseClicked = {
+            rootService.playerActionService.claimOrRenounceGoal(true, goalTileType, tier)
+            goalTilePane.isDisabled = true
+            goalTilePane.isVisible = false
+
+            goalTileList.forEach {
+                if (goalTileType == it.goalTileType && tier == it.tier) {
+                    goalButtons[goalTileList.indexOf(it)].text =
+                        game.currentPlayer.name + ", Score:  $goalTileScore"
+                }
+            }
+        }
+        renounceButton.onMouseClicked = {
+            rootService.playerActionService.claimOrRenounceGoal(false, goalTileType, tier)
+            goalTilePane.isDisabled = true
+            goalTilePane.isVisible = false
+        }
     }
 
     private fun showSupply(index: Int) {

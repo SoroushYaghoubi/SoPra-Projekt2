@@ -2,7 +2,6 @@ package gui
 
 import entity.ColorType
 import entity.GoalTileType
-import entity.Player
 import entity.PlayerType
 import service.RootService
 import tools.aqua.bgw.components.layoutviews.Pane
@@ -12,8 +11,6 @@ import tools.aqua.bgw.core.MenuScene
 import tools.aqua.bgw.style.BorderRadius
 import tools.aqua.bgw.visual.ColorVisual
 import tools.aqua.bgw.util.Font
-//import tools.aqua.bgw.visual.CompoundVisual
-//import tools.aqua.bgw.visual.ImageVisual
 import util.PRIMARY_COLOUR
 import util.SECONDARY_COLOUR
 import util.TERTIARY_COLOUR
@@ -248,8 +245,8 @@ class HostScene(
     private val playerInputs: MutableList<TextField> = mutableListOf()
     private val playerColours: MutableList<Button> = mutableListOf()
     private val playerRemoves: MutableList<Button> = mutableListOf()
-    private val playerEasyBots: MutableList<CheckBoxButton> = mutableListOf()
-    private val playerHardBots: MutableList<CheckBoxButton> = mutableListOf()
+//    private val playerEasyBots: MutableList<CheckBoxButton> = mutableListOf()
+//    private val playerHardBots: MutableList<CheckBoxButton> = mutableListOf()
 
 
     init {
@@ -264,20 +261,10 @@ class HostScene(
                         val color = playerColors[index]
                         val client = rootService.networkService.client
                         checkNotNull(client)
-                        val playerType : PlayerType
-                        if (playerNameInLobby == client.playerName) {
-                            playerType = when {
-                                playerEasyBots[0].isChecked -> PlayerType.EASYBOT
-                                playerHardBots[0].isChecked -> PlayerType.HARDBOT
-                                else -> PlayerType.HUMAN
-                            }
-                        } else {
-                            playerType = PlayerType.HUMAN
-                        }
                         val isLocal = (playerNameInLobby == client.playerName)
 
 
-                        entity.Player(playerNameInLobby, playerType, isLocal, color)
+                        entity.Player(playerNameInLobby, PlayerType.HUMAN, isLocal, color)
                     }.toMutableList()
 
                     rootService.networkService
@@ -329,7 +316,7 @@ class HostScene(
 
         val newPlayerColour = getColourButton(currentIndex)
 
-        /**
+        /*
         val newPlayerRemove = SquareButton(
             posX = 680,
             posY = 270 + 140 * currentIndex,
@@ -338,48 +325,29 @@ class HostScene(
                 removePlayer(currentIndex)
             }
         }
-        */
 
-        if (playerName == rootService.networkService.client?.playerName){
+
+        if (playerName == rootService.networkService.client?.playerName) {
             val newPlayerEasyBot = CheckBoxButton(
                 posX = 830,
                 posY = 270 + 140 * currentIndex,
             ).apply {
                 onMouseClicked = {
-                    if (!isChecked && playerHardBots[currentIndex].isChecked) {
+                    if (!isChecked && playerHardBot scurrentIndex.isChecked) {
                         // If hardBot is checked, uncheck it
-                            playerHardBots[currentIndex].change()
+                        playerHardBotscurrentIndex.change()
                     }
                     change()
                 }
             }
-
-            val newPlayerHardBot = CheckBoxButton(
-                posX = 980,
-                posY = 270 + 140 * currentIndex,
-            ).apply {
-                onMouseClicked = {
-                    // If easyBot is checked, uncheck it
-                    if (!isChecked && playerEasyBots[currentIndex].isChecked) {
-                            playerEasyBots[currentIndex].change()
-                    }
-                    change()
-                }
-            }
-            contentPlayerPane.addAll(
-                newPlayerEasyBot,
-                newPlayerHardBot,
-            )
-            playerEasyBots.add(newPlayerEasyBot)
-            playerHardBots.add(newPlayerHardBot)
         }
+        */
 
 
         // Add components to the pane
         contentPlayerPane.addAll(
             newPlayerInput,
             newPlayerTurn,
-            //newPlayerRemove,
             newPlayerColour,
         )
 
@@ -387,7 +355,6 @@ class HostScene(
         playerTurns.add(newPlayerTurn)
         playerInputs.add(newPlayerInput)
         playerColours.add(newPlayerColour)
-        //playerRemoves.add(newPlayerRemove)
     }
 
     private fun getTurnLabel(currentIndex: Int): TurnLabel {
@@ -449,42 +416,44 @@ class HostScene(
         }
     }
 
+    /*
     private fun removePlayer(index: Int) {
         if (playerInputs.size <= 1) return
 
         contentPlayerPane.remove(playerTurns[index])
         contentPlayerPane.remove(playerColours[index])
         contentPlayerPane.remove(playerRemoves[index])
-        contentPlayerPane.remove(playerEasyBots[index])
-        contentPlayerPane.remove(playerHardBots[index])
+//        contentPlayerPane.remove(playerEasyBots[index])
+//        contentPlayerPane.remove(playerHardBots[index])
         contentPlayerPane.remove(playerInputs[index])
 
         playerTurns.removeAt(index)
         playerColours.removeAt(index)
         playerRemoves.removeAt(index)
-        playerEasyBots.removeAt(index)
-        playerHardBots.removeAt(index)
+//        playerEasyBots.removeAt(index)
+//        playerHardBots.removeAt(index)
         playerInputs.removeAt(index)
 
         for (i in index until playerInputs.size) {
-            playerTurns[i].posY -= 140
-            playerColours[i].posY -= 140
-            playerRemoves[i].posY -= 140
-            playerEasyBots[i].posY -= 140
-            playerHardBots[i].posY -= 140
-            playerInputs[i].posY -= 140
+            playerTurns.posY -= 140
+            playerColours.posY -= 140
+            playerRemoves.posY -= 140
+//            playerEasyBots.posY -= 140
+//            playerHardBots.posY -= 140
+            playerInputs.posY -= 140
 
-            playerRemoves[i].onMouseClicked = {
+            playerRemoves.onMouseClicked = {
                 removePlayer(i)
             }
-            playerTurns[i].onMouseEntered = {
+            playerTurns.onMouseEntered = {
                 highlightPlayers(i)
             }
-            playerTurns[i].onMouseExited = {
+            playerTurns.onMouseExited = {
                 removeHighlight()
             }
         }
     }
+    */
 
     override fun refreshAfterPlayerJoined(playerName: String) {
         addPlayer(playerName)
@@ -593,11 +562,11 @@ class HostScene(
 
         val shuffledInputs = indices.map { playerInputs[it] }.toMutableList()
         val shuffledColors = indices.map { playerColors[it] }.toMutableList()
-        val shuffledEasyBots = indices.map { playerEasyBots[it] }.toMutableList()
-        val shuffledHardBots = indices.map { playerHardBots[it] }.toMutableList()
+//        val shuffledEasyBots = indices.map { playerEasyBots[it] }.toMutableList()
+//        val shuffledHardBots = indices.map { playerHardBots[it] }.toMutableList()
         val shuffledTurns = indices.map { playerTurns[it] }.toMutableList()
         val shuffledColours = indices.map { playerColours[it] }.toMutableList()
-        val shuffledRemoves = indices.map { playerRemoves[it] }.toMutableList()
+//        val shuffledRemoves = indices.map { playerRemoves[it] }.toMutableList()
 
         playerInputs.clear()
         playerInputs.addAll(shuffledInputs)
@@ -605,11 +574,11 @@ class HostScene(
         playerColors.clear()
         playerColors.addAll(shuffledColors)
 
-        playerEasyBots.clear()
-        playerEasyBots.addAll(shuffledEasyBots)
+//        playerEasyBots.clear()
+//        playerEasyBots.addAll(shuffledEasyBots)
 
-        playerHardBots.clear()
-        playerHardBots.addAll(shuffledHardBots)
+//        playerHardBots.clear()
+//        playerHardBots.addAll(shuffledHardBots)
 
         playerTurns.clear()
         playerTurns.addAll(shuffledTurns)
@@ -617,17 +586,15 @@ class HostScene(
         playerColours.clear()
         playerColours.addAll(shuffledColours)
 
-        playerRemoves.clear()
-        playerRemoves.addAll(shuffledRemoves)
+//        playerRemoves.clear()
+//        playerRemoves.addAll(shuffledRemoves)
 
-        rebindBotHandlers()
+//        rebindBotHandlers()
 
         updatePlayerPositions()
     }
 
-    /**
-     * sets bots to the correct players after randomizing players
-     */
+    /*
     private fun rebindBotHandlers() {
         for (i in playerEasyBots.indices) {
             playerEasyBots[i].onMouseClicked = {
@@ -649,6 +616,7 @@ class HostScene(
             }
         }
     }
+    */
 
     /**
      * current players starting position and next players starting position is switched
@@ -663,11 +631,11 @@ class HostScene(
         // Swap the players in all lists
         swapInList(playerInputs, index, nextIndex)
         swapInList(playerColors, index, nextIndex)
-        swapInList(playerEasyBots, index, nextIndex)
-        swapInList(playerHardBots, index, nextIndex)
+//        swapInList(playerEasyBots, index, nextIndex)
+//        swapInList(playerHardBots, index, nextIndex)
         swapInList(playerTurns, index, nextIndex)
         swapInList(playerColours, index, nextIndex)
-        swapInList(playerRemoves, index, nextIndex)
+//        swapInList(playerRemoves, index, nextIndex)
 
         // update the positions and click handlers
         updatePlayerPositions()
@@ -686,9 +654,9 @@ class HostScene(
             playerTurns[i].posY = 270.0 + 140 * i
             playerInputs[i].posY = 270.0 + 140 * i
             playerColours[i].posY = 280.0 + 140 * i
-            playerRemoves[i].posY = 270.0 + 140 * i
-            playerEasyBots[i].posY = 270.0 + 140 * i
-            playerHardBots[i].posY = 270.0 + 140 * i
+//            playerRemoves[i].posY = 270.0 + 140 * i
+//            playerEasyBots[i].posY = 270.0 + 140 * i
+//            playerHardBots[i].posY = 270.0 + 140 * i
 
             playerTurns[i].text = "${i + 1}"
         }
