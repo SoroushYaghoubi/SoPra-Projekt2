@@ -322,16 +322,17 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         rootService.playerActionService.endTurn()
     }
 
-    private fun specialDiscard(i: Int, personalSupplies: MutableList<Tile>, removedTile: TileType){
-        var j = i
-        while(j >= 0) {
-            val supply = personalSupplies.removeLast()
-            if (supply.tileType == removedTile) {
-                rootService.playerActionService.discardSupplyTile(supply)
-                j = -1
-            }
-        }
-    }
+    // This is not used so...
+//    private fun specialDiscard(i: Int, personalSupplies: MutableList<Tile>, removedTile: TileType){
+//        var j = i
+//        while(j >= 0) {
+//            val supply = personalSupplies.removeLast()
+//            if (supply.tileType == removedTile) {
+//                rootService.playerActionService.discardSupplyTile(supply)
+//                j = -1
+//            }
+//        }
+//    }
 
     /**
      * Receives and processes the Cultivate action message from another player.
