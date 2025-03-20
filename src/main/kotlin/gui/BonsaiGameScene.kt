@@ -510,104 +510,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         this.add(redoButton)
         this.add(saveButton)
     }
-/*
-    private fun createRightSidePane() {
-        val gameState = rootService.currentGame?.currentBonsaiGameState
-        checkNotNull(gameState) { "Game state is not initialized." }
 
-        // sorted goal tiles in order: brown, green, orange, pink, blue
-        val sortedGoalTiles = gameState.goalTiles.sortedBy {
-            when (it.goalTileType) {
-                GoalTileType.BROWN -> 0
-                GoalTileType.GREEN -> 1
-                GoalTileType.ORANGE -> 2
-                GoalTileType.PINK -> 3
-                GoalTileType.BLUE -> 4
-            }
-        }
-        goalTileList = sortedGoalTiles.toMutableList()
-
-
-        // player buttons below the save button
-        val playerButtonsY = saveButton.posY + saveButton.height + 20
-        val playerButtonHeight = 35
-        val playerButtonSpacing = 20
-
-        // number of necessary player buttons
-        val numberOfPlayerButtons = gameState.players.size
-
-        // created player buttons
-        for (i in 0 until numberOfPlayerButtons) {
-            // current player needs no buttons
-            val player = gameState.players[i]
-            val playerButton = Button(
-                posX = saveButton.posX,
-                posY = playerButtonsY + (playerButtonHeight + playerButtonSpacing) * i,
-                width = saveButton.width,
-                height = playerButtonHeight,
-                visual = ColorVisual(Color(0xffffff)).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
-                text = player.name,
-                font = Font(30)
-            ).apply {
-                playerButtons.add(this)
-                onMouseClicked = {
-                    val game = rootService.currentGame?.currentBonsaiGameState
-                    checkNotNull(game)
-                    playerPanes.forEachIndexed { index, playerPane ->
-                        val currentPlayerIndex = getOrder(game.currentPlayer)
-                        if (index == i) {
-                            playerPane.isVisible = true
-                            if (index == currentPlayerIndex) {
-                                showSupply(index)
-                            }
-                        } else {
-                            playerPane.isVisible = false
-                            hideSupply(index)
-                        }
-                    }
-                    // show player's playable tiles
-                    updatePlayableTiles(player)
-
-                    //update player's collected cards
-                    updateParchCards(player)
-                    updateCollectedMasterHelper(player)
-                }
-            }
-            buttonPane.add(playerButton)
-        }
-
-        val buttonHeight = 45
-        val buttonSpacing = 30
-        var currentY = 370
-
-        // need 6 goal tiles for 2 players and 9 for 3
-        val numberOfButtons = if (gameState.players.size == 2) 6 else 9
-
-        // create goal tile buttons in correct order
-        for (i in 0 until numberOfButtons) {
-            val goalTile = sortedGoalTiles[i % sortedGoalTiles.size]
-            val goalButton = Button(
-                posX = 20,
-                posY = currentY,
-                width = 260,
-                height = buttonHeight,
-                visual = ColorVisual(Color(getColorForGoalTile(goalTile.goalTileType))).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
-                text = "Tier: ${goalTile.tier} Score: ${goalTile.score}",
-                font = Font(30)
-            )
-            goalButtons.add(goalButton)
-            buttonPane.add(goalButton)
-            currentY += buttonHeight + buttonSpacing
-        }
-
-        // add panel to the scene
-        addComponents(buttonPane)
-    }
-    */
     // Overlay the game scene to prompt the player to choose tile
     private val overlayPane = Pane<ComponentView>(
         posX = 0, posY = 0,
@@ -1208,6 +1111,16 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         // created player buttons
         for (i in 0 until numberOfPlayerButtons) {
+            var visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            }
+            var font = Font(30)
+            if (gameState.players[i].isLocal) {
+                visual = ColorVisual(Color(0x000000)).apply {
+                    style.borderRadius = BorderRadius(20.0)
+                }
+                font = Font(30, Color.WHITE)
+            }
             // current player needs no buttons
             val player = gameState.players[i]
             val playerButton = Button(
@@ -1215,16 +1128,12 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 posY = playerButtonsY + (playerButtonHeight + playerButtonSpacing) * i,
                 width = saveButton.width,
                 height = playerButtonHeight,
-                visual = ColorVisual(Color(0xffffff)).apply {
-                    style.borderRadius = BorderRadius(20.0)
-                },
+                visual = visual,
                 text = player.name,
-                font = Font(30)
+                font = font
             ).apply {
                 playerButtons.add(this)
                 onMouseClicked = {
-                    val game = rootService.currentGame?.currentBonsaiGameState
-                    checkNotNull(game)
                     playerPanes.forEachIndexed { index, playerPane ->
                         if (index == i) {
                             playerPane.isVisible = true
@@ -1240,7 +1149,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                     updateCollectedMasterHelper(player)
 
                     //update player's name
-                    nameText.text = game.players[i].name
+                    nameText.text = gameState.players[i].name
 
                     // update player's capacity
                     updateCapacity(player)
