@@ -193,9 +193,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
-        val actPlayer = gameState.currentPlayer
-        //gameState.currentPlayer.playableTilesCopy.clear()
-        //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
         if (!gameState.currentPlayer.isLocal) {
             onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
         } else {
@@ -360,7 +357,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         val gameState = checkNotNull(game.currentBonsaiGameState) { "No active game state." }
 
         val player = getCurrentPlayer()
-        val net = rootService.networkService
 
         require(canClaimOrRenounceGoal(goalTileType, tier))
 
@@ -375,15 +371,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 } else false
             }
             // update message
-            if (net.connectionState != ConnectionState.DISCONNECTED &&
-                player.isLocal
-            ) {
-                if (net.hasCultivated) {
-                    net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
-                } else if (net.hasMeditated) {
-                    net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
-                }
-            }
+            writeGoalInMessage(goalTileType, tier, true)
         } else {
             gameState.goalTiles.forEach { tile ->
                 if (tile.goalTileType == goalTileType && tile.tier == tier) {
@@ -391,63 +379,32 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 }
             }
             // update message
-            if (net.connectionState != ConnectionState.DISCONNECTED &&
-                player.isLocal
-            ) {
-                if (net.hasCultivated) {
-                    net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
-
-                } else if (net.hasMeditated) {
-                    net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
-                }
-            }
+            writeGoalInMessage(goalTileType, tier, false)
         }
 
         onAllRefreshables { refreshAfterClaimGoal() }
+    }
 
-        /**
-        // checks if a player has already claimed a goal tile from a specific tile type
-        for (goalTile in gameState.goalTiles.flatten()) {
-        if (player.claimedGoals.any { it.goalTileType == goalTile.goalTileType }) {
-        continue
-        }
-        // checks if player has renounced the current goal tile
-        if (goalTile in player.renouncedGoals) {
-        continue
-        }
+    private fun writeGoalInMessage(goalTileType: GoalTileType, tier: Int, claim: Boolean) {
+        val net = rootService.networkService
 
-        // checks if one of the goal tile requirements is reached
-        if (canClaimOrRenounceGoal(goalTile.goalTileType, goalTile.tier)) {
-        // if the goal tile requirement is reached, get goal tile based on the claim
-        if (claim) {
-        player.claimedGoals.add(goalTile)
-        // update message
         if (net.connectionState != ConnectionState.DISCONNECTED &&
-        player.isLocal
+            getCurrentPlayer().isLocal && claim
         ) {
-        net.toBeSentCultivateMessage.claimedGoals.add((goalTile.goalTileType to goalTile.tier))
-        }
-        // remove the claimed goal tile from the list
-        for (goalTileList in gameState.goalTiles) {
-        if (goalTileList.contains(goalTile)) {
-        goalTileList.remove(goalTile)
-        break
-        }
-        }
-        } else {
-        player.renouncedGoals.add(goalTile)
-        // update message
-        if (net.connectionState != ConnectionState.DISCONNECTED &&
-        player.isLocal
-        ) {
-        net.toBeSentCultivateMessage.renouncedGoals.add((goalTile.goalTileType to goalTile.tier))
-        }
-        break
-        }
-        }
-        }
-         */
+            if (net.hasCultivated) {
+                net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
+            } else if (net.hasMeditated) {
+                net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
+            }
+        } else if (net.connectionState != ConnectionState.DISCONNECTED &&
+            getCurrentPlayer().isLocal && !claim) {
+            if (net.hasCultivated) {
+                net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
 
+            } else if (net.hasMeditated) {
+                net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
+            }
+        }
     }
 
 
@@ -533,7 +490,9 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
     }
 
     // Function to perform depth-first search and count the size of a cluster
-    private fun dfs(tilePos: Pair<Int, Int>, visited: MutableSet<Pair<Int, Int>>, bonsaiTree: MutableMap<Pair<Int, Int>, Tile>): Int {
+    private fun dfs(tilePos: Pair<Int, Int>,
+                    visited: MutableSet<Pair<Int, Int>>,
+                    bonsaiTree: MutableMap<Pair<Int, Int>, Tile>): Int {
         //stack to keep track of all the tiles
         val stack = mutableListOf(tilePos)
         var count = 0
