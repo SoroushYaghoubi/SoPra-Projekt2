@@ -992,12 +992,18 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     private fun updateZenBoard() {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-        if (game.zenDeck.isNotEmpty()) {
+        if (zenDeckView.isNotEmpty()) {
             val newCardView = zenDeckView.pop()
             newCardView.showFront()
             val oldCardViews = faceUpCards.components.toMutableList()
             faceUpCards.clear()
             faceUpCards.add(newCardView)
+            faceUpCards.addAll(oldCardViews)
+            applyCardPosition()
+            cardSumText.text = "${game.zenDeck.size}"
+        } else {
+            val oldCardViews = faceUpCards.components.toMutableList()
+            faceUpCards.clear()
             faceUpCards.addAll(oldCardViews)
             applyCardPosition()
             cardSumText.text = "${game.zenDeck.size}"
