@@ -197,11 +197,42 @@ class BotService(val rootService: RootService) {
 
     }
 
+    /**
+     * function that generates a list of all possible Moves
+     */
     private fun getAllPossibleMoves(state : BonsaiGameState) : MutableList<Move>{
         val returnList = mutableListOf<Move>()
+        val hasTiles = mutableListOf<TileType>()
 
-            
-        
+        // gets the tiles that a player has
+        for (tiles in state.currentPlayer.personalSupply){
+            hasTiles.add(tiles.tileType)
+        }
+
+        // generates all cultivate moves
+        for (listOfPlacedTiles in allPossiblePlayedTiles(
+            tree = state.currentPlayer.bonsaiTree,
+            alreadyPlayedTiles =  mutableListOf(),
+            playableTiles =  state.currentPlayer.playableTiles,
+            hasTiles =  hasTiles,
+            returnList =  mutableListOf()
+        )){
+            returnList += Move(
+                currentState = state,
+                removedTiles = mutableListOf(),
+                actionType = CULTIVATE,
+                takenCard = null,
+                chosenWoodOrLeafTile = null,
+                allTilesReceived = mutableListOf(),
+                playedTiles = listOfPlacedTiles,
+                chosenRemoveTiles = mutableListOf(),
+            )
+        }
+
+        // generates all meditate moves
+
+
+
 
 
         return returnList
