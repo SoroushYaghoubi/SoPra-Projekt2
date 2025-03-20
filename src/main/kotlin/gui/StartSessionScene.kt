@@ -38,6 +38,27 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication, rootService: RootS
             prompt = "PLAYER NAME",
         )
 
+    private val easyBotButton =
+        CheckBoxButton2(
+            posX = 1500,
+            posY = 150,
+            text = "EASY BOT",
+        ).apply {
+            onMouseClicked = {
+                change()
+            }
+        }
+
+    private val hardBotButton =
+        CheckBoxButton2(
+            posX = 1635,
+            posY = 150,
+            text = "HARD BOT",
+        ).apply {
+            onMouseClicked = {
+                change()
+            }
+        }
 
     private val backButton =
         ButtonStyle1(
@@ -80,6 +101,8 @@ class StartSessionScene(bonsaiApplication: BonsaiApplication, rootService: RootS
             sessionTextField,
             startSessionButton,
             backButton,
+            easyBotButton,
+            hardBotButton
         )
     }
 
