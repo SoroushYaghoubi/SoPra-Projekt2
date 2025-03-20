@@ -85,6 +85,10 @@ class BotService(val rootService: RootService) {
         }
     }
 
+    /**
+     * an action an easy bot would make
+     */
+
 
     fun makeRandomMove(){
         val currentGameState = rootService.currentGame?.currentBonsaiGameState
