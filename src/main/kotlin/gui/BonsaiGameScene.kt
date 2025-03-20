@@ -810,6 +810,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             limitBounds = true
         ).apply {
             this.interactive = true
+            pan(1000,1000)
         }
         treePanes.add(treePane)
         playerPane.add(treePane)
@@ -1390,10 +1391,12 @@ class BonsaiGameScene(private val rootService: RootService) :
         updatePlayableTiles(game.currentPlayer)
     }
 
+    /**
     override fun refreshAfterMeditate(position: Int?) {
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
     }
+    */
 
     override fun refreshAfterEndTurn() {
         val game = rootService.currentGame?.currentBonsaiGameState

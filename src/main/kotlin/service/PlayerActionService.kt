@@ -217,7 +217,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate(null) }
+        //onAllRefreshables { refreshAfterMeditate(null) }
+        onAllRefreshables { refreshAfterApplyCardEffects(null) }
     }
 
     /**

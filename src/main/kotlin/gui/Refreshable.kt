@@ -34,7 +34,7 @@ interface Refreshable {
     /**
      * perform refreshes that are necessary after a player has meditated
      */
-    fun refreshAfterMeditate(position: Int?){}
+    //fun refreshAfterMeditate(position: Int?){}
 
     /**
      * perform refreshes that are necessary after a player has started the cultivate action
