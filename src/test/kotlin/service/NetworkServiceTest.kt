@@ -293,10 +293,10 @@ class NetworkServiceTest {
 
 
     /**
-     * Test if correctly sent Cultivate Message
+     * Test if it fails
      */
     @Test
-    fun testSendMeditate() {
+    fun testFails() {
         val rootService1 = RootService()
         val rootService2 = RootService()
         val sessionId = (10001.. 50000).random().toString()
@@ -319,21 +319,49 @@ class NetworkServiceTest {
         val player2 = Player(
             "HIHI", PlayerType.HUMAN, false, ColorType.PURPLE)
 
-        rootService1.networkService.sendStartGameMessage(
-            mutableListOf(player1,player2),
+        rootService1.networkService.updateConnectionState(ConnectionState.DISCONNECTED)
+        assertFails {
+            rootService1.networkService.sendStartGameMessage(
+                mutableListOf(player1,player2),
+                mutableListOf(
+                    GoalTileType.BROWN, GoalTileType.PINK, GoalTileType.GREEN)
+            )
+        }
+        val rootService3 = RootService()
+        val rootService4 = RootService()
+        val sessionId2 = (10001.. 50000).random().toString()
+        rootService3.networkService.createGame (
+            SECRET_KEY,
+            "Gary",
+            sessionId2
+        )
+
+        Thread.sleep(2000)
+        rootService4.networkService.joinGame(
+            SECRET_KEY,
+            "HIHI",
+            sessionId2
+        )
+        Thread.sleep(2000)
+
+        val player3 = Player(
+            "Gary", PlayerType.HUMAN, true, ColorType.RED)
+        val player4 = Player(
+            "HIHI", PlayerType.HUMAN, false, ColorType.PURPLE)
+        rootService3.networkService.sendStartGameMessage(
+            mutableListOf(player3,player4),
             mutableListOf(
                 GoalTileType.BROWN, GoalTileType.PINK, GoalTileType.GREEN)
         )
         Thread.sleep(1000)
 
-        val game1 = rootService1.currentGame?.currentBonsaiGameState
-        val game2 = rootService2.currentGame?.currentBonsaiGameState
-        checkNotNull(game1)
-        checkNotNull(game2)
-        rootService1.playerActionService.cultivate()
-        //rootService1.treeService.playTile(game1.currentPlayer.personalSupply.last(), (0 to -1))
-        rootService1.playerActionService.endTurn()
-        Thread.sleep(1000)
-        assertEquals(game2.currentPlayer, game2.players[1])
+        val game3 = rootService3.currentGame?.currentBonsaiGameState
+        val game4 = rootService4.currentGame?.currentBonsaiGameState
+        checkNotNull(game3)
+        checkNotNull(game4)
+        rootService3.playerActionService.cultivate()
+        rootService3.networkService.updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
+        assertFails { rootService3.networkService.sendCultivateMessage() }
     }
 }
+

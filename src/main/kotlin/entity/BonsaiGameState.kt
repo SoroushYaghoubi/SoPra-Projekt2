@@ -18,7 +18,6 @@ import kotlinx.serialization.Serializable
  * @throws IllegalArgumentException If [players] is empty or [currentPlayer] is not in the list
  * @throws IllegalArgumentException If [botSpeed] is negative
  */
-
 @Serializable
 data class BonsaiGameState(
     var currentPlayer: Player,
