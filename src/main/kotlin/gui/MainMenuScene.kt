@@ -1,5 +1,6 @@
 package gui
 
+import service.RootService
 import tools.aqua.bgw.components.uicomponents.Label
 import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.core.MenuScene
@@ -13,7 +14,10 @@ import tools.aqua.bgw.visual.ImageVisual
  * to load and continue a game of bonsai or
  * to quit the application
  */
-class MainMenuScene(private val bonsaiApplication: BonsaiApplication) : MenuScene(
+class MainMenuScene(
+    private val rootService: RootService,
+    private val bonsaiApplication: BonsaiApplication
+) : MenuScene(
     1920,1080, ImageVisual("Backgrounds/Hintergrund.png",1920,1080)
 ), Refreshable {
 
@@ -32,7 +36,12 @@ class MainMenuScene(private val bonsaiApplication: BonsaiApplication) : MenuScen
         }
     }
 
-    private val continueButton = ButtonStyle1(350,615, "CONTINUE GAME")
+    private val continueButton = ButtonStyle1(350,615, "CONTINUE GAME").apply {
+        onMouseClicked = {
+            rootService.historyService.saveGame()
+            bonsaiApplication.hideMenuScene()
+        }
+    }
 
     private val hostGameButton  = ButtonStyle1(350,730, "HOST GAME").apply {
         onMouseClicked = {

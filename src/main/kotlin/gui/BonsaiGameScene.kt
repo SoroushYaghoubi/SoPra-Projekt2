@@ -430,8 +430,8 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 val isLocal = rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal ?: false
                 isVisible =  isLocal
                 onMouseClicked = {
+                    bonsaiApplication.showMainMenuScene()
                     rootService.historyService.saveGame()
-                    BonsaiApplication().showMainMenuScene()
                 }
             }
         }
