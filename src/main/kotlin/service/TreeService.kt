@@ -45,15 +45,16 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val net = rootService.networkService
         if (net.connectionState != ConnectionState.DISCONNECTED &&
             currentPlayer.isLocal
-        ) {
-            net.toBeSentCultivateMessage.playedTiles.add(
-                (tile.tileType to (tilePosition))
-            )
-            net.toBeSentMeditateMessage.playedTiles.add(
-                (tile.tileType to (tilePosition))
-            )
-        }
-        // TODO: check if player has achieved a goal tile
+        )
+            if (net.hasCultivated) {
+                net.toBeSentCultivateMessage.playedTiles.add(
+                    (tile.tileType to (tilePosition))
+                )
+            } else if (net.hasMeditated) {
+                net.toBeSentMeditateMessage.playedTiles.add(
+                    (tile.tileType to (tilePosition))
+                )
+            }
 
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
@@ -103,34 +104,48 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         val currentPlayer = getCurrentPlayer()
 
-        require(!canPlayWood())
-        require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF) { "not a valid move" }
+        if(!canPlayWood()){
+            require(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF
+                    || gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.FLOWER)
+            { "not a valid move" }
 
 
-        require(isMinimalAndCorrect(tilePosition))
+            if(isMinimalAndCorrect(tilePosition)){
+                if(gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.LEAF){
+                    if (getNeighbourTiles(tilePosition).any { it.second?.tileType == TileType.FRUIT }) {
+                        getNeighbourTiles(tilePosition)
+                            .filter { it.second?.tileType == TileType.FRUIT }
+                            .forEach { currentPlayer.bonsaiTree.remove(it.first) }
+                        currentPlayer.bonsaiTree.remove(tilePosition)
+                        // TODO : check it another time !!!!!!
+                    } else {
+                        currentPlayer.bonsaiTree.remove(tilePosition)
+                    }
+                }
+                else{
+                    currentPlayer.bonsaiTree.remove(tilePosition)
+                }
 
-        if (getNeighbourTiles(tilePosition).any { it.second?.tileType == TileType.FRUIT }) {
-            getNeighbourTiles(tilePosition)
-                .filter { it.second?.tileType == TileType.FRUIT }
-                .forEach { currentPlayer.bonsaiTree.remove(it.first) }
-            currentPlayer.bonsaiTree.remove(tilePosition)
-            // TODO : check it another time !!!!!!
-        } else {
-            currentPlayer.bonsaiTree.remove(tilePosition)
+                gameState.currentState = States.CHOOSE_ACTION
+                currentPlayer.hasPlayed = true
+                // Refresh GUI to reflect the updated tree
+                onAllRefreshables { refreshAfterRemoveFromTree(tilePosition) }
+
+                // update message
+                val net = rootService.networkService
+                // TODO(if it's allowed then...)
+                if (net.connectionState != ConnectionState.DISCONNECTED &&
+                    currentPlayer.isLocal
+                ) {
+                    net.toBeSentCultivateMessage.removedTilesAxialCoordinates.add(tilePosition)
+                    net.toBeSentMeditateMessage.removedTilesAxialCoordinates.add(tilePosition)
+                }
+            }
         }
-        gameState.currentState = States.CHOOSE_ACTION
-        // Refresh GUI to reflect the updated tree
-        onAllRefreshables { refreshAfterRemoveFromTree(tilePosition) }
+        //require(!currentPlayer.hasPlayed) {"player has already chosen other moves"}
 
-        // update message
-        val net = rootService.networkService
-        // TODO(if it's allowed then...)
-        if (net.connectionState != ConnectionState.DISCONNECTED &&
-            currentPlayer.isLocal
-        ) {
-            net.toBeSentCultivateMessage.removedTilesAxialCoordinates.add(tilePosition)
-            net.toBeSentMeditateMessage.removedTilesAxialCoordinates.add(tilePosition)
-        }
+
+
     }
 
     /**
@@ -159,6 +174,26 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         val tree = gameState.currentPlayer.bonsaiTree
+        val flowerTilesPosition = tree
+            .filter { it.value.tileType == TileType.FLOWER }.keys.toMutableList()
+        val removableFlowers: MutableList<Pair<Int, Int>> = mutableListOf()
+        flowerTilesPosition.forEach { position ->
+            val neighbourTiles = getNeighbourTiles(position)
+
+            val hasNullNeighbor = neighbourTiles.any { it.second == null }
+            val hasWoodNeighbor = neighbourTiles.any { it.second?.tileType == TileType.WOOD }
+
+            if (hasNullNeighbor && hasWoodNeighbor) {
+                if (neighbourTiles.all {
+                        it.second == null ||
+                                it.second?.tileType == TileType.WOOD ||
+                                it.second?.tileType == TileType.LEAF
+                    }) {
+                    removableFlowers.add(position)
+                }
+            }
+        }
+
         val leafTilesPositions = tree
             .filter { it.value.tileType == TileType.LEAF }.keys.toMutableList()
         val removableLeafs1: MutableList<Pair<Int, Int>> = mutableListOf()
@@ -181,8 +216,14 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 }
             }
         }
-        if (removableLeafs1.isNotEmpty()) return removableLeafs1.contains(tilePosition)
-        return removableLeafs2.contains(tilePosition)
+        if (gameState.currentPlayer.bonsaiTree[tilePosition]?.tileType == TileType.FLOWER){
+            return removableFlowers.contains(tilePosition)
+        }
+        else{
+            if (removableLeafs1.isNotEmpty()) return removableLeafs1.contains(tilePosition)
+                    return removableLeafs2.contains(tilePosition)
+        }
+
     }
 
     /**
@@ -231,7 +272,10 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
      */
     fun canPlayTile(tile: Tile): Boolean {
         val currentPlayer = getCurrentPlayer()
-        require(currentPlayer.personalSupply.contains(tile))
+        require(currentPlayer.personalSupply.any{
+            it.typeEqual(tile)
+        }
+        )
         { "Player does not have this bonsai tile in hand" }
 
         return currentPlayer.playableTilesCopy.contains(tile.tileType)
@@ -264,19 +308,19 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
             .forEach { (position, tile) ->
                 val q = position.first
                 val r = position.second
-                println("Tile at ($q, $r) -> Type: ${tile.tileType}")
 
-                val neighbourTiles = listOf(
-                    Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
-                    Pair(Pair(q, r + 1), tree.getOrDefault(Pair(q, r + 1), null)),
-                    Pair(Pair(q - 1, r + 1), tree.getOrDefault(Pair(q - 1, r + 1), null)),
-                    Pair(Pair(q - 1, r), tree.getOrDefault(Pair(q - 1, r), null)),
-                    Pair(Pair(q, r - 1), tree.getOrDefault(Pair(q, r - 1), null)),
-                    Pair(Pair(q + 1, r - 1), tree.getOrDefault(Pair(q + 1, r - 1), null))
-                ).filter { it.first !in POT }
+//                val neighbourTiles = listOf(
+//                    Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
+//                    Pair(Pair(q, r + 1), tree.getOrDefault(Pair(q, r + 1), null)),
+//                    Pair(Pair(q - 1, r + 1), tree.getOrDefault(Pair(q - 1, r + 1), null)),
+//                    Pair(Pair(q - 1, r), tree.getOrDefault(Pair(q - 1, r), null)),
+//                    Pair(Pair(q, r - 1), tree.getOrDefault(Pair(q, r - 1), null)),
+//                    Pair(Pair(q + 1, r - 1), tree.getOrDefault(Pair(q + 1, r - 1), null))
+//                ).filter { it.first !in POT }
+                val neighbourTiles = getNeighbourTiles(position).filter { it.first !in POT }
+
                 val nullPositions = neighbourTiles.filter { it.second == null }.map { it.first }
 
-                println("Null:$nullPositions")
                 if (nullPositions.isNotEmpty()) {
                     gameState.currentState = States.CHOOSE_ACTION
                     return true

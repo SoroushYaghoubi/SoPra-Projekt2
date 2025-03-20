@@ -12,6 +12,13 @@ class CSVLoader {
         registerModule(kotlinModule())
     }
 
+    /**
+     * Reads a CSV file and maps its contents to a list of objects of type [T].
+     *
+     * @param fileName The path to the CSV file, typically located in the resources folder.
+     * @return A list of objects of type [T], where each object represents a row in the CSV.
+     */
+
     inline fun <reified T> readCsvFile(fileName: String): List<T> {
         val lines = object {}.javaClass.getResourceAsStream(fileName)?.bufferedReader()
 

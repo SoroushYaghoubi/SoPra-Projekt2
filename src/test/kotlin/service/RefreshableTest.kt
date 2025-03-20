@@ -102,10 +102,10 @@ class RefreshableTest(val rootService: RootService) : Refreshable {
         refreshAfterPlayTileCalled = false
     }
 
-    override fun refreshAfterMeditate() {
-        refreshAfterMeditateCalled = false
-
-    }
+//    override fun refreshAfterMeditate() {
+//        refreshAfterMeditateCalled = false
+//
+//    }
 
     override fun refreshAfterCultivateStart() {
         refreshAfterCultivateStartCalled = true
@@ -128,7 +128,7 @@ class RefreshableTest(val rootService: RootService) : Refreshable {
     }
 
 
-    override fun refreshAfterApplyCardEffects() {
+    override fun refreshAfterApplyCardEffects(position: Int?) {
         refreshAfterApplyCardEffectsCalled = false
     }
 

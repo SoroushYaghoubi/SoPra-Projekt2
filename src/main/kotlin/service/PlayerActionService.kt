@@ -2,6 +2,8 @@ package service
 
 
 import entity.*
+//import java.util.*
+//import kotlin.concurrent.schedule
 import kotlin.math.max
 
 
@@ -37,14 +39,20 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      */
     fun meditate(cardPosition: Int, chosenTile: TileType?) {
         require(cardPosition in 0..3)
-        val msg = rootService.networkService.toBeSentMeditateMessage
-        msg.chosenCardPosition = cardPosition
-
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
+        val net = rootService.networkService
+        val msg = net.toBeSentMeditateMessage
+
+        // net stuff
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            gameState.currentPlayer.isLocal){
+            rootService.networkService.hasMeditated = true
+            msg.chosenCardPosition = cardPosition
+        }
 
         gameState.currentState = States.MEDITATE
         val actPlayer = gameState.currentPlayer
@@ -56,6 +64,7 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         // Refill the board
         rootService.gameService.refillBoard()
 
+
         onAllRefreshables { refreshAfterChooseCard() }
 
         when (cardPosition) {
@@ -64,76 +73,60 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 checkNotNull(chosenTile)
                 require(chosenTile == TileType.WOOD || chosenTile == TileType.LEAF) { "Please choose WOOD or LEAF" }
                 actPlayer.personalSupply.add(Tile(null, null, chosenTile))
-                msg.drawnTiles += chosenTile
+                if (net.connectionState != ConnectionState.DISCONNECTED &&
+                    gameState.currentPlayer.isLocal) {
+                    msg.drawnTiles += chosenTile
+                }
             }
 
             2 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.WOOD))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FLOWER))
-                msg.drawnTiles += mutableListOf(TileType.WOOD, TileType.FLOWER)
             }
 
             3 -> {
                 actPlayer.personalSupply.add(Tile(null, null, TileType.LEAF))
                 actPlayer.personalSupply.add(Tile(null, null, TileType.FRUIT))
-                msg.drawnTiles += mutableListOf(TileType.LEAF, TileType.FRUIT)
             }
         }
 
         when (drawnCard) {
 
             is ToolCard -> {
-                println("Growth")
                 actPlayer.tileCapacity += 2
             }
 
             is GrowthCard -> {
-                println("Growth")
                 actPlayer.playableTiles.add(drawnCard.tileType)
-                msg.drawnTiles += drawnCard.tileType
             }
 
             is MasterCard -> {
                 gameState.currentState = States.USING_MASTER
-                playMasterCard(drawnCard)
+                playMasterCard(drawnCard, cardPosition)
                 //gameState.currentPlayer.hasPlayed = true
                 return
             }
 
             is HelperCard -> {
                 gameState.currentState = States.USING_HELPER
-                playHelperCard(drawnCard)
+                playHelperCard(drawnCard, cardPosition)
                 //gameState.currentPlayer.hasPlayed = true
                 return
             }
 
-            else -> {
-                println("parchment")
-            }
         }
-
-        onAllRefreshables { refreshAfterApplyCardEffects() }
-        // Check personal supply limit
-        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-            gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterReceivedTile(true) }
-            return
-        }
-
-        actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
+        onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
     }
 
     /**
      * apply MasterCard effects
      * @param drawnCard : the drawn MasterCard
      */
-    private fun playMasterCard(drawnCard: MasterCard) {
-        val msg = rootService.networkService.toBeSentMeditateMessage
+    private fun playMasterCard(drawnCard: MasterCard, cardPosition: Int) {
+        //val msg = rootService.networkService.toBeSentMeditateMessage
 
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
-        println("master")
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         require(gameState.currentState == States.USING_MASTER)
@@ -141,33 +134,26 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         when (drawnCard.tileTypes.size) {
             1 -> {
-                //actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
-                onAllRefreshables { refreshAfterDrawingMasterCardAny() }
+                if (actPlayer.isLocal) {
+                    onAllRefreshables { refreshAfterDrawingMasterCardAny() }
+                } else {
+                    onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
+                }
                 return
             }
 
             2 -> {
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[1]))
-                msg.drawnTiles += drawnCard.tileTypes
             }
 
             3 -> {
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[0]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[1]))
                 actPlayer.personalSupply.add(Tile(null, null, drawnCard.tileTypes[2]))
-                msg.drawnTiles += drawnCard.tileTypes
             }
         }
-        // Check personal supply limit
-        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-            gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterReceivedTile(true) }
-            return
-        }
-        actPlayer.hasPlayed = true
-        onAllRefreshables {refreshAfterMeditate() }
-
+            onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
     }
 
     /**
@@ -185,19 +171,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         require(
             gameState.currentState == States.USING_MASTER
-        ) { "CurrentState should be Using_Master" }
+        )
 
         actPlayer.personalSupply.add(Tile(null, null, tileType))
 
-        // Check personal supply limit
-        if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
-            gameState.currentState = States.DISCARDING
-            onAllRefreshables { refreshAfterReceivedTile(true) }
-            return
-        }
-
-        actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
+        onAllRefreshables { refreshAfterApplyCardEffects(null) }
 
     }
 
@@ -205,31 +183,41 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * apply HelperCard effects
      * @param drawnCard : the drawn MasterCard
      */
-    private fun playHelperCard(drawnCard: HelperCard) {
-        val msg = rootService.networkService.toBeSentMeditateMessage
-        println("helper")
+    private fun playHelperCard(drawnCard: HelperCard, cardPosition: Int) {
+        //val msg = rootService.networkService.toBeSentMeditateMessage
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState) { "No active game state." }
         val actPlayer = gameState.currentPlayer
-        gameState.currentPlayer.playableTilesCopy.clear()
-        // val tileTypeToPlay2 = drawnCard.tileTypes[1]
-       // gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
-        // gameState.currentPlayer.playableTiles.toMutableList()
-        onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
-        // Check personal supply limit
+        //gameState.currentPlayer.playableTilesCopy.clear()
+        //gameState.currentPlayer.playableTilesCopy = drawnCard.tileTypes
+        if (!gameState.currentPlayer.isLocal) {
+            onAllRefreshables { refreshAfterApplyCardEffects(cardPosition) }
+        } else {
+            onAllRefreshables { refreshAfterDrawingHelperCard(drawnCard.tileTypes) }
+        }
+    }
+    /**
+     *
+     */
+    fun checkSupply(){
+        val game = rootService.currentGame
+        checkNotNull(game) { "No game was started." }
+
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState) { "No active game state." }
+        val actPlayer = gameState.currentPlayer
         if (actPlayer.personalSupply.size > actPlayer.tileCapacity) {
             gameState.currentState = States.DISCARDING
+
             onAllRefreshables { refreshAfterReceivedTile(true) }
             return
         }
 
         actPlayer.hasPlayed = true
-        onAllRefreshables { refreshAfterMeditate() }
-
-
+        onAllRefreshables { refreshAfterMeditate(null) }
     }
 
     /**
@@ -297,9 +285,27 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 
         require(canEndTurn())
 
+
         // Trigger end game by counting the turn of player
         if (gameState.zenDeck.isEmpty()) {
             gameState.endGameCounter++
+        }
+
+        val net = rootService.networkService
+        // if it's online and we're the local player
+        if (net.connectionState != ConnectionState.DISCONNECTED &&
+            getCurrentPlayer().isLocal
+        ) {
+            // if we cultivated then send cultivateMessage
+            if (net.hasCultivated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
+                net.sendCultivateMessage()
+                net.hasCultivated = false
+            } else if (net.hasMeditated &&
+                net.connectionState == ConnectionState.PLAYING_MY_TURN) {
+                net.sendMeditateMessage()
+                net.hasCultivated = false
+            }
         }
 
         // When the counter = the number of players -> all players finish their last turn
@@ -318,20 +324,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         gameState.currentState = States.START_TURN
         gameState.currentPlayer.hasPlayed = false
 
-        val net = rootService.networkService
-        // if it's online and we're the local player
-        if (net.connectionState != ConnectionState.DISCONNECTED &&
-            getCurrentPlayer().isLocal
-        ) {
-            // if we cultivated then send cultivateMessage
-            if (net.hasCultivated) {
-                net.sendCultivateMessage()
-                net.hasCultivated = false
-            } else {
-                net.sendMeditateMessage()
-                net.hasCultivated = false
-            }
-        }
 
         getCurrentPlayer().hasPlayed = false
         // save history
@@ -356,8 +348,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * - goal tile gets locked from player
      *
      * @param claim true if player accepts goal tile, otherwise false.
-     *
-     * TODO: this class claims or renounces two goals at the same time if possible. this might be bad
      *
      */
     fun claimOrRenounceGoal(claim: Boolean, goalTileType: GoalTileType, tier: Int) {
@@ -384,8 +374,11 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             if (net.connectionState != ConnectionState.DISCONNECTED &&
                 player.isLocal
             ) {
-                net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
-                net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
+                if (net.hasCultivated) {
+                    net.toBeSentCultivateMessage.claimedGoals.add((goalTileType to tier - 1))
+                } else if (net.hasMeditated) {
+                    net.toBeSentMeditateMessage.claimedGoals.add((goalTileType to tier - 1))
+                }
             }
         } else {
             gameState.goalTiles.removeIf { tile ->
@@ -398,8 +391,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             if (net.connectionState != ConnectionState.DISCONNECTED &&
                 player.isLocal
             ) {
-                net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
-                net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
+                if (net.hasCultivated) {
+                    net.toBeSentCultivateMessage.renouncedGoals.add((goalTileType to tier - 1))
+
+                } else if (net.hasMeditated) {
+                    net.toBeSentMeditateMessage.renouncedGoals.add((goalTileType to tier - 1))
+                }
             }
         }
 
@@ -534,7 +531,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
                 // find adjacent tiles
                 for ((dq, dr) in directions) {
                     val neighbor = Pair(q + dq, r + dr)
-                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType == TileType.LEAF && neighbor !in visited) {
+                    if (neighbor in bonsaiTree && bonsaiTree[neighbor]?.tileType ==
+                        TileType.LEAF && neighbor !in visited) {
                         stack.add(neighbor)
                     }
                 }
@@ -660,10 +658,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
 //    }
 
     fun discardSupplyTile(tileToDiscard: Tile) {
+        val msg = rootService.networkService.toBeSentMeditateMessage
         val player = getCurrentPlayer()
         check(player.personalSupply.size > player.tileCapacity)
         { "The personal supply tiles hasn't reached the capacity." }
         player.personalSupply.remove(tileToDiscard)
+        msg.discardedTiles.add(tileToDiscard.tileType)
         rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
         player.hasPlayed = true
     }

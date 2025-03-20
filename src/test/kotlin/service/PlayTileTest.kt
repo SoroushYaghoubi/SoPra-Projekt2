@@ -211,7 +211,7 @@ class PlayTileTest {
         val gameState = game.currentBonsaiGameState
         checkNotNull(gameState)
 
-        println(gameState.currentPlayer.playableTiles)
+        //println(gameState.currentPlayer.playableTiles)
         val tileToPlay = Tile(null, null, TileType.FLOWER)
 
         gameState.currentPlayer.personalSupply.add(tileToPlay)
@@ -243,10 +243,94 @@ class PlayTileTest {
         gameState.currentPlayer.playableTilesCopy.add(
             TileType.FRUIT
         )
-        assertTrue(rootService.treeService.canPlayTile(tile, Pair (2,-4)))
-        assertFalse(rootService.treeService.canPlayTile(tile, Pair (1,-4)))
+        assertTrue(rootService.treeService.canPlayTile(tile, Pair(2, -4)))
+        assertFalse(rootService.treeService.canPlayTile(tile, Pair(1, -4)))
     }
 
+    /**
+     * Test for network
+     */
+    @Test
+    fun testPlayTileMessagesIfConnected() {
+        val rootService = setUpGame()
+        val treeService = TreeService(rootService)
+        rootService.networkService.setConnectionStateTest(ConnectionState.PLAYING_MY_TURN)
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+        val tile = Tile(2, -2, TileType.LEAF)
+        gameState.currentPlayer.personalSupply.add(tile)
+        gameState.currentPlayer.playableTilesCopy.add(
+            TileType.LEAF
+        )
+
+        treeService.playTile(tile, Pair(2, -2))
+
+        //println("Meditate Message Tiles: ${rootService.networkService.toBeSentMeditateMessage.playedTiles}")
+        //println("Cultivate Message Tiles: ${rootService.networkService.toBeSentCultivateMessage.playedTiles}")
+
+        assertTrue(
+            rootService.networkService.toBeSentMeditateMessage.playedTiles.contains(
+                TileType.LEAF to Pair(2, -2)
+            )
+        )
+        assertTrue(
+            rootService.networkService.toBeSentCultivateMessage.playedTiles.contains(
+                TileType.LEAF to Pair(2, -2)
+            )
+        )
+    }
+    /**
+     * Test for network
+     */
+    @Test
+    fun testPlayTileMessagesIfDisConnected() {
+        val rootService = setUpGame()
+        val treeService = TreeService(rootService)
+        rootService.networkService.setConnectionStateTest(ConnectionState.DISCONNECTED)
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+        val tile = Tile(2, -2, TileType.LEAF)
+        gameState.currentPlayer.personalSupply.add(tile)
+        gameState.currentPlayer.playableTilesCopy.add(
+            TileType.LEAF
+        )
+
+        treeService.playTile(tile, Pair(2, -2))
+
+        //println("Meditate Message Tiles: ${rootService.networkService.toBeSentMeditateMessage.playedTiles}")
+        //println("Cultivate Message Tiles: ${rootService.networkService.toBeSentCultivateMessage.playedTiles}")
+
+        assertFalse(
+            rootService.networkService.toBeSentMeditateMessage.playedTiles.contains(
+                TileType.LEAF to Pair(2, -2)
+            )
+        )
+        assertFalse(
+            rootService.networkService.toBeSentCultivateMessage.playedTiles.contains(
+                TileType.LEAF to Pair(2, -2)
+            )
+        )
+    }
+
+    /**
+     * Test for network
+     */
+    @Test
+    fun testCanPlayIfNoTilesInHand() {
+        val rootService = setUpGame()
+        val treeService = TreeService(rootService)
+        val game = rootService.currentGame
+        checkNotNull(game)
+        val gameState = game.currentBonsaiGameState
+        checkNotNull(gameState)
+        val tile = Tile(2, 2, TileType.LEAF)
+        gameState.currentPlayer.personalSupply.clear()
+        assertFails { treeService.canPlayTile(tile) }
+    }
 }
 
 

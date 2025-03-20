@@ -5,7 +5,7 @@ import tools.aqua.bgw.core.Color
 import tools.aqua.bgw.core.MenuScene
 import tools.aqua.bgw.util.Font
 import tools.aqua.bgw.visual.ImageVisual
-import util.PRIMARY_COLOUR
+//import util.PRIMARY_COLOUR
 
 /**
  * The [MainMenuScene] is a [MenuScene] that is shown at the start of the application
