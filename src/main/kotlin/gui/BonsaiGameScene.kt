@@ -1402,9 +1402,11 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             height = 50,
             posX = 850,
             posY = 25,
-            text = "finished",
-            font = Font(size = 18),
-            visual = ColorVisual(Color(0xAAAAAA))
+            text = "Finished",
+            visual = ColorVisual(Color(0xffffff)).apply {
+                style.borderRadius = BorderRadius(20.0)
+            },
+            font = Font(30)
         ).apply {
             onMouseClicked = {
                 this.isVisible = false
@@ -1749,7 +1751,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
         overlayPane.add(
             HexagonView(
-                posX = 1260, posY = 270,
+                posX = 1200, posY = 270,
                 size = 40,
                 visual = leafTileImageVisual
             )
@@ -1767,7 +1769,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
                 })
         overlayPane.add(
             HexagonView(
-                posX = 1320, posY = 270,
+                posX = 1300, posY = 270,
                 size = 40,
                 visual = woodTileImageVisual
             ).apply {
