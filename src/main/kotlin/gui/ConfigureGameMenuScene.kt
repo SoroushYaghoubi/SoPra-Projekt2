@@ -783,8 +783,6 @@ class ConfigureGameMenuScene(
         // for player 4
         val nextIndex = if (index == playerInputs.size - 1) 0 else index + 1
 
-        println("Tausche Spieler ${index + 1} mit Spieler ${nextIndex + 1}")
-
         // Swap the players in all lists
         swapInList(playerInputs, index, nextIndex)
         swapInList(playerColors, index, nextIndex)
@@ -797,9 +795,35 @@ class ConfigureGameMenuScene(
         // update the positions and click handlers
         updatePlayerPositions()
         updatePlayerClickHandlers()
-
+        updateBotHandlers()
         // highlight the newly swapped players
         highlightPlayers(index)
+    }
+
+    /**
+     * updates the bot state
+     */
+
+    private fun updateBotHandlers() {
+        for (i in playerEasyBots.indices) {
+            playerEasyBots[i].onMouseClicked = {
+                if (!playerEasyBots[i].isChecked) {
+                    if (playerHardBots[i].isChecked) {
+                        playerHardBots[i].change()
+                    }
+                }
+                playerEasyBots[i].change()
+            }
+
+            playerHardBots[i].onMouseClicked = {
+                if (!playerHardBots[i].isChecked) {
+                    if (playerEasyBots[i].isChecked) {
+                        playerEasyBots[i].change()
+                    }
+                }
+                playerHardBots[i].change()
+            }
+        }
     }
 
     /**
