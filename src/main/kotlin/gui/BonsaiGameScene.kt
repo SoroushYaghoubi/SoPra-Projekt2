@@ -49,16 +49,12 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
     private var goalTileList: MutableList<GoalTile> = mutableListOf()
 
     private val woodTileImageVisual = ImageVisual("wood.png")
-
     private val leafTileImageVisual = ImageVisual("leaf.png")
-
     private val flowerTileImageVisual = ImageVisual("flower.png")
-
     private val fruitTileImageVisual = ImageVisual("fruit.png")
-
     private val anyTileImageVisual = ImageVisual("any.png")
-
     private val zenCardsBack = ImageVisual("ZenCards/cardsBack.png")
+    private val backgrounds = ImageVisual("Backgrounds/holz.png")
 
 
     // button for cultivate
@@ -245,7 +241,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             posY = 20,
             width = 400,
             height = 220,
-            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+            visual = ColorVisual(255,255,255,0.5).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
         ).apply {
@@ -352,7 +348,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         posY = 20,
         width = 403,
         height = 220,
-        visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+        visual = ColorVisual(255,255,255,0.5).apply {
             style.borderRadius = BorderRadius(20.0)
         }
     ).apply {
@@ -439,7 +435,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             posY = 260,
             width = 1020,
             height = 100,
-            visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+            visual = ColorVisual(255,255,255,0.5).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
         ).apply {
@@ -536,7 +532,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         posY = 20,
         width = 300,
         height = 1040,
-        visual = ColorVisual(Color(SECONDARY_COLOUR)).apply {
+        visual = ColorVisual(255,255,255,0.5).apply {
             style.borderRadius = BorderRadius(20.0)
         }
     ).apply {
@@ -760,6 +756,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
 
 
     init {
+        background = backgrounds
         addComponents(
             zenCardPane, infoPane, interactionPane,
             removeButton, cultivateButton, endTurnButton,
@@ -936,7 +933,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         val targetLayout = Pane<ComponentView>(
             width = 2000,
             height = 2000,
-            visual = ColorVisual(Color(SECONDARY_COLOUR))
+            visual = ColorVisual(Color.TRANSPARENT)
         ).apply {
             this.add(treeHexagonGrid)
         }
