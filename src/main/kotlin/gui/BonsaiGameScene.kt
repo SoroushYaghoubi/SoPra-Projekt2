@@ -98,7 +98,6 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
             onMouseClicked = {
                 if (rootService.playerActionService.canEndTurn()) {
                     rootService.playerActionService.endTurn()
-
                 }
             }
         }
@@ -154,7 +153,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         width = 380,
         height = 60,
         text = "",
-        font = Font(40, Color(TERTIARY_COLOUR))
+        font = Font(40, Color(COLOUR_BLACK))
     )
 
     // Label for player's tile capacity
@@ -165,7 +164,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         height = 60,
         text = "Capacity: ${rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.tileCapacity}",
         alignment = Alignment.CENTER_LEFT,
-        font = Font(30, Color(TERTIARY_COLOUR))
+        font = Font(30, Color(COLOUR_BLACK))
     )
 
     private val woodPlayable = HexagonView(
@@ -445,7 +444,7 @@ class BonsaiGameScene(private val rootService: RootService, private val bonsaiAp
         width = 990,
         height = 60,
         text = "",
-        font = Font(30, Color(TERTIARY_COLOUR))
+        font = Font(30, Color(COLOUR_BLACK))
     )
 
     // pane for the interaction
