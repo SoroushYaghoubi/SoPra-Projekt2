@@ -382,7 +382,8 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             writeGoalInMessage(goalTileType, tier, false)
         }
 
-        onAllRefreshables { refreshAfterClaimGoal() }
+        if(!getCurrentPlayer().isLocal && claim) onAllRefreshables {
+            refreshAfterClaimGoal(goalTileType, tier) }
     }
 
     private fun writeGoalInMessage(goalTileType: GoalTileType, tier: Int, claim: Boolean) {

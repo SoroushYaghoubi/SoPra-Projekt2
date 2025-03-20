@@ -55,19 +55,28 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         val game = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(game)
-
+        val goalTiles: MutableList<Pair<GoalTileType, Int>> = mutableListOf()
         var reached = false
         game.goalTiles.forEach {
             if (rootService.playerActionService.canClaimOrRenounceGoal(it.goalTileType, it.tier) &&
-                currentPlayer.isLocal &&
-                currentPlayer.playerType == PlayerType.HUMAN &&
-                !currentPlayer.renouncedGoals.contains(it)
-            ) {
-                // call claimOrRenounceGoal() in the gui layer
+                    !currentPlayer.renouncedGoals.contains(it)) {
+                goalTiles += (it.goalTileType to it.tier)
                 reached = true
                 onAllRefreshables { refreshAfterPlayTile(it.goalTileType, it.tier, tilePosition) }
+                }
+        }
+
+        /*
+        goalTiles.forEach {
+            if (//currentPlayer.isLocal &&
+                currentPlayer.playerType == PlayerType.HUMAN
+            ) {
+                // call claimOrRenounceGoal() in the gui layer
+
             }
         }
+        */
+
         if (!reached) {
             // do other stuff in gui
             onAllRefreshables { refreshAfterPlayTile(null, 0, tilePosition) }
