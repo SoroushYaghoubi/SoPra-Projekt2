@@ -29,7 +29,7 @@ import util.*
  * The [BonsaiGameScene] is a [BoardGameScene] that displays the whole game and
  * lets the user play the bonsai game
  */
-class BonsaiGameScene(private val rootService: RootService) :
+class BonsaiGameScene(private val rootService: RootService, private val bonsaiApplication: BonsaiApplication) :
     BoardGameScene(1920, 1080, ColorVisual(Color(PRIMARY_COLOUR))), Refreshable {
 
     private val treeTileMaps: MutableList<BidirectionalMap<Tile, HexagonView>> = mutableListOf()
@@ -420,20 +420,17 @@ class BonsaiGameScene(private val rootService: RootService) :
             posY = 100, // Adjusted to fit within the buttonPane
             width = 260,
             height = 35,
-            visual = ColorVisual(Color(0xffffff)).apply {
+            visual = ColorVisual(221, 136, 136).apply {
                 style.borderRadius = BorderRadius(20.0)
             },
-            text = "SAVE GAME",
+            text = "Quit Game",
             font = Font(36)
         ).apply {
             // hide the button in network game
             // right now it is not visible at all because it does not work
-            if (rootService.currentGame?.currentBonsaiGameState?.currentPlayer?.isLocal == true) {
-                isVisible = true
-                onMouseClicked = {
-                    rootService.historyService.saveGame()
-                    BonsaiApplication().showMainMenuScene()
-                }
+            onMouseClicked = {
+                //rootService.historyService.saveGame()
+                bonsaiApplication.showMainMenuScene()
             }
         }
 
@@ -565,7 +562,7 @@ class BonsaiGameScene(private val rootService: RootService) :
 
 
     private val claimButton = Button(
-        posX = 100,
+        posX = 75,
         posY = 450,
         width = 250,
         height = 60,
@@ -574,7 +571,7 @@ class BonsaiGameScene(private val rootService: RootService) :
     )
 
     private val renounceButton = Button(
-        posX = 400,
+        posX = 375,
         posY = 450,
         width = 250,
         height = 60,
@@ -595,9 +592,9 @@ class BonsaiGameScene(private val rootService: RootService) :
     private val goalTilePane =
         Pane<UIComponent>(
             posX = 610,
-            posY = 340,
+            posY = 240,
             width = 700,
-            height = 400,
+            height = 600,
             visual = ColorVisual(Color(0xbebebe)).apply {
                 style.borderRadius = BorderRadius(20.0)
             }
@@ -1343,7 +1340,7 @@ class BonsaiGameScene(private val rootService: RootService) :
             //addComponents(goalTilePane)
             goalTilePane.add(
                 Label(
-                    posX = 125,
+                    posX = 100,
                     posY = 250,
                     width = 500,
                     height = 50,
