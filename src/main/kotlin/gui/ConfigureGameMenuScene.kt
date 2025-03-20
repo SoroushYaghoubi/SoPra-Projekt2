@@ -386,7 +386,7 @@ class ConfigureGameMenuScene(
                             else -> PlayerType.HUMAN
                         }
                         println(playerInput.text.trim())
-                        val name =
+                        var name =
                             if (playerInput.text.trim() == "") {
                                 when (index) {
                                     3 -> "Alice"
@@ -398,6 +398,7 @@ class ConfigureGameMenuScene(
                                 playerInput.text.trim()
 
                             }
+                        if (name.length > 8) name = "${name.first().uppercaseChar()}."
                         entity.Player(name, playerType, true, color)
                     }.toMutableList()
 
