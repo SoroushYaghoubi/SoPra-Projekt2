@@ -229,6 +229,12 @@ class DeepCopyExtensionsTest {
 
         assertNotEquals(originalGameState.faceUpCards.size, copiedGameState.faceUpCards.size)
     }
+
+    /**
+     * Tests deep copy functionality of a games mastercard
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testMasterCardDeepCopy() {
 
@@ -244,6 +250,11 @@ class DeepCopyExtensionsTest {
         assert(copiedMasterCard.tileTypes !== masterCard.tileTypes)
     }
 
+    /**
+     * Tests deep copy functionality of a games tool card
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testToolCardDeepCopy() {
         // Arrange
@@ -256,6 +267,11 @@ class DeepCopyExtensionsTest {
         assertEquals(toolCard.id, copiedToolCard.id, "IDs should match")
     }
 
+    /**
+     * Tests deep copy functionality of a games parchment card
+     *
+     * tests if copied state is not the same instance as the original
+     */
     @Test
     fun testParchmentCardDeepCopy() {
         // Arrange
