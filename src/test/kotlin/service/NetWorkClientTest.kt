@@ -1,6 +1,7 @@
 package service
 
 import entity.*
+import org.junit.jupiter.api.Assertions.assertTrue
 import util.SECRET_KEY
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -145,9 +146,22 @@ class NetWorkClientTest {
         checkNotNull(game1)
         checkNotNull(game2)
         rootService1.playerActionService.cultivate()
+        for (i in 0..12) {
+            game1.currentPlayer.bonsaiTree[i to -1] = Tile(null, null,TileType.WOOD)
+            game2.currentPlayer.bonsaiTree[i to -1] = Tile(null, null,TileType.WOOD)
+        }
         //rootService1.treeService.playTile(game1.currentPlayer.personalSupply.last(), (0 to -1))
+        rootService1.playerActionService.claimOrRenounceGoal(true, GoalTileType.BROWN, 2)
+        for (i in 0..8) {
+            game1.currentPlayer.bonsaiTree[i to -2] = Tile(null, null,TileType.LEAF)
+            game2.currentPlayer.bonsaiTree[i to -2] = Tile(null, null,TileType.LEAF)
+        }
+        rootService1.playerActionService.claimOrRenounceGoal(false, GoalTileType.GREEN, 2)
         rootService1.playerActionService.endTurn()
         Thread.sleep(1000)
         assertEquals(game2.currentPlayer, game2.players[1])
+        assertTrue(game2.players[0].claimedGoals.isNotEmpty())
+        assertTrue(game2.players[0].renouncedGoals.isNotEmpty())
+
     }
 }
