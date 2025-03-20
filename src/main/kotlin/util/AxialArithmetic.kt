@@ -161,20 +161,3 @@ private infix fun Pair<Int, Int>.rotateCounterClockwiseAround(center: Pair<Int, 
         else -> throw IllegalArgumentException("Invalid radius. Implement non-adjacent ones yourself >:)")
     }
 */
-
-
-/**
-/**
- * Override axial coordinates to act like they know vector arithmetic
- */
-private operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> {
-    return Pair(this.first - other.first, this.second - other.second)
-}
-
-/**
- * Override axial coordinates to act like they know vector arithmetic
- */
-private operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
-    return Pair(this.first + other.first, this.second + other.second)
-}
-*/

@@ -48,25 +48,18 @@ class ZenCardLoader {
             val type1 = when (cardEntry.type1) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
-                "blossom" -> TileType.FLOWER
-                "fruit" -> TileType.FRUIT
-                "all" -> TileType.ANY
-                else -> TileType.EMPTY
+                else-> TileType.ANY
             }
             val type2 = when (cardEntry.type2) {
                 "log" -> TileType.WOOD
                 "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
                 "fruit" -> TileType.FRUIT
-                "all" -> TileType.ANY
                 else -> TileType.EMPTY
             }
             val type3 = when (cardEntry.type3) {
-                "log" -> TileType.WOOD
-                "leaf" -> TileType.LEAF
                 "blossom" -> TileType.FLOWER
                 "fruit" -> TileType.FRUIT
-                "all" -> TileType.ANY
                 else -> TileType.EMPTY
             }
 
