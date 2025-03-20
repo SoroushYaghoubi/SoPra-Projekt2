@@ -197,6 +197,9 @@ class BotService(val rootService: RootService) {
             personalSupply.removeAt((0 until personalSupply.size).random())
             differenceSupplyAndTiles = currentGameState.currentPlayer.tileCapacity - personalSupply.size
         }
+
+
+        Thread.sleep(1000)
         rootService.playerActionService.endTurn()
     }
 
