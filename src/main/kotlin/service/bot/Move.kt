@@ -1,7 +1,6 @@
 package service.bot
 
 import entity.BonsaiGameState
-import entity.Card
 import entity.GoalTile
 import entity.TileType
 
@@ -17,6 +16,8 @@ class Move(
     val takenCard : Int? = null,
     // the chosen TileType in meditate at card position 2
     val chosenWoodOrLeafTile : TileType? = null,
+    // the chosen tile in a mastercard any
+    val chosenAnyTile : TileType? = null,
     // list of all received Tiles in a move
     val allTilesReceived : MutableList<TileType>,
     // list of all taken goal tiles in a move

@@ -1,8 +1,6 @@
 package service.bot
 
-import entity.BonsaiGameState
-import entity.Tile
-import entity.TileType
+import entity.*
 import service.RootService
 import util.*
 
@@ -14,37 +12,98 @@ import util.*
 class BotService(val rootService: RootService) {
 
     /**
-     * Function that makes a random move for the bot
+     * Function that makes a move for the bot
+     *
+     * @param move is the move that will be used
      */
-    fun makeMove() {
+    fun makeMove(move: Move) {
 
-        // random chosen variablen for function calls
-        val action = chooseAction()
-        val chosenCard = chooseCard()
-        val chosenTile = randomTile()
+        val currentGameState = rootService.currentGame?.currentBonsaiGameState
+        checkNotNull(currentGameState)
 
         //
-        when  {
-            (action == MEDITATE) && (chosenCard == 0) ->
-                rootService.playerActionService.meditate(chooseCard(),null)
-            (action == MEDITATE) && (chosenCard == 1) ->
-                rootService.playerActionService.meditate(chooseCard(), chosenTile)
-            (action == MEDITATE) && (chosenCard == 2) ->
-                rootService.playerActionService.meditate(chooseCard(),null)
-            (action == MEDITATE) && (chosenCard == 3) ->
-                rootService.playerActionService.meditate(chooseCard(),null)
-            action == CULTIVATE -> {
-                rootService.playerActionService.cultivate()
+        when {
+            (move.actionType == MEDITATE) && (move.takenCard == 0) -> {
+                rootService.playerActionService.meditate(move.takenCard, null)
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.HELPERCARD){
+                    botPlayTiles(move)
+                }
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.MASTERCARD){
+                    val anyTile = move.chosenAnyTile
+                    if (anyTile != null) {
+                        rootService.playerActionService.chooseTile(move.chosenAnyTile)
+                    }
+                }
+                rootService.playerActionService.endTurn()
+            }
+            (move.actionType == MEDITATE) && (move.takenCard == 1) -> {
+                rootService.playerActionService.meditate(move.takenCard, move.chosenWoodOrLeafTile)
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.HELPERCARD){
+                    botPlayTiles(move)
+                }
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.MASTERCARD){
+                    val anyTile = move.chosenAnyTile
+                    if (anyTile != null) {
+                        rootService.playerActionService.chooseTile(move.chosenAnyTile)
+                    }
+                }
+                rootService.playerActionService.endTurn()
+            }
+            (move.actionType == MEDITATE) && (move.takenCard == 2) -> {
+                rootService.playerActionService.meditate(move.takenCard, null)
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.HELPERCARD){
+                    botPlayTiles(move)
+                }
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.MASTERCARD){
+                    val anyTile = move.chosenAnyTile
+                    if (anyTile != null) {
+                        rootService.playerActionService.chooseTile(move.chosenAnyTile)
+                    }
+                }
+                rootService.playerActionService.endTurn()
+            }
+            (move.actionType == MEDITATE) && (move.takenCard == 3) -> {
+                rootService.playerActionService.meditate(move.takenCard, null)
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.HELPERCARD){
+                    botPlayTiles(move)
+                }
+                if (currentGameState.faceUpCards[move.takenCard].cardType == CardType.MASTERCARD){
+                    val anyTile = move.chosenAnyTile
+                    if (anyTile != null) {
+                        rootService.playerActionService.chooseTile(move.chosenAnyTile)
+                    }
+                }
+                rootService.playerActionService.endTurn()
+            }
 
+            move.actionType == CULTIVATE -> {
+                rootService.playerActionService.cultivate()
+                botPlayTiles(move)
+                rootService.playerActionService.endTurn()
             }
         }
     }
 
-    // 0 is cultivating and 1 is meditating
-    private fun chooseAction() : Int = (0..1).random()
+
+    private fun botPlayTiles(move : Move ){
+        for (tile in move.playedTiles) {
+            rootService.treeService.playTile(Tile(null, null, tile.first), tile.second)
+        }
+        for (goalTaken in move.takenGoalTile){
+            rootService.playerActionService.claimOrRenounceGoal(
+                true,goalTaken.goalTileType, goalTaken.tier)
+        }
+        for (goalRenounced in move.renouncedGoalTile){
+            rootService.playerActionService.claimOrRenounceGoal(
+                true,goalRenounced.goalTileType, goalRenounced.tier)
+        }
+    }
+
+
+
 
     // gives back the card position
-    private fun chooseCard() : Int {
+    private fun chooseCard(): Int {
         val gameState = rootService.currentGame?.currentBonsaiGameState
         checkNotNull(gameState)
 
@@ -54,41 +113,45 @@ class BotService(val rootService: RootService) {
     }
 
     private fun randomTile(): TileType {
-       return when ((0..1).random()){
+        return when ((0..1).random()) {
             0 -> TileType.WOOD
             1 -> TileType.LEAF
-           else -> TileType.WOOD
+            else -> TileType.WOOD
         }
     }
 
     private fun allPossiblePlayedTiles(
-        tree : MutableMap<Pair<Int, Int>, Tile>,
-        alreadyPlayedTiles : MutableList<Pair<TileType,Pair<Int,Int>>>,
-        playableTiles : MutableList<TileType>,
-        hasTiles : MutableList<TileType>,
-        returnList : MutableList<MutableList<Pair<TileType,Pair<Int,Int>>>>
-        ) : MutableList<MutableList<Pair<TileType,Pair<Int,Int>>>>{
+        tree: MutableMap<Pair<Int, Int>, Tile>,
+        alreadyPlayedTiles: MutableList<Pair<TileType, Pair<Int, Int>>>,
+        playableTiles: MutableList<TileType>,
+        hasTiles: MutableList<TileType>,
+        returnList: MutableList<MutableList<Pair<TileType, Pair<Int, Int>>>>
+    ): MutableList<MutableList<Pair<TileType, Pair<Int, Int>>>> {
 
         val playedTiles = alreadyPlayedTiles
-        val newReturnList : MutableList<MutableList<Pair<TileType,Pair<Int,Int>>>> = mutableListOf()
+        val newReturnList: MutableList<MutableList<Pair<TileType, Pair<Int, Int>>>> = mutableListOf()
         returnList.add(playedTiles)
 
-        if (playableTiles.isEmpty() || hasTiles.isEmpty() ) return returnList
+        if (playableTiles.isEmpty() || hasTiles.isEmpty()) return returnList
 
-        for (emptyPosition in tree.getEmptyTiles() ){
-            val neighbors = arrayOf(0,0,0,0,0)
-            for (tilePosition in circleAround(emptyPosition)){
+        for (emptyPosition in tree.getEmptyTiles()) {
+            val neighbors = arrayOf(0, 0, 0, 0, 0)
+            for (tilePosition in circleAround(emptyPosition)) {
                 val currentTile = tree[tilePosition]
-                if (currentTile != null){
+                if (currentTile != null) {
                     when (currentTile.tileType) {
                         TileType.WOOD ->
                             neighbors[0] += 1
+
                         TileType.LEAF ->
                             neighbors[1] += 1
+
                         TileType.FLOWER ->
                             neighbors[2] += 1
+
                         TileType.FRUIT ->
                             neighbors[3] += 1
+
                         else ->
                             neighbors[4] += 1
                     }
@@ -96,102 +159,102 @@ class BotService(val rootService: RootService) {
             }
             if
                     (neighbors[0] >= 1 &&
-                        (playableTiles.contains(TileType.WOOD) || playableTiles.contains(TileType.ANY)) &&
-                        hasTiles.contains(TileType.WOOD))
-                {
-                    val newTreeWood1 = tree
-                    newTreeWood1[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.WOOD)
-                    val newPlayedTiles1 = playedTiles
-                    newPlayedTiles1.add(Pair(TileType.WOOD,emptyPosition))
-                    val newPlayableTiles1 = playableTiles
-                    if (!newPlayableTiles1.remove(TileType.WOOD)){
-                        newPlayableTiles1.remove(TileType.ANY)
-                    }
-                    val newHasTile1 = hasTiles
-                    newHasTile1.remove(TileType.WOOD)
-
-                    returnList += allPossiblePlayedTiles(
-                        newTreeWood1,
-                        newPlayedTiles1,
-                        newPlayableTiles1,
-                        newHasTile1,
-                        newReturnList
-                    )
+                (playableTiles.contains(TileType.WOOD) || playableTiles.contains(TileType.ANY)) &&
+                hasTiles.contains(TileType.WOOD)
+            ) {
+                val newTreeWood1 = tree
+                newTreeWood1[emptyPosition] = Tile(emptyPosition.first, emptyPosition.second, TileType.WOOD)
+                val newPlayedTiles1 = playedTiles
+                newPlayedTiles1.add(Pair(TileType.WOOD, emptyPosition))
+                val newPlayableTiles1 = playableTiles
+                if (!newPlayableTiles1.remove(TileType.WOOD)) {
+                    newPlayableTiles1.remove(TileType.ANY)
                 }
+                val newHasTile1 = hasTiles
+                newHasTile1.remove(TileType.WOOD)
+
+                returnList += allPossiblePlayedTiles(
+                    newTreeWood1,
+                    newPlayedTiles1,
+                    newPlayableTiles1,
+                    newHasTile1,
+                    newReturnList
+                )
+            }
 
             if (
                 neighbors[0] >= 1 &&
-                        (playableTiles.contains(TileType.LEAF) || playableTiles.contains(TileType.ANY)) &&
-                        hasTiles.contains(TileType.LEAF))
-                {
-                    val newTreeWood2 = tree
-                    newTreeWood2[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.LEAF)
-                    val newPlayedTiles2 = playedTiles
-                    newPlayedTiles2.add(Pair(TileType.LEAF,emptyPosition))
-                    val newPlayableTiles2 = playableTiles
-                    if (!newPlayableTiles2.remove(TileType.LEAF)){
-                        newPlayableTiles2.remove(TileType.ANY)
-                    }
-                    val newHasTile2 = hasTiles
-                    newHasTile2.remove(TileType.LEAF)
-
-                    returnList += allPossiblePlayedTiles(
-                        newTreeWood2,
-                        newPlayedTiles2,
-                        newPlayableTiles2,
-                        newHasTile2,
-                        newReturnList
-                    )
+                (playableTiles.contains(TileType.LEAF) || playableTiles.contains(TileType.ANY)) &&
+                hasTiles.contains(TileType.LEAF)
+            ) {
+                val newTreeWood2 = tree
+                newTreeWood2[emptyPosition] = Tile(emptyPosition.first, emptyPosition.second, TileType.LEAF)
+                val newPlayedTiles2 = playedTiles
+                newPlayedTiles2.add(Pair(TileType.LEAF, emptyPosition))
+                val newPlayableTiles2 = playableTiles
+                if (!newPlayableTiles2.remove(TileType.LEAF)) {
+                    newPlayableTiles2.remove(TileType.ANY)
                 }
+                val newHasTile2 = hasTiles
+                newHasTile2.remove(TileType.LEAF)
+
+                returnList += allPossiblePlayedTiles(
+                    newTreeWood2,
+                    newPlayedTiles2,
+                    newPlayableTiles2,
+                    newHasTile2,
+                    newReturnList
+                )
+            }
 
             if (
                 neighbors[1] >= 1 &&
-                        (playableTiles.contains(TileType.FLOWER) || playableTiles.contains(TileType.ANY)) &&
-                        hasTiles.contains(TileType.FLOWER))
-                {
-                    val newTreeWood3 = tree
-                    newTreeWood3[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.FLOWER)
-                    val newPlayedTiles3 = playedTiles
-                    newPlayedTiles3.add(Pair(TileType.FLOWER,emptyPosition))
-                    val newPlayableTiles3 = playableTiles
-                    if (!newPlayableTiles3.remove(TileType.FLOWER)){
-                        newPlayableTiles3.remove(TileType.ANY)
-                    }
-                    val newHasTile3 = hasTiles
-                    newHasTile3.remove(TileType.FLOWER)
-
-                    returnList += allPossiblePlayedTiles(
-                        newTreeWood3,
-                        newPlayedTiles3,
-                        newPlayableTiles3,
-                        newHasTile3,
-                        newReturnList
-                    )
+                (playableTiles.contains(TileType.FLOWER) || playableTiles.contains(TileType.ANY)) &&
+                hasTiles.contains(TileType.FLOWER)
+            ) {
+                val newTreeWood3 = tree
+                newTreeWood3[emptyPosition] = Tile(emptyPosition.first, emptyPosition.second, TileType.FLOWER)
+                val newPlayedTiles3 = playedTiles
+                newPlayedTiles3.add(Pair(TileType.FLOWER, emptyPosition))
+                val newPlayableTiles3 = playableTiles
+                if (!newPlayableTiles3.remove(TileType.FLOWER)) {
+                    newPlayableTiles3.remove(TileType.ANY)
                 }
+                val newHasTile3 = hasTiles
+                newHasTile3.remove(TileType.FLOWER)
+
+                returnList += allPossiblePlayedTiles(
+                    newTreeWood3,
+                    newPlayedTiles3,
+                    newPlayableTiles3,
+                    newHasTile3,
+                    newReturnList
+                )
+            }
 
             if (
                 neighbors[1] >= 2 && neighbors[4] == 0 &&
-                        (playableTiles.contains(TileType.FRUIT) || playableTiles.contains(TileType.ANY))&&
-                        hasTiles.contains(TileType.FRUIT))
-                {
-                    val newTreeWood4 = tree
-                    newTreeWood4[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.FRUIT)
-                    val newPlayedTiles4 = playedTiles
-                    newPlayedTiles4.add(Pair(TileType.FRUIT,emptyPosition))
-                    val newPlayableTiles4 = playableTiles
-                    newPlayableTiles4.remove(TileType.FRUIT)
-                    val newHasTile4 = hasTiles
-                    newHasTile4.remove(TileType.FRUIT)
+                (playableTiles.contains(TileType.FRUIT) || playableTiles.contains(TileType.ANY)) &&
+                hasTiles.contains(TileType.FRUIT)
+            ) {
+                val newTreeWood4 = tree
+                newTreeWood4[emptyPosition] = Tile(emptyPosition.first, emptyPosition.second, TileType.FRUIT)
+                val newPlayedTiles4 = playedTiles
+                newPlayedTiles4.add(Pair(TileType.FRUIT, emptyPosition))
+                val newPlayableTiles4 = playableTiles
+                newPlayableTiles4.remove(TileType.FRUIT)
+                val newHasTile4 = hasTiles
+                newHasTile4.remove(TileType.FRUIT)
 
-                    returnList += allPossiblePlayedTiles(
-                        newTreeWood4,
-                        newPlayedTiles4,
-                        newPlayableTiles4,
-                        newHasTile4,
-                        newReturnList
-                    )
-                }
+                returnList += allPossiblePlayedTiles(
+                    newTreeWood4,
+                    newPlayedTiles4,
+                    newPlayableTiles4,
+                    newHasTile4,
+                    newReturnList
+                )
             }
+        }
 
         return returnList
 
@@ -200,23 +263,23 @@ class BotService(val rootService: RootService) {
     /**
      * function that generates a list of all possible Moves
      */
-    private fun getAllPossibleMoves(state : BonsaiGameState) : MutableList<Move>{
+    private fun getAllPossibleMoves(state: BonsaiGameState): MutableList<Move> {
         val returnList = mutableListOf<Move>()
         val hasTiles = mutableListOf<TileType>()
 
         // gets the tiles that a player has
-        for (tiles in state.currentPlayer.personalSupply){
+        for (tiles in state.currentPlayer.personalSupply) {
             hasTiles.add(tiles.tileType)
         }
 
         // generates all cultivate moves
         for (listOfPlacedTiles in allPossiblePlayedTiles(
             tree = state.currentPlayer.bonsaiTree,
-            alreadyPlayedTiles =  mutableListOf(),
-            playableTiles =  state.currentPlayer.playableTiles,
-            hasTiles =  hasTiles,
-            returnList =  mutableListOf()
-        )){
+            alreadyPlayedTiles = mutableListOf(),
+            playableTiles = state.currentPlayer.playableTiles,
+            hasTiles = hasTiles,
+            returnList = mutableListOf()
+        )) {
             returnList += Move(
                 currentState = state,
                 removedTiles = mutableListOf(),
@@ -230,14 +293,57 @@ class BotService(val rootService: RootService) {
         }
 
         // generates all meditate moves
+        // generates the
+
+
+        for (position in 0 until state.faceUpCards.size) {
+            val newMove = Move(
+                currentState = state,
+                removedTiles = mutableListOf(),
+                actionType = MEDITATE,
+                takenCard = position,
+                chosenWoodOrLeafTile = null,
+                allTilesReceived = mutableListOf(),
+                playedTiles = mutableListOf(),
+                chosenRemoveTiles = mutableListOf()
+            )
 
 
 
+            when (state.faceUpCards[position].cardType) {
+                CardType.HELPERCARD -> TODO()
+                CardType.MASTERCARD -> {
+                    val card = state.faceUpCards[position] as MasterCard
+                    if (card.tileTypes.contains(TileType.ANY)) {
+                        val newMove3 = newMove
+                        val newMove4 = newMove
+                        val newMove5 = newMove
+                        val newMove6 = newMove
 
+                        newMove3.allTilesReceived.add(TileType.WOOD)
+                        newMove4.allTilesReceived.add(TileType.LEAF)
+                        newMove5.allTilesReceived.add(TileType.FLOWER)
+                        newMove6.allTilesReceived.add(TileType.FRUIT)
+
+                    } else {
+                        for (tile in card.tileTypes) {
+                            newMove.allTilesReceived.add(tile)
+                        }
+                    }
+                    if (position == 2) {
+
+                    }
+                }
+
+                else -> TODO()
+            }
+
+
+
+            return returnList
+        }
 
         return returnList
     }
-
-
-
 }
+
