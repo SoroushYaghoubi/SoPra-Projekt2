@@ -244,7 +244,7 @@ class HostScene(
     private val playerTurns: MutableList<Label> = mutableListOf()
     private val playerInputs: MutableList<TextField> = mutableListOf()
     private val playerColours: MutableList<Button> = mutableListOf()
-    private val playerRemoves: MutableList<Button> = mutableListOf()
+//    private val playerRemoves: MutableList<Button> = mutableListOf()
 //    private val playerEasyBots: MutableList<CheckBoxButton> = mutableListOf()
 //    private val playerHardBots: MutableList<CheckBoxButton> = mutableListOf()
 
