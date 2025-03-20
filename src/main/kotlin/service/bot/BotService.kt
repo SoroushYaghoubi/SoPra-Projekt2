@@ -94,16 +94,19 @@ class BotService(val rootService: RootService) {
                     }
                 }
             }
-
-            when {
-                neighbors[0] >= 1 && playableTiles.contains(TileType.WOOD) && hasTiles.contains(TileType.WOOD)->
+            if
+                    (neighbors[0] >= 1 &&
+                        (playableTiles.contains(TileType.WOOD) || playableTiles.contains(TileType.ANY)) &&
+                        hasTiles.contains(TileType.WOOD))
                 {
                     val newTreeWood1 = tree
                     newTreeWood1[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.WOOD)
                     val newPlayedTiles1 = playedTiles
                     newPlayedTiles1.add(Pair(TileType.WOOD,emptyPosition))
                     val newPlayableTiles1 = playableTiles
-                    newPlayableTiles1.remove(TileType.WOOD)
+                    if (!newPlayableTiles1.remove(TileType.WOOD)){
+                        newPlayableTiles1.remove(TileType.ANY)
+                    }
                     val newHasTile1 = hasTiles
                     newHasTile1.remove(TileType.WOOD)
 
@@ -116,14 +119,19 @@ class BotService(val rootService: RootService) {
                     )
                 }
 
-                neighbors[0] >= 1 && playableTiles.contains(TileType.LEAF) && hasTiles.contains(TileType.LEAF)->
+            if (
+                neighbors[0] >= 1 &&
+                        (playableTiles.contains(TileType.LEAF) || playableTiles.contains(TileType.ANY)) &&
+                        hasTiles.contains(TileType.LEAF))
                 {
                     val newTreeWood2 = tree
                     newTreeWood2[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.LEAF)
                     val newPlayedTiles2 = playedTiles
                     newPlayedTiles2.add(Pair(TileType.LEAF,emptyPosition))
                     val newPlayableTiles2 = playableTiles
-                    newPlayableTiles2.remove(TileType.LEAF)
+                    if (!newPlayableTiles2.remove(TileType.LEAF)){
+                        newPlayableTiles2.remove(TileType.ANY)
+                    }
                     val newHasTile2 = hasTiles
                     newHasTile2.remove(TileType.LEAF)
 
@@ -136,16 +144,21 @@ class BotService(val rootService: RootService) {
                     )
                 }
 
-                neighbors[1] >= 1 && playableTiles.contains(TileType.FLOWER) && hasTiles.contains(TileType.FLOWER)->
+            if (
+                neighbors[1] >= 1 &&
+                        (playableTiles.contains(TileType.FLOWER) || playableTiles.contains(TileType.ANY)) &&
+                        hasTiles.contains(TileType.FLOWER))
                 {
                     val newTreeWood3 = tree
-                    newTreeWood3[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.LEAF)
+                    newTreeWood3[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.FLOWER)
                     val newPlayedTiles3 = playedTiles
-                    newPlayedTiles3.add(Pair(TileType.LEAF,emptyPosition))
+                    newPlayedTiles3.add(Pair(TileType.FLOWER,emptyPosition))
                     val newPlayableTiles3 = playableTiles
-                    newPlayableTiles3.remove(TileType.LEAF)
+                    if (!newPlayableTiles3.remove(TileType.FLOWER)){
+                        newPlayableTiles3.remove(TileType.ANY)
+                    }
                     val newHasTile3 = hasTiles
-                    newHasTile3.remove(TileType.LEAF)
+                    newHasTile3.remove(TileType.FLOWER)
 
                     returnList += allPossiblePlayedTiles(
                         newTreeWood3,
@@ -156,17 +169,19 @@ class BotService(val rootService: RootService) {
                     )
                 }
 
+            if (
                 neighbors[1] >= 2 && neighbors[4] == 0 &&
-                        playableTiles.contains(TileType.FRUIT) && hasTiles.contains(TileType.FRUIT)->
+                        (playableTiles.contains(TileType.FRUIT) || playableTiles.contains(TileType.ANY))&&
+                        hasTiles.contains(TileType.FRUIT))
                 {
                     val newTreeWood4 = tree
-                    newTreeWood4[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.LEAF)
+                    newTreeWood4[emptyPosition] = Tile(emptyPosition.first,emptyPosition.second,TileType.FRUIT)
                     val newPlayedTiles4 = playedTiles
-                    newPlayedTiles4.add(Pair(TileType.LEAF,emptyPosition))
+                    newPlayedTiles4.add(Pair(TileType.FRUIT,emptyPosition))
                     val newPlayableTiles4 = playableTiles
-                    newPlayableTiles4.remove(TileType.LEAF)
+                    newPlayableTiles4.remove(TileType.FRUIT)
                     val newHasTile4 = hasTiles
-                    newHasTile4.remove(TileType.LEAF)
+                    newHasTile4.remove(TileType.FRUIT)
 
                     returnList += allPossiblePlayedTiles(
                         newTreeWood4,
@@ -177,7 +192,6 @@ class BotService(val rootService: RootService) {
                     )
                 }
             }
-        }
 
         return returnList
 
@@ -185,6 +199,14 @@ class BotService(val rootService: RootService) {
 
     private fun getAllPossibleMoves(state : BonsaiGameState) : MutableList<Move>{
         val returnList = mutableListOf<Move>()
+
+            
+        
+
+
         return returnList
     }
+
+
+
 }
