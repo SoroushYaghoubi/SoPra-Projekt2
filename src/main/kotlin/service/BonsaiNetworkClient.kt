@@ -106,21 +106,6 @@ class BonsaiNetworkClient(
         }
     }
 
-/*
-    override fun onGameActionResponse(response: GameActionResponse) {
-        BoardGameApplication.run {
-            check(networkService.connectionState == ConnectionState.PLAYING_MY_TURN ||
-                    networkService.connectionState == ConnectionState.WAITING_FOR_OPPONENT)
-            { "not currently playing in a network game."}
-
-            when (response.status) {
-                GameActionResponseStatus.SUCCESS -> {} // do nothing in this case
-                else -> disconnectAndError(response.status)
-            }
-        }
-    }
-    */
-
     /**
      * handle a [CultivateMessage] sent by the server
      */

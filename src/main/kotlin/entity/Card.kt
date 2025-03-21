@@ -11,7 +11,6 @@ import kotlinx.serialization.Transient
  *
  * @throws IllegalArgumentException If [id] is negative or not an int
  */
-
 @Serializable
 sealed class Card(
     @Transient open val id: Int = -1,

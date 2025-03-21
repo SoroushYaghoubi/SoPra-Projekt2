@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import util.SECRET_KEY
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.assertFails
 
 /**
  * Test class for [BonsaiNetworkClient]
@@ -18,6 +18,7 @@ class NetWorkClientTest {
     @Test
     fun onStartGameMessageReceived() {
         val rootService1 = RootService()
+        assertEquals(rootService1.networkService.client, null)
         val rootService2 = RootService()
         val sessionId = (10001.. 50000).random().toString()
         rootService1.networkService.createGame (
@@ -162,6 +163,14 @@ class NetWorkClientTest {
         assertEquals(game2.currentPlayer, game2.players[1])
         assertTrue(game2.players[0].claimedGoals.isNotEmpty())
         assertTrue(game2.players[0].renouncedGoals.isNotEmpty())
+
+    }
+
+    /**
+     * Test if it fails
+     */
+    @Test
+    fun testWhenFails() {
 
     }
 }

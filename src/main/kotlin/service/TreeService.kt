@@ -66,17 +66,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                 }
         }
 
-        /*
-        goalTiles.forEach {
-            if (//currentPlayer.isLocal &&
-                currentPlayer.playerType == PlayerType.HUMAN
-            ) {
-                // call claimOrRenounceGoal() in the gui layer
-
-            }
-        }
-        */
-
         if (!reached) {
             // do other stuff in gui
             onAllRefreshables { refreshAfterPlayTile(null, 0, tilePosition) }
@@ -127,7 +116,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
                             .filter { it.second?.tileType == TileType.FRUIT }
                             .forEach { currentPlayer.bonsaiTree.remove(it.first) }
                         currentPlayer.bonsaiTree.remove(tilePosition)
-                        // TODO : check it another time !!!!!!
                     } else {
                         currentPlayer.bonsaiTree.remove(tilePosition)
                     }
@@ -143,16 +131,12 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
                 // update message
                 val net = rootService.networkService
-                // TODO(if it's allowed then...)
                 if (net.connectionState != ConnectionState.DISCONNECTED &&
                     currentPlayer.isLocal
                 ) {
                     net.toBeSentCultivateMessage.removedTilesAxialCoordinates.add(tilePosition)
                     net.toBeSentMeditateMessage.removedTilesAxialCoordinates.add(tilePosition)
                 }
-
-        //require(!currentPlayer.hasPlayed) {"player has already chosen other moves"}
-
     }
 
     /**
@@ -312,17 +296,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
         val tree = getCurrentPlayer().bonsaiTree
         tree.filter { it.value.tileType == TileType.WOOD }
             .forEach { (position, tile) ->
-                val q = position.first
-                val r = position.second
-
-//                val neighbourTiles = listOf(
-//                    Pair(Pair(q + 1, r), tree.getOrDefault(Pair(q + 1, r), null)),
-//                    Pair(Pair(q, r + 1), tree.getOrDefault(Pair(q, r + 1), null)),
-//                    Pair(Pair(q - 1, r + 1), tree.getOrDefault(Pair(q - 1, r + 1), null)),
-//                    Pair(Pair(q - 1, r), tree.getOrDefault(Pair(q - 1, r), null)),
-//                    Pair(Pair(q, r - 1), tree.getOrDefault(Pair(q, r - 1), null)),
-//                    Pair(Pair(q + 1, r - 1), tree.getOrDefault(Pair(q + 1, r - 1), null))
-//                ).filter { it.first !in POT }
                 val neighbourTiles = getNeighbourTiles(position).filter { it.first !in POT }
 
                 val nullPositions = neighbourTiles.filter { it.second == null }.map { it.first }
@@ -378,31 +351,6 @@ class TreeService(private val rootService: RootService) : AbstractRefreshingServ
 
         require(neighbourTiles.isNotEmpty()) { "There are no adjacent cards" }
 
-//        if (tile.tileType == TileType.WOOD) {
-//            return neighbourTiles.contains(TileType.WOOD)
-//        }
-//        if (tile.tileType == TileType.LEAF) {
-//            return neighbourTiles.contains(TileType.WOOD)
-//        }
-//        if (tile.tileType == TileType.FLOWER) {
-//            return neighbourTiles.contains(TileType.LEAF)
-//        }
-//        if (tile.tileType == TileType.FRUIT) {
-//            if (neighbourTiles.contains(TileType.FRUIT)){
-//                return false
-//            }
-//            if (neighbourTiles.first() == TileType.LEAF && neighbourTiles.last() == TileType.LEAF) {
-//                return true
-//            }
-//            for (i in 0..<neighbourTiles.size - 1) {
-//                val currentTile = neighbourTiles[i]
-//                val nextTile = neighbourTiles[i + 1]
-//                if (currentTile == TileType.LEAF && nextTile == TileType.LEAF) {
-//                    return true
-//                }
-//            }
-//        }
-//        return false
         return when (tile.tileType) {
             TileType.WOOD -> neighbourTiles.contains(TileType.WOOD)
             TileType.LEAF -> neighbourTiles.contains(TileType.WOOD)

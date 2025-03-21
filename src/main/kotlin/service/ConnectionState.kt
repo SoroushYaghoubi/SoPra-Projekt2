@@ -12,5 +12,4 @@ enum class ConnectionState {
     WAITING_FOR_INIT,
     PLAYING_MY_TURN,
     WAITING_FOR_OPPONENT
-
 }
