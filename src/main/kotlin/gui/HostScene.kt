@@ -236,13 +236,9 @@ class HostScene(
     }
 
     // Group all player inputs in lists to easily manage them
-
     private val playerTurns: MutableList<Label> = mutableListOf()
     private val playerInputs: MutableList<TextField> = mutableListOf()
     private val playerColours: MutableList<Button> = mutableListOf()
-//    private val playerRemoves: MutableList<Button> = mutableListOf()
-//    private val playerEasyBots: MutableList<CheckBoxButton> = mutableListOf()
-//    private val playerHardBots: MutableList<CheckBoxButton> = mutableListOf()
 
 
     init {
@@ -498,11 +494,8 @@ class HostScene(
 
         val shuffledInputs = indices.map { playerInputs[it] }.toMutableList()
         val shuffledColors = indices.map { playerColors[it] }.toMutableList()
-//        val shuffledEasyBots = indices.map { playerEasyBots[it] }.toMutableList()
-//        val shuffledHardBots = indices.map { playerHardBots[it] }.toMutableList()
         val shuffledTurns = indices.map { playerTurns[it] }.toMutableList()
         val shuffledColours = indices.map { playerColours[it] }.toMutableList()
-//        val shuffledRemoves = indices.map { playerRemoves[it] }.toMutableList()
 
         playerInputs.clear()
         playerInputs.addAll(shuffledInputs)
@@ -510,49 +503,14 @@ class HostScene(
         playerColors.clear()
         playerColors.addAll(shuffledColors)
 
-//        playerEasyBots.clear()
-//        playerEasyBots.addAll(shuffledEasyBots)
-
-//        playerHardBots.clear()
-//        playerHardBots.addAll(shuffledHardBots)
-
         playerTurns.clear()
         playerTurns.addAll(shuffledTurns)
 
         playerColours.clear()
         playerColours.addAll(shuffledColours)
 
-//        playerRemoves.clear()
-//        playerRemoves.addAll(shuffledRemoves)
-
-//        rebindBotHandlers()
-
         updatePlayerPositions()
     }
-
-    /*
-    private fun rebindBotHandlers() {
-        for (i in playerEasyBots.indices) {
-            playerEasyBots[i].onMouseClicked = {
-                if (!playerEasyBots[i].isChecked) {
-                    if (playerHardBots[i].isChecked) {
-                        playerHardBots[i].change()
-                    }
-                }
-                playerEasyBots[i].change()
-            }
-
-            playerHardBots[i].onMouseClicked = {
-                if (!playerHardBots[i].isChecked) {
-                    if (playerEasyBots[i].isChecked) {
-                        playerEasyBots[i].change()
-                    }
-                }
-                playerHardBots[i].change()
-            }
-        }
-    }
-    */
 
     /**
      * current players starting position and next players starting position is switched
@@ -567,11 +525,8 @@ class HostScene(
         // Swap the players in all lists
         swapInList(playerInputs, index, nextIndex)
         swapInList(playerColors, index, nextIndex)
-//        swapInList(playerEasyBots, index, nextIndex)
-//        swapInList(playerHardBots, index, nextIndex)
         swapInList(playerTurns, index, nextIndex)
         swapInList(playerColours, index, nextIndex)
-//        swapInList(playerRemoves, index, nextIndex)
 
         // update the positions and click handlers
         updatePlayerPositions()
@@ -590,10 +545,6 @@ class HostScene(
             playerTurns[i].posY = 270.0 + 140 * i
             playerInputs[i].posY = 270.0 + 140 * i
             playerColours[i].posY = 280.0 + 140 * i
-//            playerRemoves[i].posY = 270.0 + 140 * i
-//            playerEasyBots[i].posY = 270.0 + 140 * i
-//            playerHardBots[i].posY = 270.0 + 140 * i
-
             playerTurns[i].text = "${i + 1}"
         }
     }

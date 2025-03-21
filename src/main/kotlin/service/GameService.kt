@@ -1,11 +1,7 @@
 package service
 
-//import edu.udo.cs.sopra.ntf.*
-
-//import edu.udo.cs.sopra.ntf.StartGameMessage
 import entity.*
 import util.ZenCardLoader
-//import util.getEmptyTiles
 
 /**
  * Service layer class that provides the logic for actions taken by the System during the game.
@@ -72,19 +68,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
 
             if (index == 0) {
                 tiles.add(TileType.WOOD)
-
-                //TODO() for guiteing
-                /*tiles.add(TileType.LEAF)
-                tiles.add(TileType.LEAF)
-                tiles.add(TileType.LEAF)
-                tiles.add(TileType.FRUIT)
-                repeat(8) {tiles.add(TileType.WOOD)}
-
-
-                 */
-
-
-
             } else {
                 tiles.add(TileType.WOOD)
                 tiles.add(TileType.LEAF)
@@ -282,7 +265,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
         checkNotNull(gameState) { "No active game state." }
 
         if (gameState.zenDeck.isEmpty()) {
-            //throw IllegalStateException("Zen deck is empty.")
             return
         }
 
@@ -296,7 +278,7 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
     }
 
     /**
-     * TODO needs to be checked by network, if tiers are correct
+     * it initialises GoalTiles for the game
      */
     fun createGoalTiles(goalTilesTypesEntries: MutableList<GoalTileType>, playerSize: Int)
             : MutableList<GoalTile> {
@@ -348,7 +330,6 @@ class GameService(private val rootService: RootService) : AbstractRefreshingServ
                 }
             }
         }
-
         return goalTiles.flatten().toMutableList()
     }
 }

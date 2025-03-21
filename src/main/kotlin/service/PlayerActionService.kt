@@ -2,8 +2,6 @@ package service
 
 
 import entity.*
-//import java.util.*
-//import kotlin.concurrent.schedule
 import kotlin.math.max
 import util.SIDE_VECTORS
 
@@ -104,14 +102,12 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
             is MasterCard -> {
                 gameState.currentState = States.USING_MASTER
                 playMasterCard(drawnCard, cardPosition)
-                //gameState.currentPlayer.hasPlayed = true
                 return
             }
 
             is HelperCard -> {
                 gameState.currentState = States.USING_HELPER
                 playHelperCard(drawnCard, cardPosition)
-                //gameState.currentPlayer.hasPlayed = true
                 return
             }
             is ParchmentCard -> {}
@@ -124,8 +120,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param drawnCard : the drawn MasterCard
      */
     private fun playMasterCard(drawnCard: MasterCard, cardPosition: Int) {
-        //val msg = rootService.networkService.toBeSentMeditateMessage
-
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
         val gameState = game.currentBonsaiGameState
@@ -185,7 +179,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @param drawnCard : the drawn MasterCard
      */
     private fun playHelperCard(drawnCard: HelperCard, cardPosition: Int) {
-        //val msg = rootService.networkService.toBeSentMeditateMessage
         val game = rootService.currentGame
         checkNotNull(game) { "No game was started." }
 
@@ -215,7 +208,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
         }
 
         actPlayer.hasPlayed = true
-        //onAllRefreshables { refreshAfterMeditate(null) }
         onAllRefreshables { refreshAfterApplyCardEffects(null) }
     }
 
@@ -466,8 +458,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      * @return whether the goal tile can be claimed or not
      */
     private fun hasReachedGreenGoal(bonsaiTree: MutableMap<Pair<Int, Int>, Tile>, tier: Int): Boolean {
-        // Directions for hexagonal grid adjacency
-
         // Set to keep track of visited tiles so that there are no redundant calculations
         val visited = mutableSetOf<Pair<Int, Int>>()
 
@@ -606,14 +596,6 @@ class PlayerActionService(private val rootService: RootService) : AbstractRefres
      *
      * @throws IllegalStateException if personal supply is not over capacity limit.
      */
-//    fun discardSupplyTile(tilesToDiscard: MutableList<Tile>) {
-//        val player = getCurrentPlayer()
-//        check(player.personalSupply.size > player.tileCapacity)
-//        { "The personal supply tiles hasn't reached the capacity." }
-//        player.personalSupply.removeAll(tilesToDiscard)
-//        rootService.currentGame?.currentBonsaiGameState?.currentState = States.END_TURN
-//    }
-
     fun discardSupplyTile(tileToDiscard: Tile) {
         val msg = rootService.networkService.toBeSentMeditateMessage
         val player = getCurrentPlayer()

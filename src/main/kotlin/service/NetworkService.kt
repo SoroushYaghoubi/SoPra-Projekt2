@@ -223,7 +223,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
 
         orderedPair.forEach {
             val isLocal = (myName == it.first)
-            // TODO(we need to decide if we use bot or not)
             players.add(Player(it.first, PlayerType.HUMAN, isLocal, it.second.toColor()))
         }
 
@@ -247,7 +246,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         } else {
             updateConnectionState(ConnectionState.WAITING_FOR_OPPONENT)
         }
-
         onAllRefreshables { refreshAfterGameStart() }
     }
 
@@ -255,7 +253,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
      * Receives and processes the Meditate action message from another player.
      *
      * @param message The Meditate message received from the opponent.
-     * @param sender The name of the sender (opponent).
      */
     fun receiveMeditateMessage(message: MeditateMessage) {
         // --------------- prologue: state check ---------------
@@ -301,18 +298,6 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
                     .claimOrRenounceGoal(false, it.first.toGoalTileType(), it.second) }
         }
 
-        /*
-        while (removedTiles.isNotEmpty()) {
-            val removedTile = removedTiles.removeFirst()
-            var removed = false
-            while(!removed) {
-                val i = personalSupplies.size
-                specialDiscard(i, personalSupplies, removedTile)
-                removed = true
-            }
-        }
-        */
-
         // --------------- epilogue: state update ---------------
         val currentIndex = game.players.indexOf(game.currentPlayer)
         val nextIndex = (currentIndex + 1) % game.players.size
@@ -322,23 +307,10 @@ class NetworkService(private val rootService: RootService) : AbstractRefreshingS
         rootService.playerActionService.endTurn()
     }
 
-    // This is not used so...
-//    private fun specialDiscard(i: Int, personalSupplies: MutableList<Tile>, removedTile: TileType){
-//        var j = i
-//        while(j >= 0) {
-//            val supply = personalSupplies.removeLast()
-//            if (supply.tileType == removedTile) {
-//                rootService.playerActionService.discardSupplyTile(supply)
-//                j = -1
-//            }
-//        }
-//    }
-
     /**
      * Receives and processes the Cultivate action message from another player.
      *
      * @param message The Cultivate message received from the opponent.
-     * @param sender The name of the sender (opponent).
      */
     fun receiveCultivateMessage(message: CultivateMessage) {
         check(connectionState == ConnectionState.WAITING_FOR_OPPONENT)
